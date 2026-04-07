@@ -25,7 +25,11 @@ new class extends Component
                     ['label' => 'Tools', 'route' => 'tools', 'icon' => 'tools', 'subItems' => [
                         ['label' => 'Split Cash', 'route' => 'tools.split-cash'],
                     ]],
-                    ['label' => 'Generation Image', 'route' => 'generation.index', 'icon' => 'image'],
+                    ['label' => 'Image AI', 'route' => 'image-ai', 'icon' => 'image', 'subItems' => [
+                        ['label' => 'Generation Image', 'route' => 'generation.index'],
+                        ['label' => 'Image2Prompt', 'route' => 'image-ai.image2prompt'],
+                        ['label' => 'Improve Prompt', 'route' => 'image-ai.improve-prompt'],
+                    ]],
                     ['label' => 'Internet', 'route' => 'internet', 'icon' => 'internet'],
                 ],
             ],
