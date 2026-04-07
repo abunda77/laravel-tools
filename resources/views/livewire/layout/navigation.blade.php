@@ -22,7 +22,9 @@ new class extends Component
                 'label' => 'Modules',
                 'items' => [
                     ['label' => 'Search', 'route' => 'search', 'icon' => 'search'],
-                    ['label' => 'Tools', 'route' => 'tools', 'icon' => 'tools'],
+                    ['label' => 'Tools', 'route' => 'tools', 'icon' => 'tools', 'subItems' => [
+                        ['label' => 'Split Cash', 'route' => 'tools.split-cash'],
+                    ]],
                     ['label' => 'Internet', 'route' => 'internet', 'icon' => 'internet'],
                 ],
             ],
@@ -115,17 +117,55 @@ new class extends Component
 
                     <div class="app-sidebar__links">
                         @foreach ($section['items'] as $item)
-                            <a
-                                href="{{ route($item['route']) }}"
-                                wire:navigate
-                                @click="sidebarOpen = false"
-                                class="app-sidebar__link {{ request()->routeIs($item['route']) ? 'is-active' : '' }}"
-                            >
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="{{ $iconPaths[$item['icon']] ?? $iconPaths['dashboard'] }}" />
-                                </svg>
-                                <span>{{ $item['label'] }}</span>
-                            </a>
+                            @if(isset($item['subItems']))
+                                <div x-data="{ expanded: {{ request()->routeIs($item['route']) || request()->routeIs($item['route'] . '.*') || collect($item['subItems'])->contains(fn($s) => request()->routeIs($s['route'])) ? 'true' : 'false' }} }" class="space-y-1">
+                                    <button 
+                                        type="button" 
+                                        @click="expanded = !expanded" 
+                                        class="app-sidebar__link w-full justify-between {{ request()->routeIs($item['route']) || request()->routeIs($item['route'] . '.*') || collect($item['subItems'])->contains(fn($s) => request()->routeIs($s['route'])) ? 'is-active' : '' }}"
+                                    >
+                                        <div class="flex items-center gap-3">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="{{ $iconPaths[$item['icon']] ?? $iconPaths['dashboard'] }}" />
+                                            </svg>
+                                            <span>{{ $item['label'] }}</span>
+                                        </div>
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-4 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                        </svg>
+                                    </button>
+                                    
+                                    <div 
+                                        x-show="expanded" 
+                                        x-collapse 
+                                        class="pl-11 pr-2 space-y-1"
+                                        style="display: none;"
+                                    >
+                                        @foreach($item['subItems'] as $subItem)
+                                            <a
+                                                href="{{ Route::has($subItem['route']) ? route($subItem['route']) : '#' }}"
+                                                wire:navigate
+                                                @click="sidebarOpen = false"
+                                                class="flex items-center gap-3 rounded-2xl px-3 py-2 text-sm transition duration-200 {{ request()->routeIs($subItem['route']) ? 'text-[rgb(var(--app-ink))] font-bold bg-white/50' : 'text-[rgb(var(--app-muted))] hover:text-[rgb(var(--app-ink))] hover:bg-white/50' }}"
+                                            >
+                                                <span>{{ $subItem['label'] }}</span>
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @else
+                                <a
+                                    href="{{ route($item['route']) }}"
+                                    wire:navigate
+                                    @click="sidebarOpen = false"
+                                    class="app-sidebar__link {{ request()->routeIs($item['route']) ? 'is-active' : '' }}"
+                                >
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="{{ $iconPaths[$item['icon']] ?? $iconPaths['dashboard'] }}" />
+                                    </svg>
+                                    <span>{{ $item['label'] }}</span>
+                                </a>
+                            @endif
                         @endforeach
                     </div>
                 </div>

@@ -13,6 +13,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('profile', 'profile')->name('profile');
     Route::view('search', 'search')->name('search');
     Route::view('tools', 'tools')->name('tools');
+    Route::view('tools/split-cash', 'tools.split-cash')->name('tools.split-cash');
     Route::view('internet', 'internet')->name('internet');
 });
 
