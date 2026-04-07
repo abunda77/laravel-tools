@@ -49,7 +49,10 @@ class DownloaderWorkbench extends Component
             'apiKeyOverride' => ['nullable', 'string', 'max:2048'],
         ]);
 
-        if (! filled($this->apiKeyOverride) && ! filled(ApiKey::valueByName(DownloaderService::API_KEY_NAME))) {
+        $savedApiKey = filled($this->apiKeyOverride) ? null : ApiKey::valueByName(DownloaderService::API_KEY_NAME);
+        $apiKey = $this->apiKeyOverride ?: $savedApiKey;
+
+        if (! filled($apiKey)) {
             $this->addError('apiKeyOverride', 'API key belum tersedia. Simpan dulu di Settings atau isi override API key.');
 
             return;
@@ -59,11 +62,11 @@ class DownloaderWorkbench extends Component
             $this->result = $downloaderService->execute(
                 $this->selectedProvider,
                 $this->link,
-                $this->apiKeyOverride ?: null,
+                $apiKey,
             );
 
             $this->errorMessage = null;
-            $this->hasSavedApiKey = filled(ApiKey::valueByName(DownloaderService::API_KEY_NAME));
+            $this->hasSavedApiKey = filled($savedApiKey) || ($this->hasSavedApiKey && filled($this->apiKeyOverride));
         } catch (\Throwable $throwable) {
             $this->result = null;
             $this->errorMessage = $throwable->getMessage();

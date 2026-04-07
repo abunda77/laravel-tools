@@ -3,6 +3,7 @@
 namespace App\Livewire\Settings;
 
 use App\Models\ApiKey;
+use Illuminate\View\View;
 use Livewire\Component;
 
 class ApiKeyManager extends Component
@@ -21,22 +22,14 @@ class ApiKeyManager extends Component
 
     // ── State ────────────────────────────────────────────────────────────────
 
-    /** @var int|null  ID of the record being edited; null = adding new */
+    /** @var int|null ID of the record being edited; null = adding new */
     public ?int $editingId = null;
 
-    /** @var bool  Show/hide the add-or-edit form panel */
+    /** @var bool Show/hide the add-or-edit form panel */
     public bool $showForm = false;
 
-    /** @var bool  Whether the "value" field has a stored key (mask display) */
+    /** @var bool Whether the "value" field has a stored key (mask display) */
     public bool $hasValue = false;
-
-    /**
-     * @return array<int, ApiKey>
-     */
-    public function getApiKeysProperty(): \Illuminate\Database\Eloquent\Collection
-    {
-        return ApiKey::query()->orderBy('label')->get();
-    }
 
     // ── Lifecycle ─────────────────────────────────────────────────────────────
 
@@ -58,14 +51,14 @@ class ApiKeyManager extends Component
     {
         $key = ApiKey::findOrFail($id);
 
-        $this->editingId  = $key->id;
-        $this->name       = $key->name;
-        $this->label      = $key->label;
+        $this->editingId = $key->id;
+        $this->name = $key->name;
+        $this->label = $key->label;
         $this->description = (string) $key->description;
-        $this->isActive   = $key->is_active;
-        $this->value      = ''; // never pre-fill the secret
-        $this->hasValue   = filled($key->value);
-        $this->showForm   = true;
+        $this->isActive = $key->is_active;
+        $this->value = ''; // never pre-fill the secret
+        $this->hasValue = filled($key->value);
+        $this->showForm = true;
     }
 
     public function closeForm(): void
@@ -79,10 +72,10 @@ class ApiKeyManager extends Component
         $isEditing = $this->editingId !== null;
 
         $rules = [
-            'label'       => ['required', 'string', 'max:100'],
+            'label' => ['required', 'string', 'max:100'],
             'description' => ['nullable', 'string', 'max:500'],
-            'value'       => ['nullable', 'string', 'max:2048'],
-            'isActive'    => ['boolean'],
+            'value' => ['nullable', 'string', 'max:2048'],
+            'isActive' => ['boolean'],
         ];
 
         // name is only editable on create
@@ -98,9 +91,9 @@ class ApiKeyManager extends Component
             /** @var ApiKey $key */
             $key = ApiKey::findOrFail($this->editingId);
 
-            $key->label       = $validated['label'];
+            $key->label = $validated['label'];
             $key->description = $validated['description'] ?? null;
-            $key->is_active   = $validated['isActive'];
+            $key->is_active = $validated['isActive'];
 
             // Only update value if user typed something new
             if (filled($validated['value'])) {
@@ -111,11 +104,11 @@ class ApiKeyManager extends Component
             $key->save();
         } else {
             $key = ApiKey::create([
-                'name'        => $validated['name'],
-                'label'       => $validated['label'],
+                'name' => $validated['name'],
+                'label' => $validated['label'],
                 'description' => $validated['description'] ?? null,
-                'value'       => $validated['value'] ?: null,
-                'is_active'   => $validated['isActive'],
+                'value' => $validated['value'] ?: null,
+                'is_active' => $validated['isActive'],
             ]);
 
             $this->hasValue = filled($key->value);
@@ -160,19 +153,21 @@ class ApiKeyManager extends Component
 
     private function resetForm(): void
     {
-        $this->name        = '';
-        $this->label       = '';
+        $this->name = '';
+        $this->label = '';
         $this->description = '';
-        $this->value       = '';
-        $this->isActive    = true;
-        $this->hasValue    = false;
-        $this->editingId   = null;
+        $this->value = '';
+        $this->isActive = true;
+        $this->hasValue = false;
+        $this->editingId = null;
 
         $this->resetValidation();
     }
 
-    public function render(): \Illuminate\View\View
+    public function render(): View
     {
-        return view('livewire.settings.api-key-manager');
+        return view('livewire.settings.api-key-manager', [
+            'apiKeys' => ApiKey::query()->orderBy('label')->get(),
+        ]);
     }
 }

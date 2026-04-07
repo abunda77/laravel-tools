@@ -3,6 +3,7 @@
 namespace Tests\Feature\ExternalApi;
 
 use App\Livewire\ExternalApi\DownloaderWorkbench;
+use App\Models\ApiKey;
 use App\Models\User;
 use App\Support\Settings\SystemSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -26,14 +27,8 @@ class DownloaderWorkbenchTest extends TestCase
 
     public function test_downloader_can_execute_tiktok_request_using_saved_settings(): void
     {
-        app(SystemSettings::class)->putMany([
-            'provider_base_url' => 'https://api.ferdev.my.id',
-            'provider_api_key' => 'saved-api-key',
-            'request_timeout_seconds' => 30,
-            'request_retry_times' => 1,
-            'request_retry_sleep_ms' => 100,
-            'queue_connection' => 'database',
-        ]);
+        $this->configureDownloaderSettings();
+        $this->createDownloaderApiKey();
 
         Http::fake([
             'https://api.ferdev.my.id/downloader/tiktok*' => Http::response([
@@ -83,14 +78,8 @@ class DownloaderWorkbenchTest extends TestCase
 
     public function test_downloader_can_execute_instagram_request_using_metadata_payload(): void
     {
-        app(SystemSettings::class)->putMany([
-            'provider_base_url' => 'https://api.ferdev.my.id',
-            'provider_api_key' => 'saved-api-key',
-            'request_timeout_seconds' => 30,
-            'request_retry_times' => 1,
-            'request_retry_sleep_ms' => 100,
-            'queue_connection' => 'database',
-        ]);
+        $this->configureDownloaderSettings();
+        $this->createDownloaderApiKey();
 
         Http::fake([
             'https://api.ferdev.my.id/downloader/instagram*' => Http::response([
@@ -125,14 +114,8 @@ class DownloaderWorkbenchTest extends TestCase
 
     public function test_downloader_can_execute_facebook_request_with_hd_and_sd_links(): void
     {
-        app(SystemSettings::class)->putMany([
-            'provider_base_url' => 'https://api.ferdev.my.id',
-            'provider_api_key' => 'saved-api-key',
-            'request_timeout_seconds' => 30,
-            'request_retry_times' => 1,
-            'request_retry_sleep_ms' => 100,
-            'queue_connection' => 'database',
-        ]);
+        $this->configureDownloaderSettings();
+        $this->createDownloaderApiKey();
 
         Http::fake([
             'https://api.ferdev.my.id/downloader/facebook*' => Http::response([
@@ -161,5 +144,25 @@ class DownloaderWorkbenchTest extends TestCase
             ->assertSet('result.downloadOptions.0.url', 'https://video.example.com/video-hd.mp4')
             ->assertSet('result.downloadOptions.1.label', 'Download SD')
             ->assertSet('result.downloadOptions.1.url', 'https://video.example.com/video-sd.mp4');
+    }
+
+    private function configureDownloaderSettings(): void
+    {
+        app(SystemSettings::class)->putMany([
+            'request_timeout_seconds' => 30,
+            'request_retry_times' => 1,
+            'request_retry_sleep_ms' => 100,
+            'queue_connection' => 'database',
+        ]);
+    }
+
+    private function createDownloaderApiKey(): void
+    {
+        ApiKey::query()->create([
+            'name' => 'downloader_provider',
+            'label' => 'Downloader Provider',
+            'value' => 'saved-api-key',
+            'is_active' => true,
+        ]);
     }
 }

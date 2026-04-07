@@ -4,10 +4,13 @@ namespace App\Support\Settings;
 
 use App\Models\AppSetting;
 use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 
 class SystemSettings
 {
+    private const CACHE_PREFIX = 'tools.settings.';
+
     /**
      * @return array<string, mixed>
      */
@@ -25,6 +28,23 @@ class SystemSettings
     public function get(string $key): mixed
     {
         $definition = $this->definition($key);
+
+        if ($this->isSecret($key)) {
+            return $this->resolveValue($key, $definition);
+        }
+
+        return Cache::remember(
+            $this->cacheKey($key),
+            now()->addMinutes(10),
+            fn () => $this->resolveValue($key, $definition),
+        );
+    }
+
+    /**
+     * @param  array<string, mixed>  $definition
+     */
+    private function resolveValue(string $key, array $definition): mixed
+    {
         $setting = AppSetting::query()->where('key', $key)->value('value');
 
         if ($setting === null) {
@@ -60,6 +80,8 @@ class SystemSettings
             ['key' => $key],
             ['value' => $this->prepareForStorage($key, $value)],
         );
+
+        Cache::forget($this->cacheKey($key));
     }
 
     /**
@@ -104,5 +126,10 @@ class SystemSettings
             is_bool($value) => $value ? '1' : '0',
             default => (string) $value,
         };
+    }
+
+    private function cacheKey(string $key): string
+    {
+        return self::CACHE_PREFIX.$key;
     }
 }

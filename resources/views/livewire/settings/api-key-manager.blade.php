@@ -15,17 +15,17 @@
         <div class="settings-hero__stats">
             <article class="mini-stat">
                 <span>Total Keys</span>
-                <strong>{{ $this->apiKeys->count() }}</strong>
+                <strong>{{ $apiKeys->count() }}</strong>
             </article>
 
             <article class="mini-stat">
                 <span>Active</span>
-                <strong>{{ $this->apiKeys->where('is_active', true)->count() }}</strong>
+                <strong>{{ $apiKeys->where('is_active', true)->count() }}</strong>
             </article>
 
             <article class="mini-stat">
                 <span>Has Value</span>
-                <strong>{{ $this->apiKeys->filter(fn ($k) => filled($k->value))->count() }}</strong>
+                <strong>{{ $apiKeys->filter(fn ($k) => filled($k->value))->count() }}</strong>
             </article>
         </div>
     </section>
@@ -172,13 +172,13 @@
                     </button>
                 </div>
 
-                @if ($this->apiKeys->isEmpty())
+                @if ($apiKeys->isEmpty())
                     <div class="empty-state">
                         <p>Belum ada API key. Klik <strong>+ Tambah</strong> untuk mendaftarkan layanan pertama.</p>
                     </div>
                 @else
                     <div class="api-key-list">
-                        @foreach ($this->apiKeys as $apiKey)
+                        @foreach ($apiKeys as $apiKey)
                             <article class="api-key-item {{ $apiKey->is_active ? '' : 'api-key-item--inactive' }}">
                                 <div class="api-key-item__info">
                                     <div class="api-key-item__header">
