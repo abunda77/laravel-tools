@@ -14,6 +14,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('search', 'search')->name('search');
     Route::view('tools', 'tools')->name('tools');
     Route::view('tools/split-cash', 'tools.split-cash')->name('tools.split-cash');
+    Route::view('generation/image', 'generation.image')->name('generation.index');
     Route::view('internet', 'internet')->name('internet');
 });
 

@@ -299,6 +299,10 @@
                         <p>Gunakan <code>name: gemini</code></p>
                     </article>
                     <article>
+                        <strong>Freepik Generation Service</strong>
+                        <p>Gunakan <code>name: freepik_provider</code></p>
+                    </article>
+                    <article>
                         <strong>Custom service lain</strong>
                         <p>Bebas mendefinisikan <code>name</code> sesuai kebutuhan.</p>
                     </article>

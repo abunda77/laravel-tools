@@ -79,26 +79,24 @@ docs/
 
 ---
 
-## Sidebar Navigasi (Rencana)
+## Sidebar Navigasi
 
 ```
+Workspace
 ├── Dashboard
-├── External API
-│   ├── Downloader
-│   ├── Search
-│   ├── Tools
-│   ├── Internet
-│   └── Random
-├── Custom Scripts
-│   ├── Script List
-│   └── Run Script
+├── Downloader
+└── Custom Scripts
+
+Modules
+├── Search
+├── Tools
+│   └── Split Cash
+└── Internet
+
+Operations
 ├── Execution History
 ├── Settings
-│   ├── API Settings
-│   └── App Settings
-└── Users
-    ├── User List
-    └── Roles & Permissions
+└── Profile
 ```
 
 ---
@@ -263,7 +261,7 @@ php artisan test
 - [x] Inisialisasi Laravel 13
 - [x] Install Breeze + Livewire + Volt
 - [x] Konfigurasi Tailwind CSS
-- [ ] Buat layout dashboard + sidebar
+- [x] Buat layout dashboard + sidebar
 - [ ] Auth flow (login, logout, proteksi route)
 
 ### 🔲 Phase 2 — External API Module
