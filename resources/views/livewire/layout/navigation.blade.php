@@ -37,6 +37,7 @@ new class extends Component
                 'label' => 'Operations',
                 'items' => [
                     ['label' => 'Execution History', 'route' => 'execution-history', 'icon' => 'history'],
+                    ['label' => 'Backup Data ApiKey', 'route' => 'operations.api-key-backups', 'icon' => 'settings'],
                     ['label' => 'Settings', 'route' => 'settings', 'icon' => 'settings'],
                     ['label' => 'Profile', 'route' => 'profile', 'icon' => 'profile'],
                 ],

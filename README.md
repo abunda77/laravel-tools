@@ -60,8 +60,12 @@ app/
     ExternalApi/
       DownloaderWorkbench.php
     Forms/
+    Operations/
+      ApiKeyBackupManager.php
     Settings/
   Services/
+    ApiKeys/
+      ApiKeyBackupService.php
     ExternalApi/
       DownloaderService.php
   Support/
@@ -94,10 +98,23 @@ Modules
 └── Internet
 
 Operations
+├── Backup Data ApiKey
 ├── Execution History
 ├── Settings
 └── Profile
 ```
+
+---
+
+## Fitur Backup Data ApiKey
+
+Menu **Operations -> Backup Data ApiKey** menyediakan pengelolaan backup untuk data API key yang tersimpan di database.
+
+- **Backup**: membuat file JSON berisi semua API key, termasuk value yang sudah didekripsi agar bisa dipulihkan kembali.
+- **Download**: mengunduh file backup yang sudah dibuat dari tabel daftar backup.
+- **Restore Apikey**: meng-upload file backup JSON dan melakukan restore dengan `updateOrCreate` berdasarkan kolom `name`.
+- File backup disimpan di disk lokal private: `storage/app/private/api-key-backups`.
+- File backup berisi secret API key asli, sehingga tidak boleh di-commit ke repository atau dibagikan sembarangan.
 
 ---
 
@@ -278,6 +295,7 @@ php artisan test
 
 ### 🔲 Phase 4 — Settings & Security
 - [x] Settings management (API key terpusat, timeout, queue mode)
+- [x] Backup dan restore API key dari file backup
 - [ ] Role & Permission (spatie/laravel-permission)
 - [ ] Audit log (spatie/laravel-activitylog)
 
@@ -293,6 +311,7 @@ php artisan test
 
 - **Custom Script Executor**: Hindari menjalankan shell command bebas dari input user. Prioritaskan `Artisan command` atau `PHP class handler`. Jika shell command diperlukan, gunakan **whitelist** command yang diizinkan.
 - **API Key**: Semua input `value` dari halaman manajemen API Keys akan dienkripsi dari bawaan sistem sebelum masuk ke database (`Crypt::encryptString`) untuk faktor keamanan.
+- **Backup API Key**: File backup API key berisi secret asli agar dapat direstore. Simpan file backup di lokasi aman dan jangan commit file dari `storage/app/private/api-key-backups`.
 - **Permission**: Batasi akses menu tertentu menggunakan role-based access control.
 
 ---

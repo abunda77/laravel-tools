@@ -9,6 +9,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('external-api', 'external-api')->name('external-api');
     Route::view('custom-scripts', 'custom-scripts')->name('custom-scripts');
     Route::view('execution-history', 'execution-history')->name('execution-history');
+    Route::view('operations/api-key-backups', 'operations.api-key-backups')->name('operations.api-key-backups');
     Route::view('settings', 'settings')->name('settings');
     Route::view('profile', 'profile')->name('profile');
     Route::view('search', 'search')->name('search');
