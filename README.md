@@ -38,6 +38,9 @@ Pendekatan utama adalah **config-driven modules**, sehingga menu dan submenu API
 - Dokumentasi online: [https://api.ferdev.my.id/docs](https://api.ferdev.my.id/docs)
 - Base URL: `https://api.ferdev.my.id`
 - Semua endpoint menggunakan method `GET` dan membutuhkan `apikey`
+- Exchange Rate API docs: [https://docs.api.co.id/products/exchange-rate/](https://docs.api.co.id/products/exchange-rate/)
+- Exchange Rate endpoint base URL: `https://use.api.co.id`
+- Exchange Rate authentication header: `x-api-co-id`
 
 ### Kategori API yang Tersedia
 
@@ -60,6 +63,8 @@ app/
     ExternalApi/
       DownloaderWorkbench.php
     Forms/
+    Internet/
+      CurrencyExchangeRate.php
     Operations/
       ApiKeyBackupManager.php
     Settings/
@@ -68,6 +73,8 @@ app/
       ApiKeyBackupService.php
     ExternalApi/
       DownloaderService.php
+    Internet/
+      CurrencyExchangeRateService.php
   Support/
     Registries/
 config/
@@ -103,6 +110,25 @@ Operations
 ├── Settings
 └── Profile
 ```
+
+---
+
+Catatan modul Internet:
+- `Overview`
+- `Kurs Mata Uang`
+
+---
+
+## Fitur Kurs Mata Uang
+
+Menu **Modules -> Internet -> Kurs Mata Uang** menyediakan workbench untuk mengambil kurs mata uang real-time dari API.co.id.
+
+- Menggunakan API key tersimpan di tabel `api_keys` dengan identifier `apicoid_provider`.
+- Base URL yang dipakai adalah `https://use.api.co.id`.
+- Endpoint yang dipanggil adalah `/currency/exchange-rate`.
+- Semua request memakai header autentikasi `x-api-co-id`.
+- Parameter query utama adalah `pair`, contoh `USDIDR`, `SGDIDR`, atau `EURUSD`.
+- Hasil menampilkan pair, rate, waktu update data, dan raw JSON response untuk inspeksi.
 
 ---
 
@@ -287,6 +313,7 @@ php artisan test
 - [ ] Halaman daftar tools per kategori
 - [ ] Form parameter dinamis + execute endpoint
 - [ ] Tampil hasil response (JSON, image, link)
+- [x] Modul Internet: Kurs Mata Uang (API.co.id Exchange Rate)
 
 ### 🔲 Phase 3 — Custom Script Module
 - [ ] Registry custom script
@@ -311,6 +338,7 @@ php artisan test
 
 - **Custom Script Executor**: Hindari menjalankan shell command bebas dari input user. Prioritaskan `Artisan command` atau `PHP class handler`. Jika shell command diperlukan, gunakan **whitelist** command yang diizinkan.
 - **API Key**: Semua input `value` dari halaman manajemen API Keys akan dienkripsi dari bawaan sistem sebelum masuk ke database (`Crypt::encryptString`) untuk faktor keamanan.
+- **API Key Internet / Exchange Rate**: Modul Kurs Mata Uang mengambil key dari `api_keys` dengan identifier `apicoid_provider` dan mengirimkannya melalui header `x-api-co-id`.
 - **Backup API Key**: File backup API key berisi secret asli agar dapat direstore. Simpan file backup di lokasi aman dan jangan commit file dari `storage/app/private/api-key-backups`.
 - **Permission**: Batasi akses menu tertentu menggunakan role-based access control.
 
@@ -320,4 +348,3 @@ php artisan test
 
 Project ini open-source dan tersedia di bawah [MIT License](https://opensource.org/licenses/MIT).
 By ERIE PUTRANTO
-
