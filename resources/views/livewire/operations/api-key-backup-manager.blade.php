@@ -69,13 +69,25 @@
                                     <td>{{ $backupFile['last_modified']->format('d M Y H:i') }}</td>
                                     <td>{{ number_format($backupFile['size'] / 1024, 2) }} KB</td>
                                     <td class="text-right">
-                                        <button
-                                            type="button"
-                                            class="icon-action icon-action--edit"
-                                            wire:click="downloadBackup('{{ $backupFile['filename'] }}')"
-                                        >
-                                            Download
-                                        </button>
+                                        <div class="backup-table__actions">
+                                            <button
+                                                type="button"
+                                                class="icon-action icon-action--edit"
+                                                wire:click="downloadBackup('{{ $backupFile['filename'] }}')"
+                                            >
+                                                Download
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="icon-action icon-action--danger"
+                                                wire:click="deleteBackup('{{ $backupFile['filename'] }}')"
+                                                wire:confirm="Hapus file backup [{{ $backupFile['filename'] }}]?"
+                                                wire:loading.attr="disabled"
+                                                wire:target="deleteBackup('{{ $backupFile['filename'] }}')"
+                                            >
+                                                Hapus
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
@@ -178,6 +190,12 @@
     white-space: nowrap;
 }
 
+.backup-table__actions {
+    display: inline-flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
 .icon-action--edit {
     background: rgba(99, 102, 241, 0.12);
     color: rgb(165, 163, 255);
@@ -185,5 +203,13 @@
 }
 
 .icon-action--edit:hover { background: rgba(99, 102, 241, 0.22); }
+
+.icon-action--danger {
+    background: rgba(239, 68, 68, 0.12);
+    color: rgb(251, 113, 133);
+    border-color: rgba(239, 68, 68, 0.25);
+}
+
+.icon-action--danger:hover { background: rgba(239, 68, 68, 0.2); }
     </style>
 </div>

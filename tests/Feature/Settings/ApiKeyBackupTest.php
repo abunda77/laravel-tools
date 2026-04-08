@@ -62,6 +62,33 @@ class ApiKeyBackupTest extends TestCase
             ->assertFileDownloaded(basename($files[0]));
     }
 
+    public function test_user_can_delete_api_key_backup_file(): void
+    {
+        Storage::fake('local');
+
+        $this->createApiKey();
+
+        $user = User::factory()->create();
+
+        Livewire::actingAs($user)
+            ->test(ApiKeyBackupManager::class)
+            ->call('createBackup')
+            ->assertHasNoErrors();
+
+        $files = Storage::disk('local')->files('api-key-backups');
+
+        $this->assertCount(1, $files);
+
+        $filename = basename($files[0]);
+
+        Livewire::actingAs($user)
+            ->test(ApiKeyBackupManager::class)
+            ->call('deleteBackup', $filename)
+            ->assertHasNoErrors();
+
+        Storage::disk('local')->assertMissing('api-key-backups/'.$filename);
+    }
+
     public function test_user_can_restore_api_keys_from_backup_file(): void
     {
         Storage::fake('local');

@@ -60,6 +60,17 @@ class ApiKeyBackupService
         ]);
     }
 
+    public function delete(string $filename): void
+    {
+        $path = $this->pathFromFilename($filename);
+
+        if (! Storage::disk('local')->exists($path)) {
+            throw new InvalidArgumentException('File backup tidak ditemukan.');
+        }
+
+        Storage::disk('local')->delete($path);
+    }
+
     public function restoreFromUploadedFile(UploadedFile $file): int
     {
         $contents = file_get_contents($file->getRealPath());

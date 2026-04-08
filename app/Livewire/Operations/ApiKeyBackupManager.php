@@ -30,6 +30,13 @@ class ApiKeyBackupManager extends Component
         return $backups->download($filename);
     }
 
+    public function deleteBackup(string $filename, ApiKeyBackupService $backups): void
+    {
+        $backups->delete($filename);
+
+        session()->flash('api_key_backup_status', "Backup [{$filename}] berhasil dihapus.");
+    }
+
     public function restoreBackup(ApiKeyBackupService $backups): void
     {
         $this->validate([
