@@ -31,8 +31,19 @@
 
         <form wire:submit.prevent="improvePrompt" class="settings-form">
             <div class="form-grid">
-                <div class="form-field form-field--wide">
-                    <label for="prompt" class="form-label">Prompt</label>
+                <div class="form-field form-field--wide" x-data="clipboardButton(@entangle('prompt'))">
+                    <div class="mb-3 flex items-center justify-between gap-3">
+                        <label for="prompt" class="form-label mb-0">Prompt</label>
+                        <button
+                            type="button"
+                            class="app-sidebar__logout w-auto px-4 py-2 text-xs"
+                            x-on:click="copy()"
+                            x-bind:disabled="!value"
+                        >
+                            <span x-show="!copied">Copy text</span>
+                            <span x-show="copied" x-cloak>Copied</span>
+                        </button>
+                    </div>
                     <textarea
                         id="prompt"
                         wire:model="prompt"
@@ -122,14 +133,27 @@
 
     @if($generatedPrompts !== [])
         <section class="surface-panel">
-            <div class="surface-panel__header">
-                <p class="section-kicker">Result</p>
-                <h3>Improved Prompt</h3>
-            </div>
-
             <div class="result-stack">
                 @foreach($generatedPrompts as $prompt)
-                    <article wire:key="improved-prompt-{{ $loop->index }}" class="rounded-[1.6rem] border border-[rgb(var(--app-line))] bg-white/80 p-5">
+                    <article
+                        wire:key="improved-prompt-{{ $loop->index }}"
+                        x-data="clipboardButton(@js($prompt))"
+                        class="rounded-[1.6rem] border border-[rgb(var(--app-line))] bg-white/80 p-5"
+                    >
+                        <div class="mb-4 flex items-center justify-between gap-3">
+                            <div>
+                                <p class="section-kicker">Result</p>
+                                <h3 class="text-2xl font-bold text-[rgb(var(--app-ink))]">Improved Prompt</h3>
+                            </div>
+                            <button
+                                type="button"
+                                class="app-sidebar__logout w-auto px-4 py-2 text-xs"
+                                x-on:click="copy()"
+                            >
+                                <span x-show="!copied">Copy text</span>
+                                <span x-show="copied" x-cloak>Copied</span>
+                            </button>
+                        </div>
                         <p class="whitespace-pre-wrap text-sm leading-7 text-[rgb(var(--app-ink))]">{{ $prompt }}</p>
                     </article>
                 @endforeach

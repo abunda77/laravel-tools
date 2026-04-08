@@ -24,7 +24,8 @@ class ImprovePromptTest extends TestCase
         $response
             ->assertOk()
             ->assertSee('Improve Prompt')
-            ->assertSee('Tingkatkan Prompt');
+            ->assertSee('Tingkatkan Prompt')
+            ->assertSee('Copy text');
     }
 
     public function test_component_creates_improve_prompt_task(): void

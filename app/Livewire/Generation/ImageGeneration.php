@@ -4,12 +4,15 @@ namespace App\Livewire\Generation;
 
 use App\Services\Freepik\ImageGenerationService;
 use Exception;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 
 class ImageGeneration extends Component
 {
     private const TASK_HISTORY_CACHE_KEY = 'freepik.task-history';
+
+    private const TASK_HISTORY_LIMIT = 10;
 
     public string $prompt = '';
 
@@ -39,9 +42,12 @@ class ImageGeneration extends Component
                 fn () => $service->getTasksHistory(),
             );
 
-            if (isset($response['data']) && is_array($response['data'])) {
-                // Reverse the array so newest tasks are first, assuming the API returns oldest first or chronological
-                $this->taskHistory = array_reverse($response['data']);
+            $tasks = Arr::get($response, 'data');
+
+            if (is_array($tasks)) {
+                $this->taskHistory = array_values(
+                    array_slice(array_reverse($tasks), 0, self::TASK_HISTORY_LIMIT),
+                );
             }
         } catch (Exception $e) {
             // fail silently or flash error

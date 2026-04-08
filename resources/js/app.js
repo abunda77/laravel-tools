@@ -1,6 +1,28 @@
 import './bootstrap';
 
 document.addEventListener('alpine:init', () => {
+    Alpine.data('clipboardButton', (initialValue = '') => ({
+        copied: false,
+        value: initialValue,
+
+        async copy() {
+            if (!this.value) {
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(this.value.toString());
+                this.copied = true;
+
+                setTimeout(() => {
+                    this.copied = false;
+                }, 2000);
+            } catch (error) {
+                console.error('Failed to copy: ', error);
+            }
+        },
+    }));
+
     Alpine.data('splitCash', () => ({
         amountDisplay: '',
         rawAmount: 0,
