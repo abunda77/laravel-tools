@@ -30,7 +30,10 @@ new class extends Component
                         ['label' => 'Image2Prompt', 'route' => 'image-ai.image2prompt'],
                         ['label' => 'Improve Prompt', 'route' => 'image-ai.improve-prompt'],
                     ]],
-                    ['label' => 'Internet', 'route' => 'internet', 'icon' => 'internet'],
+                    ['label' => 'Internet', 'route' => 'internet', 'icon' => 'internet', 'subItems' => [
+                        ['label' => 'Overview', 'route' => 'internet'],
+                        ['label' => 'Kurs Mata Uang', 'route' => 'internet.currency-exchange-rate'],
+                    ]],
                 ],
             ],
             [

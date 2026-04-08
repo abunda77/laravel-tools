@@ -19,6 +19,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('image-ai/image2prompt', 'image-ai.image2prompt')->name('image-ai.image2prompt');
     Route::view('image-ai/improve-prompt', 'image-ai.improve-prompt')->name('image-ai.improve-prompt');
     Route::view('internet', 'internet')->name('internet');
+    Route::view('internet/currency-exchange-rate', 'internet.currency-exchange-rate')->name('internet.currency-exchange-rate');
 });
 
 require __DIR__.'/auth.php';
