@@ -319,3 +319,5 @@ php artisan test
 ## Lisensi
 
 Project ini open-source dan tersedia di bawah [MIT License](https://opensource.org/licenses/MIT).
+By ERIE PUTRANTO
+
