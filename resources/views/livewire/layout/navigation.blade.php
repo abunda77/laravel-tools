@@ -33,6 +33,7 @@ new class extends Component
                     ['label' => 'Internet', 'route' => 'internet', 'icon' => 'internet', 'subItems' => [
                         ['label' => 'Overview', 'route' => 'internet'],
                         ['label' => 'Kurs Mata Uang', 'route' => 'internet.currency-exchange-rate'],
+                        ['label' => 'Proxy Validate', 'route' => 'internet.proxy-validate'],
                     ]],
                 ],
             ],

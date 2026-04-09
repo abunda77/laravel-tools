@@ -65,6 +65,7 @@ app/
     Forms/
     Internet/
       CurrencyExchangeRate.php
+      ProxyValidate.php
     Operations/
       ApiKeyBackupManager.php
     Settings/
@@ -75,6 +76,7 @@ app/
       DownloaderService.php
     Internet/
       CurrencyExchangeRateService.php
+      ProxyValidateService.php
   Support/
     Registries/
 config/
@@ -116,6 +118,7 @@ Operations
 Catatan modul Internet:
 - `Overview`
 - `Kurs Mata Uang`
+- `Proxy Validate`
 
 ---
 
@@ -129,6 +132,31 @@ Menu **Modules -> Internet -> Kurs Mata Uang** menyediakan workbench untuk menga
 - Semua request memakai header autentikasi `x-api-co-id`.
 - Parameter query utama adalah `pair`, contoh `USDIDR`, `SGDIDR`, atau `EURUSD`.
 - Hasil menampilkan pair, rate, waktu update data, dan raw JSON response untuk inspeksi.
+
+---
+
+## Fitur Proxy Validate
+
+Menu **Modules -> Internet -> Proxy Validate** menyediakan workbench untuk memuat, memfilter, memvalidasi, dan mengekspor daftar proxy dari source GitHub publik.
+
+- Source proxy yang tersedia saat ini: `All Proxies`, `HTTP Only`, `SOCKS5 Only`, dan `Indonesia Only`.
+- Format input yang diparse adalah `IP:PORT | PROTOCOL | COUNTRY | ANONYMITY`.
+- Tabel menyediakan filter di header untuk `Address`, `Protocol`, `Country`, `Anonymity`, dan `Status`.
+- Setiap row memiliki:
+  - checkbox untuk bulk selection,
+  - action icon untuk check validitas per row,
+  - action icon untuk copy `IP:PORT`.
+- Bulk action `Check selected` hanya memproses row yang dipilih user.
+- Tersedia quick select:
+  - `Select visible valid only`
+  - `Select visible unchecked only`
+- Hasil validasi menampilkan status `Unchecked`, `Valid`, atau `Invalid`, beserta response time, detected IP, dan error message jika tersedia.
+- Export hasil seleksi tersedia dalam format `CSV` dan `TXT`.
+- Progress panel ditampilkan selama validasi berjalan agar user bisa melihat jumlah item yang sudah diproses.
+
+Catatan:
+- Validasi dilakukan dengan mencoba request ke endpoint uji publik melalui proxy yang dipilih.
+- Karena banyak proxy publik lambat atau mati, jumlah status `Invalid` yang tinggi adalah kondisi yang normal.
 
 ---
 
@@ -314,6 +342,7 @@ php artisan test
 - [ ] Form parameter dinamis + execute endpoint
 - [ ] Tampil hasil response (JSON, image, link)
 - [x] Modul Internet: Kurs Mata Uang (API.co.id Exchange Rate)
+- [x] Modul Internet: Proxy Validate (filter, bulk select, validate, export, progress)
 
 ### 🔲 Phase 3 — Custom Script Module
 - [ ] Registry custom script
