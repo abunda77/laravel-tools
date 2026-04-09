@@ -63,6 +63,8 @@ app/
     ExternalApi/
       DownloaderWorkbench.php
     Forms/
+    Generation/
+      VideoGeneration.php
     Internet/
       CurrencyExchangeRate.php
       ProxyValidate.php
@@ -74,6 +76,8 @@ app/
       ApiKeyBackupService.php
     ExternalApi/
       DownloaderService.php
+    Freepik/
+      VideoGenerationService.php
     Internet/
       CurrencyExchangeRateService.php
       ProxyValidateService.php
@@ -122,6 +126,11 @@ Catatan modul Internet:
 
 ---
 
+Catatan modul Video AI:
+- `Generation Video`
+
+---
+
 ## Fitur Kurs Mata Uang
 
 Menu **Modules -> Internet -> Kurs Mata Uang** menyediakan workbench untuk mengambil kurs mata uang real-time dari API.co.id.
@@ -157,6 +166,30 @@ Menu **Modules -> Internet -> Proxy Validate** menyediakan workbench untuk memua
 Catatan:
 - Validasi dilakukan dengan mencoba request ke endpoint uji publik melalui proxy yang dipilih.
 - Karena banyak proxy publik lambat atau mati, jumlah status `Invalid` yang tinggi adalah kondisi yang normal.
+
+---
+
+## Fitur Generation Video
+
+Menu **Modules -> Video AI -> Generation Video** menyediakan workbench untuk generate video memakai Freepik Kling v3 Standard dengan API key `freepik_provider`.
+
+- Endpoint generate yang dipakai: `POST /v1/ai/video/kling-v3-std`
+- Endpoint history task: `GET /v1/ai/video/kling-v3`
+- Endpoint task by id: `GET /v1/ai/video/kling-v3/{task_id}`
+- Form input mengikuti flow `Generate Image`, dengan parameter utama:
+  - `prompt`
+  - `aspect_ratio`
+  - `duration`
+  - `negative_prompt`
+  - `generate_audio`
+  - `cfg_scale`
+- Setelah submit, sistem menyimpan `task_id`, menampilkan status task, lalu melakukan polling berkala sampai task selesai atau gagal.
+- Jika task selesai, hasil video ditampilkan di halaman dan bisa dibuka atau diunduh langsung.
+- Riwayat task terbaru juga ditampilkan pada panel history agar user bisa melacak task yang sedang berjalan atau hasil sebelumnya.
+
+Catatan:
+- Implementasi saat ini memakai flow text-to-video standar dan reuse pola task history dari modul `Generate Image`.
+- Semua request tetap menggunakan API key tersimpan di tabel `api_keys` dengan name `freepik_provider`.
 
 ---
 
