@@ -6,8 +6,10 @@ use App\Livewire\ImageAi\ImageToPrompt;
 use App\Models\ApiKey;
 use App\Models\User;
 use App\Support\Settings\SystemSettings;
+use Illuminate\Http\Request;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Route;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -25,6 +27,35 @@ class ImageToPromptTest extends TestCase
             ->assertOk()
             ->assertSee('Image2Prompt')
             ->assertSee('Buat Prompt dari Gambar');
+    }
+
+    public function test_forwarded_https_requests_generate_secure_urls(): void
+    {
+        Route::middleware('web')->get('/_testing/proxy-url', function (Request $request) {
+            return response()->json([
+                'is_secure' => $request->isSecure(),
+                'upload_url' => url('/livewire/upload-file'),
+            ]);
+        });
+
+        $response = $this
+            ->withServerVariables([
+                'HTTP_X_FORWARDED_PROTO' => 'https',
+                'HTTP_X_FORWARDED_HOST' => 'tools.serverdata.my.id',
+                'HTTP_X_FORWARDED_PORT' => '443',
+                'HTTP_HOST' => 'tools.serverdata.my.id',
+                'SERVER_PORT' => 80,
+                'HTTPS' => 'off',
+                'REMOTE_ADDR' => '127.0.0.1',
+            ])
+            ->get('/_testing/proxy-url');
+
+        $response
+            ->assertOk()
+            ->assertJson([
+                'is_secure' => true,
+                'upload_url' => 'https://tools.serverdata.my.id/livewire/upload-file',
+            ]);
     }
 
     public function test_component_generates_prompt_task_from_image_url(): void
