@@ -24,48 +24,108 @@ new #[Layout('layouts.guest')] class extends Component
     }
 }; ?>
 
-<div>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+<div class="auth-login-shell">
+    <div class="auth-ambient auth-ambient--one"></div>
+    <div class="auth-ambient auth-ambient--two"></div>
 
-    <form wire:submit="login">
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="form.email" id="email" class="block mt-1 w-full" type="email" name="email" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('form.email')" class="mt-2" />
-        </div>
+    <main class="auth-login-stage">
+        <section class="auth-login-intro" aria-labelledby="login-heading">
+            <a href="/" wire:navigate class="auth-login-brand" aria-label="{{ config('app.name', 'Laravel Tools') }}">
+                <x-application-logo class="auth-login-logo" />
+                <span>{{ config('app.name', 'Laravel Tools') }}</span>
+            </a>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+            <div class="auth-login-copy">
+                <p class="auth-login-kicker">Secure workspace</p>
+                <h1 id="login-heading">Masuk ke dashboard operasional.</h1>
+                <p>
+                    Kelola automasi, API, dan workflow internal dari satu ruang kerja yang rapi.
+                </p>
+            </div>
 
-            <x-text-input wire:model="form.password" id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
+            <div class="auth-signal-panel" aria-hidden="true">
+                <div class="auth-signal-panel__header">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="auth-signal-panel__body">
+                    <div class="auth-signal-panel__meter auth-signal-panel__meter--wide"></div>
+                    <div class="auth-signal-panel__meter"></div>
+                    <div class="auth-signal-panel__grid">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-            <x-input-error :messages="$errors->get('form.password')" class="mt-2" />
-        </div>
+        <section class="auth-login-panel" aria-label="Login form">
+            <div class="auth-login-panel__heading">
+                <p>Welcome back</p>
+                <h2>Sign in</h2>
+            </div>
 
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember" class="inline-flex items-center">
-                <input wire:model="form.remember" id="remember" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
-        </div>
+            <x-auth-session-status class="auth-session-status" :status="session('status')" />
 
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}" wire:navigate>
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
+            <form wire:submit="login" class="auth-login-form">
+                <div class="auth-login-field">
+                    <label for="email">Email</label>
+                    <input
+                        wire:model="form.email"
+                        id="email"
+                        class="auth-login-input"
+                        type="email"
+                        name="email"
+                        required
+                        autofocus
+                        autocomplete="username"
+                        placeholder="you@example.com"
+                    >
+                    <x-input-error :messages="$errors->get('form.email')" class="auth-login-error" />
+                </div>
 
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
-    </form>
+                <div class="auth-login-field">
+                    <label for="password">Password</label>
+                    <input
+                        wire:model="form.password"
+                        id="password"
+                        class="auth-login-input"
+                        type="password"
+                        name="password"
+                        required
+                        autocomplete="current-password"
+                        placeholder="Enter your password"
+                    >
+                    <x-input-error :messages="$errors->get('form.password')" class="auth-login-error" />
+                </div>
+
+                <div class="auth-login-options">
+                    <label for="remember" class="auth-login-check">
+                        <input wire:model="form.remember" id="remember" type="checkbox" name="remember">
+                        <span>{{ __('Remember me') }}</span>
+                    </label>
+
+                    @if (Route::has('password.request'))
+                        <a href="{{ route('password.request') }}" wire:navigate>
+                            {{ __('Forgot your password?') }}
+                        </a>
+                    @endif
+                </div>
+
+                <button type="submit" class="auth-login-submit">
+                    <span wire:loading.remove wire:target="login">{{ __('Log in') }}</span>
+                    <span wire:loading wire:target="login" class="auth-login-submit__loading">
+                        <svg class="size-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                        </svg>
+                        Processing
+                    </span>
+                </button>
+            </form>
+        </section>
+    </main>
 </div>
