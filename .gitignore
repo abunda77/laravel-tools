@@ -31,3 +31,7 @@ temp-laravel13/
 **/caddy
 frankenphp
 frankenphp-worker.php
+docs/
+/docs
+
+
