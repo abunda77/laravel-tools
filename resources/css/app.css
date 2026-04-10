@@ -649,6 +649,154 @@
         color: rgb(var(--app-ink));
     }
 
+    .parcel-summary {
+        @apply flex flex-col gap-4 rounded-[1.7rem] p-5 lg:flex-row lg:items-start lg:justify-between;
+        border: 1px solid rgb(167 243 208);
+        background:
+            linear-gradient(135deg, rgb(236 253 245 / 0.92), rgb(255 255 255 / 0.96)),
+            radial-gradient(circle at 12% 20%, rgb(16 185 129 / 0.16), transparent 32%);
+    }
+
+    .parcel-summary h4 {
+        @apply text-3xl font-extrabold tracking-tight;
+        color: rgb(var(--app-ink));
+    }
+
+    .parcel-summary p:last-child {
+        @apply mt-3 max-w-3xl text-sm leading-7;
+        color: rgb(var(--app-muted));
+    }
+
+    .parcel-data-grid {
+        @apply grid gap-3 sm:grid-cols-2 xl:grid-cols-3;
+    }
+
+    .parcel-data-grid article {
+        @apply rounded-[1.3rem] px-4 py-4;
+        border: 1px solid rgb(var(--app-line));
+        background: rgb(255 255 255 / 0.82);
+    }
+
+    .parcel-data-grid span {
+        @apply block text-[0.68rem] font-semibold uppercase tracking-[0.22em];
+        color: rgb(var(--app-muted));
+    }
+
+    .parcel-data-grid strong {
+        @apply mt-2 block break-words text-base font-bold leading-6;
+        color: rgb(var(--app-ink));
+    }
+
+    .parcel-timeline {
+        @apply rounded-[1.7rem] p-5;
+        border: 1px solid rgb(var(--app-line));
+        background: rgb(255 255 255 / 0.78);
+    }
+
+    .parcel-timeline__list {
+        @apply mt-5 space-y-0;
+    }
+
+    .parcel-timeline__list article {
+        @apply grid grid-cols-[1.5rem_minmax(0,1fr)] gap-4;
+    }
+
+    .parcel-timeline__marker {
+        @apply relative flex justify-center;
+    }
+
+    .parcel-timeline__marker::before {
+        @apply absolute bottom-0 top-7 w-px;
+        content: '';
+        background: rgb(209 213 219);
+    }
+
+    .parcel-timeline__list article:last-child .parcel-timeline__marker::before {
+        @apply hidden;
+    }
+
+    .parcel-timeline__marker span {
+        @apply relative z-10 mt-1 block size-4 rounded-full border-4 border-white;
+        background: rgb(var(--app-brand));
+        box-shadow: 0 0 0 1px rgb(var(--app-brand)), 0 10px 20px rgb(12 112 93 / 0.18);
+    }
+
+    .parcel-timeline__content {
+        @apply pb-6;
+    }
+
+    .parcel-timeline__content time {
+        @apply block text-xs font-bold uppercase tracking-[0.2em];
+        color: rgb(var(--app-brand-deep));
+    }
+
+    .parcel-timeline__content p {
+        @apply mt-2 rounded-[1.1rem] px-4 py-3 text-sm leading-6;
+        border: 1px solid rgb(var(--app-line));
+        background: rgb(246 245 240 / 0.58);
+        color: rgb(var(--app-ink));
+    }
+
+    .whois-summary {
+        @apply flex flex-col gap-4 rounded-[1.7rem] p-5 lg:flex-row lg:items-start lg:justify-between;
+        border: 1px solid rgb(191 219 254);
+        background:
+            linear-gradient(135deg, rgb(239 246 255 / 0.94), rgb(255 255 255 / 0.96)),
+            radial-gradient(circle at 10% 20%, rgb(20 184 166 / 0.16), transparent 34%);
+    }
+
+    .whois-summary h4 {
+        @apply break-words text-3xl font-extrabold tracking-tight;
+        color: rgb(var(--app-ink));
+    }
+
+    .whois-facts {
+        @apply grid gap-3 sm:grid-cols-2 xl:grid-cols-3;
+    }
+
+    .whois-facts article {
+        @apply rounded-[1.3rem] px-4 py-4;
+        border: 1px solid rgb(var(--app-line));
+        background: rgb(255 255 255 / 0.82);
+    }
+
+    .whois-facts span {
+        @apply block text-[0.68rem] font-semibold uppercase tracking-[0.22em];
+        color: rgb(var(--app-muted));
+    }
+
+    .whois-facts strong {
+        @apply mt-2 block break-words text-sm font-bold leading-6;
+        color: rgb(var(--app-ink));
+    }
+
+    .whois-record {
+        @apply overflow-hidden rounded-[1.7rem];
+        border: 1px solid rgb(var(--app-line));
+        background: rgb(255 255 255 / 0.86);
+    }
+
+    .whois-record__header {
+        @apply flex flex-col gap-3 border-b px-5 py-4 sm:flex-row sm:items-center sm:justify-between;
+        border-color: rgb(var(--app-line));
+    }
+
+    .whois-record__header h3 {
+        @apply text-xl font-extrabold tracking-tight;
+        color: rgb(var(--app-ink));
+    }
+
+    .whois-record__header strong {
+        @apply rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.2em];
+        background: rgb(246 245 240);
+        color: rgb(var(--app-muted));
+    }
+
+    .whois-record pre {
+        @apply max-h-[34rem] overflow-auto whitespace-pre-wrap break-words px-5 py-5 text-xs leading-6;
+        color: rgb(var(--app-ink));
+    }
+
     .json-viewer {
         @apply overflow-hidden rounded-[1.6rem];
         border: 1px solid rgb(var(--app-line));

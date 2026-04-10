@@ -16,6 +16,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('search', 'search')->name('search');
     Route::view('tools', 'tools')->name('tools');
     Route::view('tools/split-cash', 'tools.split-cash')->name('tools.split-cash');
+    Route::view('tools/cek-resi', 'tools.cek-resi')->name('tools.cek-resi');
     Route::view('generation/image', 'generation.image')->name('generation.index');
     Route::view('generation/video', 'generation.video')->name('generation.video');
     Route::view('image-ai/image2prompt', 'image-ai.image2prompt')->name('image-ai.image2prompt');
@@ -23,6 +24,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('internet', 'internet')->name('internet');
     Route::view('internet/currency-exchange-rate', 'internet.currency-exchange-rate')->name('internet.currency-exchange-rate');
     Route::view('internet/proxy-validate', 'internet.proxy-validate')->name('internet.proxy-validate');
+    Route::view('internet/whois', 'internet.whois')->name('internet.whois');
 });
 
 require __DIR__.'/auth.php';

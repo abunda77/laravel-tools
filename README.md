@@ -68,6 +68,9 @@ app/
     Internet/
       CurrencyExchangeRate.php
       ProxyValidate.php
+      Whois.php
+    Tools/
+      CekResi.php
     Operations/
       ApiKeyBackupManager.php
     Settings/
@@ -81,6 +84,9 @@ app/
     Internet/
       CurrencyExchangeRateService.php
       ProxyValidateService.php
+      WhoisService.php
+    Tools/
+      CekResiService.php
   Support/
     Registries/
 config/
@@ -123,11 +129,31 @@ Catatan modul Internet:
 - `Overview`
 - `Kurs Mata Uang`
 - `Proxy Validate`
+- `Whois`
+
+---
+
+Catatan modul Tools:
+- `Split Cash`
+- `Cek Resi`
 
 ---
 
 Catatan modul Video AI:
 - `Generation Video`
+
+---
+
+## Fitur Cek Resi
+
+Menu **Modules -> Tools -> Cek Resi** menyediakan workbench untuk melacak paket berdasarkan nomor resi dan ekspedisi.
+
+- Menggunakan API key tersimpan di tabel `api_keys` dengan identifier `downloader_provider`.
+- Base URL yang dipakai adalah `https://api.ferdev.my.id`.
+- Endpoint yang dipanggil adalah `/tools/cekresi`.
+- Parameter query utama adalah `resi` dan `ekspedisi`, contoh `SPXID054330680586` dan `shopee-express`.
+- Hasil menampilkan data dari key `data`: resi, ekspedisi, kode ekspedisi, status, tanggal kirim, customer service, posisi terakhir, share link, dan history pengiriman.
+- History pengiriman ditampilkan sebagai timeline vertikal agar alur perjalanan paket mudah dibaca.
 
 ---
 
@@ -166,6 +192,20 @@ Menu **Modules -> Internet -> Proxy Validate** menyediakan workbench untuk memua
 Catatan:
 - Validasi dilakukan dengan mencoba request ke endpoint uji publik melalui proxy yang dipilih.
 - Karena banyak proxy publik lambat atau mati, jumlah status `Invalid` yang tinggi adalah kondisi yang normal.
+
+---
+
+## Fitur Whois
+
+Menu **Modules -> Internet -> Whois** menyediakan workbench untuk melihat informasi registrasi domain.
+
+- Menggunakan API key tersimpan di tabel `api_keys` dengan identifier `downloader_provider`.
+- Base URL yang dipakai adalah `https://api.ferdev.my.id`.
+- Endpoint yang dipanggil adalah `/internet/whois`.
+- Parameter query utama adalah `domain`, contoh `produkmastah.com`.
+- Hasil menampilkan `data.domain` dan `data.result`.
+- Raw WHOIS record ditampilkan dengan line break asli agar mudah dibaca dan diaudit.
+- Ringkasan registrar, tanggal registrasi, tanggal kedaluwarsa, DNSSEC, dan name server diekstrak dari raw WHOIS jika tersedia.
 
 ---
 
@@ -374,8 +414,10 @@ php artisan test
 - [ ] Halaman daftar tools per kategori
 - [ ] Form parameter dinamis + execute endpoint
 - [ ] Tampil hasil response (JSON, image, link)
+- [x] Modul Tools: Cek Resi (tracking paket + timeline vertikal)
 - [x] Modul Internet: Kurs Mata Uang (API.co.id Exchange Rate)
 - [x] Modul Internet: Proxy Validate (filter, bulk select, validate, export, progress)
+- [x] Modul Internet: Whois (lookup domain + raw WHOIS record)
 
 ### 🔲 Phase 3 — Custom Script Module
 - [ ] Registry custom script
@@ -401,6 +443,7 @@ php artisan test
 - **Custom Script Executor**: Hindari menjalankan shell command bebas dari input user. Prioritaskan `Artisan command` atau `PHP class handler`. Jika shell command diperlukan, gunakan **whitelist** command yang diizinkan.
 - **API Key**: Semua input `value` dari halaman manajemen API Keys akan dienkripsi dari bawaan sistem sebelum masuk ke database (`Crypt::encryptString`) untuk faktor keamanan.
 - **API Key Internet / Exchange Rate**: Modul Kurs Mata Uang mengambil key dari `api_keys` dengan identifier `apicoid_provider` dan mengirimkannya melalui header `x-api-co-id`.
+- **API Key Ferdev Provider**: Modul Downloader, Tools -> Cek Resi, dan Internet -> Whois mengambil key dari `api_keys` dengan identifier `downloader_provider` dan mengirimkannya sebagai parameter query `apikey`.
 - **Backup API Key**: File backup API key berisi secret asli agar dapat direstore. Simpan file backup di lokasi aman dan jangan commit file dari `storage/app/private/api-key-backups`.
 - **Permission**: Batasi akses menu tertentu menggunakan role-based access control.
 

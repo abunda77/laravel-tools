@@ -25,6 +25,7 @@ new class extends Component
                     ['label' => 'Search', 'route' => 'search', 'icon' => 'search'],
                     ['label' => 'Tools', 'route' => 'tools', 'icon' => 'tools', 'subItems' => [
                         ['label' => 'Split Cash', 'route' => 'tools.split-cash'],
+                        ['label' => 'Cek Resi', 'route' => 'tools.cek-resi'],
                     ]],
                     ['label' => 'Image AI', 'route' => 'image-ai', 'icon' => 'image', 'subItems' => [
                         ['label' => 'Generation Image', 'route' => 'generation.index'],
@@ -38,6 +39,7 @@ new class extends Component
                         ['label' => 'Overview', 'route' => 'internet'],
                         ['label' => 'Kurs Mata Uang', 'route' => 'internet.currency-exchange-rate'],
                         ['label' => 'Proxy Validate', 'route' => 'internet.proxy-validate'],
+                        ['label' => 'Whois', 'route' => 'internet.whois'],
                     ]],
                 ],
             ],
