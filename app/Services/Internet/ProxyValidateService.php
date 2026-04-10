@@ -2,11 +2,20 @@
 
 namespace App\Services\Internet;
 
+use Illuminate\Http\Client\Pool;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Throwable;
 
 class ProxyValidateService
 {
+    private const VALIDATION_TIMEOUT_SECONDS = 8;
+
+    private const VALIDATION_CONNECT_TIMEOUT_SECONDS = 2;
+
+    private const VALIDATION_CONCURRENCY = 20;
+
     /**
      * @var array<string, string>
      */
@@ -23,6 +32,7 @@ class ProxyValidateService
     private const TEST_ENDPOINTS = [
         'https://httpbin.org/ip',
         'https://api.ipify.org?format=json',
+        'https://ifconfig.me/all.json',
     ];
 
     /**
@@ -54,6 +64,7 @@ class ProxyValidateService
 
         $response = Http::accept('text/plain')
             ->timeout(20)
+            ->connectTimeout(5)
             ->get($url)
             ->throw();
 
@@ -90,7 +101,7 @@ class ProxyValidateService
      */
     public function validate(array $proxy): array
     {
-        $proxyUrl = $this->buildProxyUrl($proxy);
+        $proxyOptions = $this->buildProxyOptions($proxy);
         $lastError = null;
 
         foreach (self::TEST_ENDPOINTS as $endpoint) {
@@ -98,30 +109,19 @@ class ProxyValidateService
 
             try {
                 $response = Http::acceptJson()
-                    ->timeout(8)
-                    ->withOptions(['proxy' => $proxyUrl])
+                    ->timeout(self::VALIDATION_TIMEOUT_SECONDS)
+                    ->connectTimeout(self::VALIDATION_CONNECT_TIMEOUT_SECONDS)
+                    ->withOptions(['proxy' => $proxyOptions])
                     ->get($endpoint)
                     ->throw();
 
-                $proxy['status'] = 'Valid';
-                $proxy['response_time_ms'] = (int) round((microtime(true) - $startedAt) * 1000);
-                $proxy['detected_ip'] = $this->extractDetectedIp($response->json());
-                $proxy['error_message'] = null;
-                $proxy['last_checked_at'] = now()->format('d M Y H:i:s');
-
-                return $proxy;
-            } catch (\Throwable $throwable) {
-                $lastError = $throwable->getMessage();
+                return $this->validProxy($proxy, $response, $startedAt);
+            } catch (Throwable $throwable) {
+                $lastError = $this->summarizeError($throwable->getMessage());
             }
         }
 
-        $proxy['status'] = 'Invalid';
-        $proxy['response_time_ms'] = null;
-        $proxy['detected_ip'] = null;
-        $proxy['error_message'] = $lastError;
-        $proxy['last_checked_at'] = now()->format('d M Y H:i:s');
-
-        return $proxy;
+        return $this->invalidProxy($proxy, $lastError);
     }
 
     /**
@@ -154,11 +154,57 @@ class ProxyValidateService
      */
     public function validateMany(array $proxies): array
     {
-        foreach ($proxies as $index => $proxy) {
-            $proxies[$index] = $this->validate($proxy);
+        if ($proxies === []) {
+            return [];
         }
 
-        return $proxies;
+        $pendingIndexes = array_keys($proxies);
+        $lastErrors = [];
+
+        foreach (self::TEST_ENDPOINTS as $endpoint) {
+            if ($pendingIndexes === []) {
+                break;
+            }
+
+            $nextPendingIndexes = [];
+
+            foreach (array_chunk($pendingIndexes, self::VALIDATION_CONCURRENCY) as $indexChunk) {
+                $startedAt = microtime(true);
+                $responses = Http::pool(
+                    fn (Pool $pool): array => array_map(
+                        fn (int $index) => $pool->as((string) $index)
+                            ->acceptJson()
+                            ->timeout(self::VALIDATION_TIMEOUT_SECONDS)
+                            ->connectTimeout(self::VALIDATION_CONNECT_TIMEOUT_SECONDS)
+                            ->withOptions(['proxy' => $this->buildProxyOptions($proxies[$index])])
+                            ->get($endpoint),
+                        $indexChunk
+                    ),
+                    self::VALIDATION_CONCURRENCY
+                );
+
+                foreach ($indexChunk as $index) {
+                    $result = $responses[(string) $index] ?? null;
+
+                    if ($result instanceof Response && $result->successful()) {
+                        $proxies[$index] = $this->validProxy($proxies[$index], $result, $startedAt);
+
+                        continue;
+                    }
+
+                    $lastErrors[$index] = $this->resultErrorMessage($result);
+                    $nextPendingIndexes[] = $index;
+                }
+            }
+
+            $pendingIndexes = $nextPendingIndexes;
+        }
+
+        foreach ($pendingIndexes as $index) {
+            $proxies[$index] = $this->invalidProxy($proxies[$index], $lastErrors[$index] ?? null);
+        }
+
+        return array_values($proxies);
     }
 
     private function resolveSourceUrl(string $sourceName): string
@@ -284,14 +330,19 @@ class ProxyValidateService
      *     last_checked_at: string|null
      * }  $proxy
      */
-    private function buildProxyUrl(array $proxy): string
+    private function buildProxyOptions(array $proxy): array
     {
-        return match ($proxy['protocol']) {
+        $proxyUrl = match ($proxy['protocol']) {
             'HTTP' => 'http://'.$proxy['address'],
             'SOCKS4' => 'socks4://'.$proxy['address'],
             'SOCKS5' => 'socks5://'.$proxy['address'],
             default => throw new \InvalidArgumentException('Protocol proxy tidak didukung.'),
         };
+
+        return [
+            'http' => $proxyUrl,
+            'https' => $proxyUrl,
+        ];
     }
 
     private function extractDetectedIp(mixed $payload): ?string
@@ -312,5 +363,45 @@ class ProxyValidateService
         }
 
         return null;
+    }
+
+    private function validProxy(array $proxy, Response $response, float $startedAt): array
+    {
+        $proxy['status'] = 'Valid';
+        $proxy['response_time_ms'] = (int) round((microtime(true) - $startedAt) * 1000);
+        $proxy['detected_ip'] = $this->extractDetectedIp($response->json());
+        $proxy['error_message'] = null;
+        $proxy['last_checked_at'] = now()->format('d M Y H:i:s');
+
+        return $proxy;
+    }
+
+    private function invalidProxy(array $proxy, ?string $errorMessage): array
+    {
+        $proxy['status'] = 'Invalid';
+        $proxy['response_time_ms'] = null;
+        $proxy['detected_ip'] = null;
+        $proxy['error_message'] = $errorMessage ?? 'Unknown validation error';
+        $proxy['last_checked_at'] = now()->format('d M Y H:i:s');
+
+        return $proxy;
+    }
+
+    private function resultErrorMessage(mixed $result): string
+    {
+        if ($result instanceof Response) {
+            return $this->summarizeError("HTTP {$result->status()}");
+        }
+
+        if ($result instanceof Throwable) {
+            return $this->summarizeError($result->getMessage());
+        }
+
+        return 'Unknown validation error';
+    }
+
+    private function summarizeError(string $message): string
+    {
+        return Str::limit($message, 180);
     }
 }

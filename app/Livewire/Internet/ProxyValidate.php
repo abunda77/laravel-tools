@@ -3,8 +3,8 @@
 namespace App\Livewire\Internet;
 
 use App\Services\Internet\ProxyValidateService;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Livewire\Component;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProxyValidate extends Component
 {
@@ -321,27 +321,30 @@ class ProxyValidate extends Component
         $this->validationProcessed = 0;
         $this->validationTotal = count($validAddresses);
         $this->validationStatus = 'Starting validation';
-        $this->stream(to: 'validation-progress', content: $this->progressMarkup(), replace: true);
 
-        foreach ($validAddresses as $position => $address) {
+        $indexes = [];
+        $proxies = [];
+
+        foreach ($validAddresses as $address) {
             $index = $this->findProxyIndex($address);
 
             if ($index === null) {
                 continue;
             }
 
-            $this->validationStatus = "Checking {$address}";
-            $this->stream(to: 'validation-progress', content: $this->progressMarkup(), replace: true);
-
-            $this->proxies[$index] = $proxyValidateService->validate($this->proxies[$index]);
-            $this->validationProcessed = $position + 1;
-            $this->validationStatus = "Processed {$this->validationProcessed} of {$this->validationTotal}";
-            $this->stream(to: 'validation-progress', content: $this->progressMarkup(), replace: true);
+            $indexes[] = $index;
+            $proxies[] = $this->proxies[$index];
         }
 
+        $validatedProxies = $proxyValidateService->validateMany($proxies);
+
+        foreach ($validatedProxies as $position => $proxy) {
+            $this->proxies[$indexes[$position]] = $proxy;
+        }
+
+        $this->validationProcessed = count($validatedProxies);
         $this->isValidating = false;
         $this->validationStatus = 'Validation finished';
-        $this->stream(to: 'validation-progress', content: $this->progressMarkup(), replace: true);
     }
 
     /**

@@ -95,7 +95,7 @@
 
                 <div class="mb-4 grid gap-3 xl:grid-cols-[minmax(0,1fr)_auto]">
                     <div class="rounded-[1.2rem] border border-[rgb(var(--app-line))] bg-white/80 px-4 py-3">
-                        <div wire:stream.replace="validation-progress">{!! $this->progressMarkup() !!}</div>
+                        <div>{!! $this->progressMarkup() !!}</div>
                     </div>
 
                     <div class="flex flex-wrap items-center justify-end gap-2">
