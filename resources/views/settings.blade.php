@@ -6,7 +6,7 @@
     <section class="page-stack">
 
         {{-- ── Tab Navigation ─────────────────────────────────────────────── --}}
-        <div class="settings-tabs" x-data="{ tab: window.location.hash === '#api-keys' ? 'api-keys' : 'general' }">
+        <div class="settings-tabs" x-data="{ tab: ['#api-keys', '#llm-models'].includes(window.location.hash) ? window.location.hash.slice(1) : 'general' }">
             <nav class="settings-tabs__nav" role="tablist" aria-label="Settings tabs">
                 <button
                     role="tab"
@@ -26,6 +26,15 @@
                 >
                     API Keys
                 </button>
+                <button
+                    role="tab"
+                    :aria-selected="tab === 'llm-models'"
+                    :class="{ 'settings-tabs__tab--active': tab === 'llm-models' }"
+                    class="settings-tabs__tab"
+                    @click="tab = 'llm-models'; history.replaceState(null, '', '#llm-models')"
+                >
+                    LLM Models
+                </button>
             </nav>
 
             <div class="settings-tabs__panels">
@@ -35,6 +44,10 @@
 
                 <div x-show="tab === 'api-keys'" x-cloak>
                     @livewire(\App\Livewire\Settings\ApiKeyManager::class)
+                </div>
+
+                <div x-show="tab === 'llm-models'" x-cloak>
+                    @livewire(\App\Livewire\Settings\LlmModelManager::class)
                 </div>
             </div>
         </div>

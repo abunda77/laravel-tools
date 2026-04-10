@@ -6,6 +6,7 @@ Route::view('/', 'welcome');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
+    Route::view('workspace/chatbot', 'workspace.chatbot')->name('workspace.chatbot');
     Route::view('external-api', 'external-api')->name('external-api');
     Route::view('custom-scripts', 'custom-scripts')->name('custom-scripts');
     Route::view('execution-history', 'execution-history')->name('execution-history');
