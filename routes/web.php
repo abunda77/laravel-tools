@@ -18,6 +18,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('search/unsplash', 'search.unsplash')->name('search.unsplash');
     Route::view('search/google-image', 'search.google-image')->name('search.google-image');
     Route::view('search/tiktok', 'search.tiktok')->name('search.tiktok');
+    Route::view('search/youtube', 'search.youtube')->name('search.youtube');
     Route::view('tools', 'tools')->name('tools');
     Route::view('tools/split-cash', 'tools.split-cash')->name('tools.split-cash');
     Route::view('tools/cek-resi', 'tools.cek-resi')->name('tools.cek-resi');

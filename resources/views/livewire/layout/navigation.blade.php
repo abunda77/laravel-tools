@@ -28,6 +28,7 @@ new class extends Component
                         ['label' => 'Unsplash', 'route' => 'search.unsplash'],
                         ['label' => 'Google Image', 'route' => 'search.google-image'],
                         ['label' => 'TikTok Video', 'route' => 'search.tiktok'],
+                        ['label' => 'Youtube', 'route' => 'search.youtube'],
                     ]],
                     ['label' => 'Tools', 'route' => 'tools', 'icon' => 'tools', 'subItems' => [
                         ['label' => 'Split Cash', 'route' => 'tools.split-cash'],
