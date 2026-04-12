@@ -144,12 +144,21 @@ new class extends Component
 
                     <div class="app-sidebar__links">
                         @foreach ($section['items'] as $item)
-                            @if(isset($item['subItems']))
-                                <div x-data="{ expanded: {{ request()->routeIs($item['route']) || request()->routeIs($item['route'] . '.*') || collect($item['subItems'])->contains(fn($s) => request()->routeIs($s['route'])) ? 'true' : 'false' }} }" class="space-y-1">
+                            @php
+                                $hasSubItems = isset($item['subItems']);
+                                $isCurrentRoute = request()->routeIs($item['route']) || request()->routeIs($item['route'] . '.*');
+                                $hasActiveSubItem = $hasSubItems
+                                    && collect($item['subItems'])->contains(fn (array $subItem): bool => request()->routeIs($subItem['route']));
+                                $isExpanded = $isCurrentRoute || $hasActiveSubItem;
+                            @endphp
+
+                            @if($hasSubItems)
+                                <div x-data="{ expanded: {{ $isExpanded ? 'true' : 'false' }} }" class="space-y-1">
                                     <button 
                                         type="button" 
                                         @click="expanded = !expanded" 
-                                        class="app-sidebar__link w-full justify-between {{ request()->routeIs($item['route']) || request()->routeIs($item['route'] . '.*') || collect($item['subItems'])->contains(fn($s) => request()->routeIs($s['route'])) ? 'is-active' : '' }}"
+                                        :aria-expanded="expanded"
+                                        class="app-sidebar__link w-full justify-between {{ $isExpanded ? 'is-active' : '' }}"
                                     >
                                         <div class="flex items-center gap-3">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-5">
@@ -157,14 +166,13 @@ new class extends Component
                                             </svg>
                                             <span>{{ $item['label'] }}</span>
                                         </div>
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-4 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-4" :class="expanded ? 'rotate-180' : ''">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                                         </svg>
                                     </button>
                                     
                                     <div 
                                         x-show="expanded" 
-                                        x-collapse 
                                         class="pl-11 pr-2 space-y-1"
                                         style="display: none;"
                                     >

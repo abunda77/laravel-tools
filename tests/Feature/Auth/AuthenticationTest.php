@@ -66,7 +66,9 @@ class AuthenticationTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSeeVolt('layout.navigation');
+            ->assertSeeVolt('layout.navigation')
+            ->assertDontSee('x-collapse', false)
+            ->assertDontSee('transition-transform duration-200', false);
     }
 
     public function test_users_can_logout(): void
