@@ -8,6 +8,11 @@ use Livewire\Component;
 
 class SendWhatsapp extends Component
 {
+    /** @var array<int, array{id: string, display_name: string, state: string, jid: string, created_at: string}> */
+    public array $devices = [];
+
+    public string $deviceId = '';
+
     public string $phone = '6281310307754@s.whatsapp.net';
 
     public string $message = 'selamat malam bro';
@@ -24,10 +29,14 @@ class SendWhatsapp extends Component
 
     public ?string $errorMessage = null;
 
-    public function mount(): void
+    public function mount(SendWhatsappService $sendWhatsappService): void
     {
         $this->hasConfiguredCredentials = filled(config('tools.whatsapp.username'))
             && filled(config('tools.whatsapp.password'));
+
+        if ($this->hasConfiguredCredentials) {
+            $this->loadDevices($sendWhatsappService);
+        }
     }
 
     public function send(SendWhatsappService $sendWhatsappService): void
@@ -37,6 +46,7 @@ class SendWhatsapp extends Component
         $this->replyMessageId = trim($this->replyMessageId);
 
         $this->validate([
+            'deviceId' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:255'],
             'message' => ['required', 'string', 'max:5000'],
             'replyMessageId' => ['nullable', 'string', 'max:255'],
@@ -46,6 +56,7 @@ class SendWhatsapp extends Component
 
         try {
             $this->result = $sendWhatsappService->send(
+                deviceId: $this->deviceId,
                 phone: $this->phone,
                 message: $this->message,
                 replyMessageId: $this->replyMessageId,
@@ -65,6 +76,28 @@ class SendWhatsapp extends Component
     public function getPrettyResponseProperty(): string
     {
         return json_encode($this->result['response'] ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) ?: '{}';
+    }
+
+    public function refreshDevices(SendWhatsappService $sendWhatsappService): void
+    {
+        $this->loadDevices($sendWhatsappService);
+    }
+
+    private function loadDevices(SendWhatsappService $sendWhatsappService): void
+    {
+        try {
+            $this->devices = $sendWhatsappService->devices();
+            $this->deviceId = $this->devices[0]['id'] ?? '';
+            $this->errorMessage = null;
+
+            if (empty($this->devices)) {
+                $this->errorMessage = 'Daftar device WhatsApp kosong. Pastikan device sudah tersedia di provider.';
+            }
+        } catch (\Throwable $throwable) {
+            $this->devices = [];
+            $this->deviceId = '';
+            $this->errorMessage = $throwable->getMessage();
+        }
     }
 
     public function render(): View

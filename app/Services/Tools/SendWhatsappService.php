@@ -14,6 +14,8 @@ use RuntimeException;
 
 class SendWhatsappService
 {
+    public const DEVICES_ENDPOINT = '/devices';
+
     public const ENDPOINT = '/send/message';
 
     private const MIN_TIMEOUT_SECONDS = 5;
@@ -24,15 +26,41 @@ class SendWhatsappService
     ) {}
 
     /**
+     * @return array<int, array{id: string, display_name: string, state: string, jid: string, created_at: string}>
+     */
+    public function devices(): array
+    {
+        try {
+            $response = $this->request()
+                ->get(self::DEVICES_ENDPOINT)
+                ->throw();
+        } catch (ConnectionException $exception) {
+            throw new RuntimeException(
+                'Tidak dapat mengambil daftar device WhatsApp. Periksa koneksi atau coba beberapa saat lagi.',
+                previous: $exception,
+            );
+        } catch (RequestException $exception) {
+            throw new RuntimeException(
+                $this->extractErrorMessage($exception->response),
+                previous: $exception,
+            );
+        }
+
+        return $this->mapDevicesResponse($response);
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function send(
+        string $deviceId,
         string $phone,
         string $message,
         ?string $replyMessageId = null,
         bool $isForwarded = false,
         int $duration = 86400,
     ): array {
+        $deviceId = $this->validateDeviceId($deviceId);
         $phone = $this->validatePhone($phone);
         $message = $this->validateMessage($message);
         $replyMessageId = $this->sanitizeReplyMessageId($replyMessageId);
@@ -40,6 +68,9 @@ class SendWhatsappService
 
         try {
             $response = $this->request()
+                ->withHeaders([
+                    'X-Device-Id' => $deviceId,
+                ])
                 ->post(self::ENDPOINT, [
                     'phone' => $phone,
                     'message' => $message,
@@ -60,7 +91,7 @@ class SendWhatsappService
             );
         }
 
-        return $this->mapResponse($response, $phone, $message, $replyMessageId, $isForwarded, $duration);
+        return $this->mapResponse($response, $deviceId, $phone, $message, $replyMessageId, $isForwarded, $duration);
     }
 
     private function request(): PendingRequest
@@ -121,6 +152,17 @@ class SendWhatsappService
         return max(0, (int) $this->settings->get('request_retry_sleep_ms'));
     }
 
+    private function validateDeviceId(string $deviceId): string
+    {
+        $deviceId = trim($deviceId);
+
+        if (blank($deviceId)) {
+            throw new InvalidArgumentException('Device WhatsApp wajib dipilih.');
+        }
+
+        return $deviceId;
+    }
+
     private function validatePhone(string $phone): string
     {
         $phone = trim($phone);
@@ -160,10 +202,42 @@ class SendWhatsappService
     }
 
     /**
+     * @return array<int, array{id: string, display_name: string, state: string, jid: string, created_at: string}>
+     */
+    private function mapDevicesResponse(Response $response): array
+    {
+        $payload = $response->json();
+
+        if (! is_array($payload)) {
+            throw new RuntimeException('API WhatsApp mengembalikan daftar device yang tidak valid (bukan JSON).');
+        }
+
+        if ((string) Arr::get($payload, 'code') !== 'SUCCESS') {
+            throw new RuntimeException(
+                (string) (Arr::get($payload, 'message') ?: 'API WhatsApp gagal mengambil daftar device.'),
+            );
+        }
+
+        return collect(Arr::wrap(Arr::get($payload, 'results', [])))
+            ->filter(fn (mixed $item): bool => is_array($item))
+            ->map(fn (array $item): array => [
+                'id' => (string) Arr::get($item, 'id', ''),
+                'display_name' => (string) Arr::get($item, 'display_name', ''),
+                'state' => (string) Arr::get($item, 'state', ''),
+                'jid' => (string) Arr::get($item, 'jid', ''),
+                'created_at' => (string) Arr::get($item, 'created_at', ''),
+            ])
+            ->filter(fn (array $item): bool => filled($item['id']))
+            ->values()
+            ->all();
+    }
+
+    /**
      * @return array<string, mixed>
      */
     private function mapResponse(
         Response $response,
+        string $deviceId,
         string $phone,
         string $message,
         ?string $replyMessageId,
@@ -188,6 +262,7 @@ class SendWhatsappService
             'messageId' => (string) Arr::get($payload, 'results.message_id', ''),
             'status' => (string) Arr::get($payload, 'results.status', ''),
             'request' => [
+                'device_id' => $deviceId,
                 'phone' => $phone,
                 'message' => $message,
                 'reply_message_id' => $replyMessageId ?? '',

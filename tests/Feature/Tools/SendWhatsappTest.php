@@ -23,6 +23,24 @@ class SendWhatsappTest extends TestCase
 
     public function test_authenticated_user_can_view_send_whatsapp_page(): void
     {
+        $this->configureWhatsappCredentials();
+
+        Http::fake([
+            'http://46.102.156.214:3003/devices' => Http::response([
+                'code' => 'SUCCESS',
+                'message' => 'List devices',
+                'results' => [
+                    [
+                        'id' => 'e11e33af-b3e9-43ec-b034-5f7e9f0c46a3',
+                        'display_name' => 'Whatsapp Gateway',
+                        'state' => 'logged_in',
+                        'jid' => '6285194990269@s.whatsapp.net',
+                        'created_at' => '2026-04-12T02:02:47.592528629Z',
+                    ],
+                ],
+            ], 200),
+        ]);
+
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->get(route('tools.send-whatsapp'));
@@ -37,6 +55,26 @@ class SendWhatsappTest extends TestCase
         $this->configureWhatsappCredentials();
 
         Http::fake([
+            'http://46.102.156.214:3003/devices' => Http::response([
+                'code' => 'SUCCESS',
+                'message' => 'List devices',
+                'results' => [
+                    [
+                        'id' => 'e11e33af-b3e9-43ec-b034-5f7e9f0c46a3',
+                        'display_name' => 'Whatsapp Gateway',
+                        'state' => 'logged_in',
+                        'jid' => '6285194990269@s.whatsapp.net',
+                        'created_at' => '2026-04-12T02:02:47.592528629Z',
+                    ],
+                    [
+                        'id' => 'e21e33af-b3e9-43ec-b034-5f7e9f0c46a3',
+                        'display_name' => 'Josh Grobak',
+                        'state' => 'logged_in',
+                        'jid' => '6281310307754@s.whatsapp.net',
+                        'created_at' => '2026-04-12T03:51:30.467942683Z',
+                    ],
+                ],
+            ], 200),
             'http://46.102.156.214:3003/send/message' => Http::response([
                 'code' => 'SUCCESS',
                 'message' => 'Message sent to 6281310307754@s.whatsapp.net (server timestamp: 2026-04-12 02:05:23 +0000 UTC)',
@@ -51,6 +89,8 @@ class SendWhatsappTest extends TestCase
 
         Livewire::actingAs($user)
             ->test(SendWhatsapp::class)
+            ->assertSet('deviceId', 'e11e33af-b3e9-43ec-b034-5f7e9f0c46a3')
+            ->set('deviceId', 'e21e33af-b3e9-43ec-b034-5f7e9f0c46a3')
             ->set('phone', '6281310307754@s.whatsapp.net')
             ->set('message', 'selamat malam bro')
             ->set('replyMessageId', '')
@@ -60,15 +100,18 @@ class SendWhatsappTest extends TestCase
             ->assertHasNoErrors()
             ->assertSet('result.code', 'SUCCESS')
             ->assertSet('result.messageId', '3EB0ECAD575DA35654E202')
+            ->assertSet('result.request.device_id', 'e21e33af-b3e9-43ec-b034-5f7e9f0c46a3')
             ->assertSet('result.request.phone', '6281310307754@s.whatsapp.net')
             ->assertSet('result.request.duration', 86400)
             ->assertSee('Response JSON');
 
         Http::assertSent(function ($request) {
             $authorizationHeader = $request->header('Authorization')[0] ?? null;
+            $deviceHeader = $request->header('X-Device-Id')[0] ?? null;
 
             return $request->url() === 'http://46.102.156.214:3003/send/message'
                 && $authorizationHeader === 'Basic '.base64_encode('Username:Password')
+                && $deviceHeader === 'e21e33af-b3e9-43ec-b034-5f7e9f0c46a3'
                 && $request['phone'] === '6281310307754@s.whatsapp.net'
                 && $request['message'] === 'selamat malam bro'
                 && $request['reply_message_id'] === ''
@@ -90,6 +133,7 @@ class SendWhatsappTest extends TestCase
 
         Livewire::actingAs($user)
             ->test(SendWhatsapp::class)
+            ->set('deviceId', 'dummy-device-id')
             ->set('phone', '6281310307754@s.whatsapp.net')
             ->set('message', 'selamat malam bro')
             ->call('send')
@@ -101,6 +145,22 @@ class SendWhatsappTest extends TestCase
         $this->configureRequestSettings();
         $this->configureWhatsappCredentials();
 
+        Http::fake([
+            'http://46.102.156.214:3003/devices' => Http::response([
+                'code' => 'SUCCESS',
+                'message' => 'List devices',
+                'results' => [
+                    [
+                        'id' => 'e11e33af-b3e9-43ec-b034-5f7e9f0c46a3',
+                        'display_name' => 'Whatsapp Gateway',
+                        'state' => 'logged_in',
+                        'jid' => '6285194990269@s.whatsapp.net',
+                        'created_at' => '2026-04-12T02:02:47.592528629Z',
+                    ],
+                ],
+            ], 200),
+        ]);
+
         $user = User::factory()->create();
 
         Livewire::actingAs($user)
@@ -110,6 +170,43 @@ class SendWhatsappTest extends TestCase
             ->call('send')
             ->assertHasNoErrors()
             ->assertSet('errorMessage', 'Nomor tujuan harus memakai format WhatsApp JID, contoh 6281310307754@s.whatsapp.net.');
+    }
+
+    public function test_send_whatsapp_loads_devices_on_mount(): void
+    {
+        $this->configureRequestSettings();
+        $this->configureWhatsappCredentials();
+
+        Http::fake([
+            'http://46.102.156.214:3003/devices' => Http::response([
+                'code' => 'SUCCESS',
+                'message' => 'List devices',
+                'results' => [
+                    [
+                        'id' => 'e11e33af-b3e9-43ec-b034-5f7e9f0c46a3',
+                        'display_name' => 'Whatsapp Gateway',
+                        'state' => 'logged_in',
+                        'jid' => '6285194990269@s.whatsapp.net',
+                        'created_at' => '2026-04-12T02:02:47.592528629Z',
+                    ],
+                    [
+                        'id' => 'e21e33af-b3e9-43ec-b034-5f7e9f0c46a3',
+                        'display_name' => 'Josh Grobak',
+                        'state' => 'logged_in',
+                        'jid' => '6281310307754@s.whatsapp.net',
+                        'created_at' => '2026-04-12T03:51:30.467942683Z',
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $user = User::factory()->create();
+
+        Livewire::actingAs($user)
+            ->test(SendWhatsapp::class)
+            ->assertSet('deviceId', 'e11e33af-b3e9-43ec-b034-5f7e9f0c46a3')
+            ->assertSet('devices.0.display_name', 'Whatsapp Gateway')
+            ->assertSet('devices.1.id', 'e21e33af-b3e9-43ec-b034-5f7e9f0c46a3');
     }
 
     private function configureRequestSettings(): void

@@ -14,12 +14,12 @@
                 <strong>{{ $hasConfiguredCredentials ? 'Ready' : 'Missing' }}</strong>
             </div>
             <div class="mini-stat">
-                <span>Endpoint</span>
-                <strong>{{ \App\Services\Tools\SendWhatsappService::ENDPOINT }}</strong>
+                <span>Devices</span>
+                <strong>{{ count($devices) }}</strong>
             </div>
             <div class="mini-stat">
-                <span>Method</span>
-                <strong>POST</strong>
+                <span>Endpoint</span>
+                <strong>{{ \App\Services\Tools\SendWhatsappService::ENDPOINT }}</strong>
             </div>
         </div>
     </section>
@@ -43,6 +43,33 @@
 
             <form wire:submit="send" class="settings-form">
                 <div class="form-grid">
+                    <div class="form-field">
+                        <div class="flex items-start justify-between gap-4">
+                            <label for="send_whatsapp_device_id" class="form-label">Device</label>
+                            <button
+                                type="button"
+                                wire:click="refreshDevices"
+                                class="text-xs font-semibold uppercase tracking-[0.24em] text-[rgb(var(--app-muted))] transition hover:text-[rgb(var(--app-ink))]"
+                            >
+                                Refresh
+                            </button>
+                        </div>
+                        <select
+                            id="send_whatsapp_device_id"
+                            wire:model="deviceId"
+                            class="form-input"
+                        >
+                            <option value="">Pilih device</option>
+                            @foreach ($devices as $device)
+                                <option value="{{ $device['id'] }}">
+                                    {{ $device['display_name'] ?: $device['jid'] }} | {{ $device['state'] ?: 'unknown' }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <p class="form-help">Value option memakai <code>id</code> dari endpoint <code>/devices</code>.</p>
+                        @error('deviceId') <p class="form-error">{{ $message }}</p> @enderror
+                    </div>
+
                     <div class="form-field">
                         <label for="send_whatsapp_phone" class="form-label">Phone / JID</label>
                         <input
@@ -139,6 +166,10 @@
 
                     <div class="parcel-data-grid">
                         <article>
+                            <span>Device ID</span>
+                            <strong>{{ $result['request']['device_id'] }}</strong>
+                        </article>
+                        <article>
                             <span>Message ID</span>
                             <strong>{{ $result['messageId'] ?: '-' }}</strong>
                         </article>
@@ -177,6 +208,10 @@
                 </div>
 
                 <div class="settings-checklist">
+                    <article>
+                        <strong>deviceId header</strong>
+                        <p>Pilih device dari endpoint <code>/devices</code>. Saat kirim, nilainya dikirim sebagai header <code>X-Device-Id</code>.</p>
+                    </article>
                     <article>
                         <strong>phone</strong>
                         <p>Nomor tujuan dalam format JID WhatsApp.</p>
