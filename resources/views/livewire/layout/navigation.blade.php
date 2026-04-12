@@ -22,7 +22,10 @@ new class extends Component
             [
                 'label' => 'Modules',
                 'items' => [
-                    ['label' => 'Search', 'route' => 'search', 'icon' => 'search'],
+                    ['label' => 'Search', 'route' => 'search', 'icon' => 'search', 'subItems' => [
+                        ['label' => 'Overview', 'route' => 'search'],
+                        ['label' => 'Tokopedia', 'route' => 'search.tokopedia'],
+                    ]],
                     ['label' => 'Tools', 'route' => 'tools', 'icon' => 'tools', 'subItems' => [
                         ['label' => 'Split Cash', 'route' => 'tools.split-cash'],
                         ['label' => 'Cek Resi', 'route' => 'tools.cek-resi'],
