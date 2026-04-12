@@ -69,6 +69,11 @@ app/
       CurrencyExchangeRate.php
       ProxyValidate.php
       Whois.php
+    Search/
+      GoogleImageSearch.php
+      TokopediaSearch.php
+      UnsplashSearch.php
+      TiktokVideoSearch.php
     Tools/
       CekResi.php
     Operations/
@@ -85,6 +90,11 @@ app/
       CurrencyExchangeRateService.php
       ProxyValidateService.php
       WhoisService.php
+    Search/
+      GoogleImageSearchService.php
+      TokopediaSearchService.php
+      UnsplashSearchService.php
+      TiktokVideoSearchService.php
     Tools/
       CekResiService.php
   Support/
@@ -125,6 +135,15 @@ Operations
 
 ---
 
+Catatan modul Search:
+- `Overview`
+- `Tokopedia`
+- `Unsplash`
+- `Google Image`
+- `TikTok Video`
+
+---
+
 Catatan modul Internet:
 - `Overview`
 - `Kurs Mata Uang`
@@ -141,6 +160,60 @@ Catatan modul Tools:
 
 Catatan modul Video AI:
 - `Generation Video`
+
+---
+
+## Fitur Search Tokopedia
+
+Menu **Modules -> Search -> Tokopedia** menyediakan workbench untuk mencari produk Tokopedia.
+
+- Menggunakan API key tersimpan di tabel `api_keys` dengan identifier `downloader_provider`.
+- Base URL yang dipakai adalah `https://api.ferdev.my.id`.
+- Endpoint yang dipanggil adalah `/search/tokopedia`.
+- Parameter query utama adalah `query`, contoh `itel city 100`.
+- Hasil mengambil data dari array `data` dan menampilkan informasi `id`, `name`, `price`, `price_number`, `shop.name`, `shop.city`, `url`, dan `thumbnail`.
+- UI menyediakan dua mode tampilan: `Card View` dan `Table View`.
+- Raw JSON response tetap ditampilkan untuk inspeksi payload provider.
+
+---
+
+## Fitur Search Unsplash
+
+Menu **Modules -> Search -> Unsplash** menyediakan workbench untuk mencari gambar dari Unsplash.
+
+- Menggunakan API key tersimpan di tabel `api_keys` dengan identifier `downloader_provider`.
+- Base URL yang dipakai adalah `https://api.ferdev.my.id`.
+- Endpoint yang dipanggil adalah `/search/unsplash`.
+- Parameter query utama adalah `query`, contoh `river in the mount`.
+- Hasil mengambil data dari array `result` dan menampilkan `title`, `download`, dan `preview`.
+- Setiap item dirender sebagai card gallery, tabel URL, dan raw JSON response.
+
+---
+
+## Fitur Search Google Image
+
+Menu **Modules -> Search -> Google Image** menyediakan workbench untuk mencari gambar dari Google Image.
+
+- Menggunakan API key tersimpan di tabel `api_keys` dengan identifier `downloader_provider`.
+- Base URL yang dipakai adalah `https://api.ferdev.my.id`.
+- Endpoint yang dipanggil adalah `/search/gimage`.
+- Parameter query utama adalah `query`, contoh `burung perkutut`.
+- Hasil mengambil data dari array `result` dan menampilkan `title`, `url`, dan `image`.
+- Setiap item dirender sebagai preview gambar, tabel URL, dan raw JSON response.
+
+---
+
+## Fitur Search TikTok Video
+
+Menu **Modules -> Search -> TikTok Video** menyediakan workbench untuk mencari konten video TikTok.
+
+- Menggunakan API key tersimpan di tabel `api_keys` dengan identifier `downloader_provider`.
+- Base URL yang dipakai adalah `https://api.ferdev.my.id`.
+- Endpoint yang dipanggil adalah `/search/tiktok`.
+- Parameter query utama adalah `query`, contoh `pargoy`.
+- Hasil mengambil data dari array `result`, yang berisi daftar URL video `.mp4`.
+- Setiap URL video dirender sebagai preview player video dan juga disusun dalam tabel URL.
+- Raw JSON response tetap ditampilkan untuk verifikasi payload provider.
 
 ---
 
@@ -414,6 +487,10 @@ php artisan test
 - [ ] Halaman daftar tools per kategori
 - [ ] Form parameter dinamis + execute endpoint
 - [ ] Tampil hasil response (JSON, image, link)
+- [x] Modul Search: Tokopedia (card view + table view + raw JSON)
+- [x] Modul Search: Unsplash (gallery card + table URL + raw JSON)
+- [x] Modul Search: Google Image (preview image + table URL + raw JSON)
+- [x] Modul Search: TikTok Video (preview video + table URL + raw JSON)
 - [x] Modul Tools: Cek Resi (tracking paket + timeline vertikal)
 - [x] Modul Internet: Kurs Mata Uang (API.co.id Exchange Rate)
 - [x] Modul Internet: Proxy Validate (filter, bulk select, validate, export, progress)
@@ -443,7 +520,7 @@ php artisan test
 - **Custom Script Executor**: Hindari menjalankan shell command bebas dari input user. Prioritaskan `Artisan command` atau `PHP class handler`. Jika shell command diperlukan, gunakan **whitelist** command yang diizinkan.
 - **API Key**: Semua input `value` dari halaman manajemen API Keys akan dienkripsi dari bawaan sistem sebelum masuk ke database (`Crypt::encryptString`) untuk faktor keamanan.
 - **API Key Internet / Exchange Rate**: Modul Kurs Mata Uang mengambil key dari `api_keys` dengan identifier `apicoid_provider` dan mengirimkannya melalui header `x-api-co-id`.
-- **API Key Ferdev Provider**: Modul Downloader, Tools -> Cek Resi, dan Internet -> Whois mengambil key dari `api_keys` dengan identifier `downloader_provider` dan mengirimkannya sebagai parameter query `apikey`.
+- **API Key Ferdev Provider**: Modul Downloader, Search -> Tokopedia, Search -> Unsplash, Search -> Google Image, Search -> TikTok Video, Tools -> Cek Resi, dan Internet -> Whois mengambil key dari `api_keys` dengan identifier `downloader_provider` dan mengirimkannya sebagai parameter query `apikey`.
 - **Backup API Key**: File backup API key berisi secret asli agar dapat direstore. Simpan file backup di lokasi aman dan jangan commit file dari `storage/app/private/api-key-backups`.
 - **Permission**: Batasi akses menu tertentu menggunakan role-based access control.
 

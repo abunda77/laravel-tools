@@ -36,6 +36,40 @@
                 <div class="surface-panel__header">
                     <div>
                         <p class="section-kicker">Available tools</p>
+                        <h3>Unsplash</h3>
+                    </div>
+                    <a href="{{ route('search.unsplash') }}" wire:navigate class="primary-action">
+                        Buka tool
+                    </a>
+                </div>
+
+                <p class="surface-panel__text">
+                    Cari gambar Unsplash lewat endpoint <code>/search/unsplash</code> dengan API key
+                    <code>downloader_provider</code>, lalu lihat hasil sebagai galeri, tabel URL, dan raw JSON.
+                </p>
+            </div>
+
+            <div class="surface-panel surface-panel--compact">
+                <div class="surface-panel__header">
+                    <div>
+                        <p class="section-kicker">Available tools</p>
+                        <h3>Google Image</h3>
+                    </div>
+                    <a href="{{ route('search.google-image') }}" wire:navigate class="primary-action">
+                        Buka tool
+                    </a>
+                </div>
+
+                <p class="surface-panel__text">
+                    Cari gambar Google lewat endpoint <code>/search/gimage</code> dengan API key
+                    <code>downloader_provider</code>, lalu lihat hasil sebagai preview gambar, tabel URL, dan raw JSON.
+                </p>
+            </div>
+
+            <div class="surface-panel surface-panel--compact">
+                <div class="surface-panel__header">
+                    <div>
+                        <p class="section-kicker">Available tools</p>
                         <h3>TikTok Video</h3>
                     </div>
                     <a href="{{ route('search.tiktok') }}" wire:navigate class="primary-action">

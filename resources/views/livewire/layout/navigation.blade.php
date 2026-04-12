@@ -25,6 +25,8 @@ new class extends Component
                     ['label' => 'Search', 'route' => 'search', 'icon' => 'search', 'subItems' => [
                         ['label' => 'Overview', 'route' => 'search'],
                         ['label' => 'Tokopedia', 'route' => 'search.tokopedia'],
+                        ['label' => 'Unsplash', 'route' => 'search.unsplash'],
+                        ['label' => 'Google Image', 'route' => 'search.google-image'],
                         ['label' => 'TikTok Video', 'route' => 'search.tiktok'],
                     ]],
                     ['label' => 'Tools', 'route' => 'tools', 'icon' => 'tools', 'subItems' => [
