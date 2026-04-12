@@ -32,6 +32,7 @@ new class extends Component
                     ['label' => 'Tools', 'route' => 'tools', 'icon' => 'tools', 'subItems' => [
                         ['label' => 'Split Cash', 'route' => 'tools.split-cash'],
                         ['label' => 'Cek Resi', 'route' => 'tools.cek-resi'],
+                        ['label' => 'Kirim WA / Send Whatsapp', 'route' => 'tools.send-whatsapp'],
                     ]],
                     ['label' => 'Image AI', 'route' => 'image-ai', 'icon' => 'image', 'subItems' => [
                         ['label' => 'Generation Image', 'route' => 'generation.index'],

@@ -21,6 +21,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('tools', 'tools')->name('tools');
     Route::view('tools/split-cash', 'tools.split-cash')->name('tools.split-cash');
     Route::view('tools/cek-resi', 'tools.cek-resi')->name('tools.cek-resi');
+    Route::view('tools/send-whatsapp', 'tools.send-whatsapp')->name('tools.send-whatsapp');
     Route::view('generation/image', 'generation.image')->name('generation.index');
     Route::view('generation/video', 'generation.video')->name('generation.video');
     Route::view('image-ai/image2prompt', 'image-ai.image2prompt')->name('image-ai.image2prompt');

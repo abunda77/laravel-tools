@@ -15,4 +15,9 @@ return [
             'default' => env('TOOLS_QUEUE_CONNECTION', env('QUEUE_CONNECTION', 'database')),
         ],
     ],
+    'whatsapp' => [
+        'base_url' => env('WHATSAPP_API_BASE_URL', 'http://46.102.156.214:3003'),
+        'username' => env('WHATSAPP_API_USERNAME'),
+        'password' => env('WHATSAPP_API_PASSWORD'),
+    ],
 ];

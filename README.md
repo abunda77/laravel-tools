@@ -76,6 +76,7 @@ app/
       TiktokVideoSearch.php
     Tools/
       CekResi.php
+      SendWhatsapp.php
     Operations/
       ApiKeyBackupManager.php
     Settings/
@@ -97,6 +98,7 @@ app/
       TiktokVideoSearchService.php
     Tools/
       CekResiService.php
+      SendWhatsappService.php
   Support/
     Registries/
 config/
@@ -155,6 +157,7 @@ Catatan modul Internet:
 Catatan modul Tools:
 - `Split Cash`
 - `Cek Resi`
+- `Kirim WA / Send Whatsapp`
 
 ---
 
@@ -227,6 +230,19 @@ Menu **Modules -> Tools -> Cek Resi** menyediakan workbench untuk melacak paket 
 - Parameter query utama adalah `resi` dan `ekspedisi`, contoh `SPXID054330680586` dan `shopee-express`.
 - Hasil menampilkan data dari key `data`: resi, ekspedisi, kode ekspedisi, status, tanggal kirim, customer service, posisi terakhir, share link, dan history pengiriman.
 - History pengiriman ditampilkan sebagai timeline vertikal agar alur perjalanan paket mudah dibaca.
+
+---
+
+## Fitur Kirim WA / Send Whatsapp
+
+Menu **Modules -> Tools -> Kirim WA / Send Whatsapp** menyediakan workbench untuk mengirim pesan WhatsApp melalui provider eksternal.
+
+- Base URL diambil dari environment `WHATSAPP_API_BASE_URL` dengan default `http://46.102.156.214:3003`.
+- Endpoint yang dipanggil adalah `/send/message`.
+- Semua request memakai basic auth dari `WHATSAPP_API_USERNAME` dan `WHATSAPP_API_PASSWORD`.
+- Request body yang dikirim berisi `phone`, `message`, `reply_message_id`, `is_forwarded`, dan `duration`.
+- Contoh target yang didukung: `6281310307754@s.whatsapp.net`.
+- Hasil menampilkan `code`, `message`, `results.message_id`, `results.status`, dan raw JSON response untuk inspeksi payload provider.
 
 ---
 
