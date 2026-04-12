@@ -31,6 +31,23 @@
                     <code>downloader_provider</code>, lalu lihat hasil dalam mode <code>card</code> atau <code>table</code>.
                 </p>
             </div>
+
+            <div class="surface-panel surface-panel--compact">
+                <div class="surface-panel__header">
+                    <div>
+                        <p class="section-kicker">Available tools</p>
+                        <h3>TikTok Video</h3>
+                    </div>
+                    <a href="{{ route('search.tiktok') }}" wire:navigate class="primary-action">
+                        Buka tool
+                    </a>
+                </div>
+
+                <p class="surface-panel__text">
+                    Cari video TikTok lewat endpoint <code>/search/tiktok</code> dengan API key
+                    <code>downloader_provider</code>, lalu lihat hasil sebagai preview video dan daftar URL.
+                </p>
+            </div>
         </div>
     </section>
 </x-app-layout>

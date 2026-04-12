@@ -25,6 +25,7 @@ new class extends Component
                     ['label' => 'Search', 'route' => 'search', 'icon' => 'search', 'subItems' => [
                         ['label' => 'Overview', 'route' => 'search'],
                         ['label' => 'Tokopedia', 'route' => 'search.tokopedia'],
+                        ['label' => 'TikTok Video', 'route' => 'search.tiktok'],
                     ]],
                     ['label' => 'Tools', 'route' => 'tools', 'icon' => 'tools', 'subItems' => [
                         ['label' => 'Split Cash', 'route' => 'tools.split-cash'],
