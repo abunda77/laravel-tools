@@ -91,16 +91,19 @@ class ApiKeyManager extends Component
             /** @var ApiKey $key */
             $key = ApiKey::findOrFail($this->editingId);
 
-            $key->label = $validated['label'];
-            $key->description = $validated['description'] ?? null;
-            $key->is_active = $validated['isActive'];
+            $attributes = [
+                'label' => $validated['label'],
+                'description' => $validated['description'] ?? null,
+                'is_active' => $validated['isActive'],
+            ];
 
             // Only update value if user typed something new
             if (filled($validated['value'])) {
-                $key->value = $validated['value'];
+                $attributes['value'] = $validated['value'];
                 $this->hasValue = true;
             }
 
+            $key->fill($attributes);
             $key->save();
         } else {
             $key = ApiKey::create([
