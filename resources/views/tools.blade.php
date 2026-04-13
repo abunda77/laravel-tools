@@ -14,7 +14,7 @@
             </div>
         </div>
 
-        <div class="grid gap-6 lg:grid-cols-3">
+        <div class="grid gap-6 lg:grid-cols-2 2xl:grid-cols-4">
             <div class="surface-panel surface-panel--compact">
                 <div class="surface-panel__header">
                     <div>
@@ -26,6 +26,20 @@
                 </div>
                 <p class="surface-panel__text">
                     Hitung pembagian uang tunai dengan cepat untuk kebutuhan transaksi operasional.
+                </p>
+            </div>
+
+            <div class="surface-panel surface-panel--compact">
+                <div class="surface-panel__header">
+                    <div>
+                        <h3>Calculator PVC</h3>
+                    </div>
+                    <a href="{{ route('tools.calculator-pvc') }}" wire:navigate class="primary-action">
+                        Buka
+                    </a>
+                </div>
+                <p class="surface-panel__text">
+                    Estimasi kebutuhan lembar PVC panel atau board berdasarkan ukuran bidang dan harga per lembar.
                 </p>
             </div>
 

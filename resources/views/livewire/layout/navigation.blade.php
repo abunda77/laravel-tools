@@ -32,6 +32,7 @@ new class extends Component
                     ]],
                     ['label' => 'Tools', 'route' => 'tools', 'icon' => 'tools', 'subItems' => [
                         ['label' => 'Split Cash', 'route' => 'tools.split-cash'],
+                        ['label' => 'Calculator PVC', 'route' => 'tools.calculator-pvc'],
                         ['label' => 'Cek Resi', 'route' => 'tools.cek-resi'],
                         ['label' => 'Kirim WA / Send Whatsapp', 'route' => 'tools.send-whatsapp'],
                     ]],
