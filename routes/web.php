@@ -32,6 +32,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('internet/currency-exchange-rate', 'internet.currency-exchange-rate')->name('internet.currency-exchange-rate');
     Route::view('internet/proxy-validate', 'internet.proxy-validate')->name('internet.proxy-validate');
     Route::view('internet/whois', 'internet.whois')->name('internet.whois');
+    Route::view('apifreaks-tools', 'apifreaks-tools')->name('apifreaks-tools');
+    Route::view('apifreaks-tools/credit-usage', 'apifreaks-tools.credit-usage')->name('apifreaks-tools.credit-usage');
+    Route::view('apifreaks-tools/domain-whois-lookup', 'apifreaks-tools.domain-whois-lookup')->name('apifreaks-tools.domain-whois-lookup');
+    Route::view('apifreaks-tools/domain-whois-history-lookup', 'apifreaks-tools.domain-whois-history-lookup')->name('apifreaks-tools.domain-whois-history-lookup');
+    Route::view('apifreaks-tools/domain-search', 'apifreaks-tools.domain-search')->name('apifreaks-tools.domain-search');
+    Route::view('apifreaks-tools/subdomain-lookup', 'apifreaks-tools.subdomain-lookup')->name('apifreaks-tools.subdomain-lookup');
+    Route::view('apifreaks-tools/commodity-symbols', 'apifreaks-tools.commodity-symbols')->name('apifreaks-tools.commodity-symbols');
+    Route::view('apifreaks-tools/live-commodity-prices', 'apifreaks-tools.live-commodity-prices')->name('apifreaks-tools.live-commodity-prices');
+    Route::view('apifreaks-tools/historical-commodity-prices', 'apifreaks-tools.historical-commodity-prices')->name('apifreaks-tools.historical-commodity-prices');
 });
 
 require __DIR__.'/auth.php';

@@ -50,6 +50,17 @@ new class extends Component
                         ['label' => 'Proxy Validate', 'route' => 'internet.proxy-validate'],
                         ['label' => 'Whois', 'route' => 'internet.whois'],
                     ]],
+                    ['label' => 'ApiFreaks Tools', 'route' => 'apifreaks-tools', 'icon' => 'api', 'subItems' => [
+                        ['label' => 'Overview', 'route' => 'apifreaks-tools'],
+                        ['label' => 'Credit Usage', 'route' => 'apifreaks-tools.credit-usage'],
+                        ['label' => 'Domain WHOIS Lookup', 'route' => 'apifreaks-tools.domain-whois-lookup'],
+                        ['label' => 'WHOIS History', 'route' => 'apifreaks-tools.domain-whois-history-lookup'],
+                        ['label' => 'Domain Search', 'route' => 'apifreaks-tools.domain-search'],
+                        ['label' => 'Subdomain Lookup', 'route' => 'apifreaks-tools.subdomain-lookup'],
+                        ['label' => 'Commodity Symbols', 'route' => 'apifreaks-tools.commodity-symbols'],
+                        ['label' => 'Live Commodity Prices', 'route' => 'apifreaks-tools.live-commodity-prices'],
+                        ['label' => 'Historical Commodity Prices', 'route' => 'apifreaks-tools.historical-commodity-prices'],
+                    ]],
                 ],
             ],
             [
