@@ -8,7 +8,7 @@
 
 Laravel Tools adalah panel admin internal yang dirancang untuk:
 
-- Menjalankan **API eksternal** dari berbagai provider (Downloader, Search, Tools, Internet, Random, dll.)
+- Menjalankan **API eksternal** dari berbagai provider (Downloader, Search, Tools, Internet, ApiFreaks, Random, dll.)
 - Menjalankان **script/command custom** internal buatan sendiri
 - Memonitor histori eksekusi, status, dan log setiap request
 
@@ -41,6 +41,9 @@ Pendekatan utama adalah **config-driven modules**, sehingga menu dan submenu API
 - Exchange Rate API docs: [https://docs.api.co.id/products/exchange-rate/](https://docs.api.co.id/products/exchange-rate/)
 - Exchange Rate endpoint base URL: `https://use.api.co.id`
 - Exchange Rate authentication header: `x-api-co-id`
+- ApiFreaks docs: [https://apifreaks.com](https://apifreaks.com)
+- ApiFreaks endpoint base URL: `https://api.apifreaks.com`
+- ApiFreaks authentication header: `X-apiKey`
 
 ### Kategori API yang Tersedia
 
@@ -48,6 +51,7 @@ Pendekatan utama adalah **config-driven modules**, sehingga menu dan submenu API
 - `Search`
 - `Tools`
 - `Internet`
+- `ApiFreaks Tools`
 - `Random`
 - `Artificial Intelligence` *(dari docs online)*
 - `Maker`, `Sticker`, `Stalker` *(dari docs online)*
@@ -65,6 +69,15 @@ app/
     Forms/
     Generation/
       VideoGeneration.php
+    ApiFreaks/
+      CommoditySymbols.php
+      CreditUsage.php
+      DomainSearch.php
+      DomainWhoisHistoryLookup.php
+      DomainWhoisLookup.php
+      HistoricalCommodityPrices.php
+      LiveCommodityPrices.php
+      SubdomainLookup.php
     Internet/
       CurrencyExchangeRate.php
       ProxyValidate.php
@@ -84,6 +97,16 @@ app/
   Services/
     ApiKeys/
       ApiKeyBackupService.php
+    ApiFreaks/
+      ApiFreaksService.php
+      CommoditySymbolsService.php
+      CreditUsageService.php
+      DomainSearchService.php
+      DomainWhoisHistoryLookupService.php
+      DomainWhoisLookupService.php
+      HistoricalCommodityPricesService.php
+      LiveCommodityPricesService.php
+      SubdomainLookupService.php
     ExternalApi/
       DownloaderService.php
     Freepik/
@@ -139,6 +162,11 @@ Operations
 
 ---
 
+Ringkasan sidebar saat ini:
+- `Workspace`: `Dashboard`, `Downloader`, `Custom Scripts`
+- `Modules`: `Search`, `Tools`, `Internet`, `ApiFreaks Tools`
+- `Operations`: `Backup Data ApiKey`, `Execution History`, `Settings`, `Profile`
+
 Catatan modul Search:
 - `Overview`
 - `Tokopedia`
@@ -154,6 +182,19 @@ Catatan modul Internet:
 - `Kurs Mata Uang`
 - `Proxy Validate`
 - `Whois`
+
+---
+
+Catatan modul ApiFreaks Tools:
+- `Overview`
+- `Credit Usage`
+- `Domain WHOIS Lookup`
+- `WHOIS History`
+- `Domain Search`
+- `Subdomain Lookup`
+- `Commodity Symbols`
+- `Live Commodity Prices`
+- `Historical Commodity Prices`
 
 ---
 
@@ -312,6 +353,80 @@ Menu **Modules -> Internet -> Whois** menyediakan workbench untuk melihat inform
 - Hasil menampilkan `data.domain` dan `data.result`.
 - Raw WHOIS record ditampilkan dengan line break asli agar mudah dibaca dan diaudit.
 - Ringkasan registrar, tanggal registrasi, tanggal kedaluwarsa, DNSSEC, dan name server diekstrak dari raw WHOIS jika tersedia.
+
+---
+
+## Fitur ApiFreaks Tools
+
+Menu **Modules -> ApiFreaks Tools** menyediakan kumpulan workbench untuk endpoint dari provider ApiFreaks.
+
+- Semua tool di grup ini menggunakan API key tersimpan di tabel `api_keys` dengan identifier `apifreaks_provider`.
+- Base URL yang dipakai adalah `https://api.apifreaks.com`.
+- Semua request memakai header autentikasi `X-apiKey`.
+- Raw JSON response tetap ditampilkan di setiap halaman untuk inspeksi payload provider.
+
+### Credit Usage API
+
+- Route: `apifreaks-tools.credit-usage`
+- Endpoint: `/v1.0/credits/usage/info`
+- Method: `GET`
+- Menampilkan response object dalam bentuk tabel field-value seperti status akun, subscription credits, dan one-off credits.
+
+### Domain WHOIS Lookup API
+
+- Route: `apifreaks-tools.domain-whois-lookup`
+- Endpoint: `/v1.0/domain/whois/live`
+- Method: `GET`
+- Parameter utama: `domainName`
+- Menampilkan tabel summary domain, registrar, contact registrant/administrative/technical/billing, name servers, dan domain statuses.
+
+### Domain WHOIS History Lookup API
+
+- Route: `apifreaks-tools.domain-whois-history-lookup`
+- Endpoint: `/v1.0/domain/whois/history`
+- Method: `GET`
+- Parameter utama: `domainName`
+- Menampilkan histori WHOIS dalam tabel record berisi nomor snapshot, domain, query time, create/update/expiry date, registrar, dan registrant.
+
+### Domain Search API
+
+- Route: `apifreaks-tools.domain-search`
+- Endpoint: `/v1.0/domain/availability`
+- Method: `GET`
+- Parameter utama: `domain`, `source`
+- Source yang didukung di UI: `dns` dan `whois`
+- Menampilkan status availability domain dalam tabel ringkas satu baris.
+
+### Subdomain Lookup API
+
+- Route: `apifreaks-tools.subdomain-lookup`
+- Endpoint: `/v1.0/subdomains/lookup`
+- Method: `GET`
+- Parameter utama: `domain`
+- Menampilkan tabel subdomain berisi `subdomain`, `first_seen`, `last_seen`, dan `inactive_from`.
+
+### Commodity Symbols
+
+- Route: `apifreaks-tools.commodity-symbols`
+- Endpoint: `/v1.0/commodity/symbols`
+- Method: `GET`
+- Menampilkan tabel symbol komoditas dengan kolom `symbol`, `name`, `category`, `currency`, `unit`, `status`, dan `updateInterval`.
+
+### Live Commodity Prices API
+
+- Route: `apifreaks-tools.live-commodity-prices`
+- Endpoint: `/v1.0/commodity/rates/latest`
+- Method: `GET`
+- Parameter utama: `symbols`, `updates`, `quote`
+- Menampilkan tabel rate live per symbol dengan kolom `symbol`, `rate`, `unit`, dan `quote`.
+
+### Historical Commodity Prices API
+
+- Route: `apifreaks-tools.historical-commodity-prices`
+- Endpoint: `/v1.0/commodity/rates/historical`
+- Method: `GET`
+- Parameter utama: `symbols`, `date`
+- Menampilkan tabel historical OHLC per symbol dengan kolom `date`, `open`, `high`, `low`, dan `close`.
 
 ---
 
