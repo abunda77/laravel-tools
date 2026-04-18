@@ -29,6 +29,8 @@ new class extends Component
                         ['label' => 'Google Image', 'route' => 'search.google-image'],
                         ['label' => 'TikTok Video', 'route' => 'search.tiktok'],
                         ['label' => 'Youtube', 'route' => 'search.youtube'],
+                        ['label' => 'Youtube Finder', 'route' => 'search.youtube-finder'],
+                        ['label' => 'Youtube Channel', 'route' => 'search.youtube-channel'],
                     ]],
                     ['label' => 'Tools', 'route' => 'tools', 'icon' => 'tools', 'subItems' => [
                         ['label' => 'Split Cash', 'route' => 'tools.split-cash'],

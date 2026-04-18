@@ -99,6 +99,23 @@
                     <code>downloader_provider</code>, lalu lihat hasil dalam mode <code>card</code> atau <code>table</code>.
                 </p>
             </div>
+
+            <div class="surface-panel surface-panel--compact">
+                <div class="surface-panel__header">
+                    <div>
+                        <p class="section-kicker">Available tools</p>
+                        <h3>Youtube Finder</h3>
+                    </div>
+                    <a href="{{ route('search.youtube-finder') }}" wire:navigate class="primary-action">
+                        Buka tool
+                    </a>
+                </div>
+
+                <p class="surface-panel__text">
+                    Cari video YouTube langsung via <code>YouTube Data API v3</code> dengan API key
+                    <code>youtubeapi_provider</code>, lalu lihat thumbnail, title, channel, views, release date, durasi, dan link dalam tabel.
+                </p>
+            </div>
         </div>
     </section>
 </x-app-layout>

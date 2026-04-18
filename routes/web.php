@@ -19,6 +19,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('search/google-image', 'search.google-image')->name('search.google-image');
     Route::view('search/tiktok', 'search.tiktok')->name('search.tiktok');
     Route::view('search/youtube', 'search.youtube')->name('search.youtube');
+    Route::view('search/youtube-finder', 'search.youtube-finder')->name('search.youtube-finder');
+    Route::view('search/youtube-channel', 'search.youtube-channel')->name('search.youtube-channel');
     Route::view('tools', 'tools')->name('tools');
     Route::view('tools/split-cash', 'tools.split-cash')->name('tools.split-cash');
     Route::view('tools/calculator-pvc', 'tools.pvc-calculator')->name('tools.calculator-pvc');

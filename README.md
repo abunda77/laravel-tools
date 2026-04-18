@@ -9,7 +9,7 @@
 Laravel Tools adalah panel admin internal yang dirancang untuk:
 
 - Menjalankan **API eksternal** dari berbagai provider (Downloader, Search, Tools, Internet, ApiFreaks, Random, dll.)
-- Menjalankان **script/command custom** internal buatan sendiri
+- Menjalankan **script/command custom** internal buatan sendiri
 - Memonitor histori eksekusi, status, dan log setiap request
 
 Pendekatan utama adalah **config-driven modules**, sehingga menu dan submenu API bisa ditambahkan dari konfigurasi tanpa perlu mengubah kode program satu per satu.
@@ -60,7 +60,7 @@ Pendekatan utama adalah **config-driven modules**, sehingga menu dan submenu API
 
 ## Struktur Modul
 
-```
+```text
 app/
   Livewire/
     Actions/
@@ -87,6 +87,8 @@ app/
       TokopediaSearch.php
       UnsplashSearch.php
       TiktokVideoSearch.php
+      YoutubeChannel.php
+      YoutubeFinder.php
       YoutubeSearch.php
     Tools/
       CekResi.php
@@ -120,6 +122,8 @@ app/
       TokopediaSearchService.php
       UnsplashSearchService.php
       TiktokVideoSearchService.php
+      YoutubeChannelService.php
+      YoutubeFinderService.php
       YoutubeSearchService.php
     Tools/
       CekResiService.php
@@ -141,23 +145,23 @@ docs/
 
 ## Sidebar Navigasi
 
-```
+```text
 Workspace
-├── Dashboard
-├── Downloader
-└── Custom Scripts
+|-- Dashboard
+|-- Downloader
+`-- Custom Scripts
 
 Modules
-├── Search
-├── Tools
-│   └── Split Cash
-└── Internet
+|-- Search
+|-- Tools
+|   `-- Split Cash
+`-- Internet
 
 Operations
-├── Backup Data ApiKey
-├── Execution History
-├── Settings
-└── Profile
+|-- Backup Data ApiKey
+|-- Execution History
+|-- Settings
+`-- Profile
 ```
 
 ---
@@ -174,6 +178,8 @@ Catatan modul Search:
 - `Google Image`
 - `TikTok Video`
 - `Youtube`
+- `Youtube Finder`
+- `Youtube Channel`
 
 ---
 
@@ -275,6 +281,34 @@ Menu **Modules -> Search -> Youtube** menyediakan workbench untuk mencari video 
 - Hasil mengambil data dari array `result` dan menampilkan `title`, `duration`, `views`, `url`, `thumbnail`, `uploadDate`, dan `author`.
 - UI menyediakan dua mode tampilan: `Card View` dan `Table View`.
 - Raw JSON response tetap ditampilkan untuk verifikasi payload provider.
+
+---
+
+## Fitur Search Youtube Finder
+
+Menu **Modules -> Search -> Youtube Finder** menyediakan workbench untuk mencari video YouTube langsung lewat **YouTube Data API v3**.
+
+- Menggunakan API key tersimpan di tabel `api_keys` dengan identifier `youtubeapi_provider`.
+- Endpoint yang dipakai adalah kombinasi `search.list` dan `videos.list` dari YouTube Data API v3.
+- Parameter query utama adalah `query`, contoh `laravel tutorial`.
+- Hasil pencarian dirender dalam tabel yang menampilkan `thumbnail`, `title`, `description`, `channelTitle`, `views`, `likes`, `comments`, `duration`, `publishedAt`, kualitas video, dan `url`.
+- Judul video dan action `Buka video` sama-sama mengarah ke URL video YouTube yang sama.
+- Jika YouTube mengembalikan `nextPageToken`, UI menyediakan tombol `load more` untuk mengambil halaman berikutnya.
+- Raw JSON hasil yang sudah dipetakan tetap ditampilkan untuk inspeksi cepat.
+
+---
+
+## Fitur Search Youtube Channel
+
+Menu **Modules -> Search -> Youtube Channel** menyediakan workbench untuk melihat profil channel YouTube dan daftar video upload-nya.
+
+- Menggunakan API key tersimpan di tabel `api_keys` dengan identifier `youtubeapi_provider`.
+- Endpoint yang dipakai adalah `channels.list`, `playlistItems.list`, dan `search.list` dari YouTube Data API v3.
+- Input utama menerima `Channel ID` atau handle seperti `@Google`.
+- Hasil menampilkan informasi channel seperti `title`, `description`, `subscriberCount`, `viewCount`, `videoCount`, dan thumbnail channel.
+- Daftar video channel dirender dalam tabel dengan thumbnail, judul, tanggal rilis, dan link ke video.
+- Tersedia mode pencarian video di dalam channel yang memakai keyword dan menampilkan total hasil pencarian channel tersebut.
+- State hasil lama dipertahankan jika request refresh berikutnya gagal, sehingga data terakhir yang valid tidak langsung hilang dari UI.
 
 ---
 
@@ -580,7 +614,7 @@ APP_URL=http://localhost
 DB_CONNECTION=sqlite
 # atau sesuaikan untuk MySQL/PostgreSQL
 
-# Catatan: API Key untuk layanan eksternal kini dikelola langsung 
+# Catatan: API Key untuk layanan eksternal kini dikelola langsung
 # melalui antarmuka web (Menu Settings -> API Keys), bukan via .env.
 ```
 
@@ -595,10 +629,10 @@ composer run dev
 ```
 
 Perintah ini menjalankan:
-- `php artisan serve` — server Laravel
-- `php artisan queue:listen` — queue worker
-- `php artisan pail` — log viewer
-- `npm run dev` — Vite (hot reload)
+- `php artisan serve` - server Laravel
+- `php artisan queue:listen` - queue worker
+- `php artisan pail` - log viewer
+- `npm run dev` - Vite (hot reload)
 
 ### Hanya Laravel Server
 
@@ -622,14 +656,14 @@ php artisan test
 
 ## Tahapan Pengembangan (Roadmap)
 
-### ✅ Phase 1 — Foundation *(sedang berjalan)*
+### Phase 1 - Foundation *(sedang berjalan)*
 - [x] Inisialisasi Laravel 13
 - [x] Install Breeze + Livewire + Volt
 - [x] Konfigurasi Tailwind CSS
 - [x] Buat layout dashboard + sidebar
 - [ ] Auth flow (login, logout, proteksi route)
 
-### 🔲 Phase 2 — External API Module
+### Phase 2 - External API Module
 - [ ] Config registry dari folder `docs`
 - [ ] Halaman daftar kategori API
 - [ ] Halaman daftar tools per kategori
@@ -640,23 +674,25 @@ php artisan test
 - [x] Modul Search: Google Image (preview image + table URL + raw JSON)
 - [x] Modul Search: TikTok Video (preview video + table URL + raw JSON)
 - [x] Modul Search: Youtube (card view + table view + raw JSON)
+- [x] Modul Search: Youtube Finder (table view + pagination + YouTube Data API v3)
+- [x] Modul Search: Youtube Channel (profil channel + daftar upload + pencarian dalam channel)
 - [x] Modul Tools: Cek Resi (tracking paket + timeline vertikal)
 - [x] Modul Internet: Kurs Mata Uang (API.co.id Exchange Rate)
 - [x] Modul Internet: Proxy Validate (filter, bulk select, validate, export, progress)
 - [x] Modul Internet: Whois (lookup domain + raw WHOIS record)
 
-### 🔲 Phase 3 — Custom Script Module
+### Phase 3 - Custom Script Module
 - [ ] Registry custom script
 - [ ] Script executor aman (whitelist-based)
 - [ ] Log eksekusi script
 
-### 🔲 Phase 4 — Settings & Security
+### Phase 4 - Settings & Security
 - [x] Settings management (API key terpusat, timeout, queue mode)
 - [x] Backup dan restore API key dari file backup
 - [ ] Role & Permission (spatie/laravel-permission)
 - [ ] Audit log (spatie/laravel-activitylog)
 
-### 🔲 Phase 5 — Reliability
+### Phase 5 - Reliability
 - [ ] Queue untuk task berat (downloader, OCR, dll.)
 - [ ] Retry & timeout configuration
 - [ ] Health check provider API
@@ -670,6 +706,7 @@ php artisan test
 - **API Key**: Semua input `value` dari halaman manajemen API Keys akan dienkripsi dari bawaan sistem sebelum masuk ke database (`Crypt::encryptString`) untuk faktor keamanan.
 - **API Key Internet / Exchange Rate**: Modul Kurs Mata Uang mengambil key dari `api_keys` dengan identifier `apicoid_provider` dan mengirimkannya melalui header `x-api-co-id`.
 - **API Key Ferdev Provider**: Modul Downloader, Search -> Tokopedia, Search -> Unsplash, Search -> Google Image, Search -> TikTok Video, Search -> Youtube, Tools -> Cek Resi, dan Internet -> Whois mengambil key dari `api_keys` dengan identifier `downloader_provider` dan mengirimkannya sebagai parameter query `apikey`.
+- **API Key YouTube Data API**: Modul Search -> Youtube Finder dan Search -> Youtube Channel mengambil key dari `api_keys` dengan identifier `youtubeapi_provider` untuk request ke YouTube Data API v3.
 - **Backup API Key**: File backup API key berisi secret asli agar dapat direstore. Simpan file backup di lokasi aman dan jangan commit file dari `storage/app/private/api-key-backups`.
 - **Permission**: Batasi akses menu tertentu menggunakan role-based access control.
 

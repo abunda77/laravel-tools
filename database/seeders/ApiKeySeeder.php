@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\ApiKey;
 use Illuminate\Database\Seeder;
 
 class ApiKeySeeder extends Seeder
@@ -18,10 +18,11 @@ class ApiKeySeeder extends Seeder
             ['name' => 'gemini', 'label' => 'Gemini', 'description' => 'API key untuk provider Gemini di ChatBot.'],
             ['name' => 'anthropic', 'label' => 'Claude / Anthropic', 'description' => 'API key untuk provider Claude / Anthropic di ChatBot.'],
             ['name' => 'perplexity', 'label' => 'Perplexity', 'description' => 'API key untuk Perplexity Sonar dan Search citations.'],
+            ['name' => 'youtubeapi_provider', 'label' => 'YouTube Data API', 'description' => 'API key dari Google Cloud Console untuk YouTube Data API v3 (digunakan di fitur Youtube Channel).'],
         ];
 
         foreach ($keys as $key) {
-            \App\Models\ApiKey::firstOrCreate(
+            ApiKey::firstOrCreate(
                 ['name' => $key['name']],
                 [
                     'label' => $key['label'],
