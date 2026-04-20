@@ -168,7 +168,7 @@ Operations
 
 Ringkasan sidebar saat ini:
 - `Workspace`: `Dashboard`, `Downloader`, `Custom Scripts`
-- `Modules`: `Search`, `Tools`, `Internet`, `ApiFreaks Tools`
+- `Modules`: `Search`, `Tools`, `Image AI`, `Video AI`, `Internet`, `ApiFreaks Tools`, `Apify Scraper`
 - `Operations`: `Backup Data ApiKey`, `Execution History`, `Settings`, `Profile`
 
 Catatan modul Search:
@@ -201,6 +201,11 @@ Catatan modul ApiFreaks Tools:
 - `Commodity Symbols`
 - `Live Commodity Prices`
 - `Historical Commodity Prices`
+
+---
+
+Catatan modul Apify Scraper:
+- `GMaps 1.0`
 
 ---
 
@@ -488,6 +493,22 @@ Catatan:
 
 ---
 
+## Fitur Apify Scraper GMaps 1.0
+
+Menu **Modules -> Apify Scraper -> GMaps 1.0** menyediakan workbench untuk menjalankan actor Apify yang mengambil data bisnis dari Google Maps.
+
+- Menggunakan API key tersimpan di tabel `api_keys` dengan identifier `apify_provider`.
+- Endpoint yang dipakai adalah `POST /v2/acts/sbEjxxfeFlEBHijJS/run-sync-get-dataset-items` dari Apify API.
+- Parameter utama yang wajib adalah `search_query`.
+- Parameter `gmaps_url`, `latitude`, `longitude`, `area_width`, `area_height`, dan `max_results` bersifat opsional.
+- Jika `area_width` atau `area_height` dikosongkan, backend memakai default `20`.
+- Jika `max_results` dikosongkan, backend memakai default `500`.
+- Hasil response dirender sebagai tabel dinamis berdasarkan key payload actor, sehingga perubahan struktur kolom dari provider tetap bisa ditampilkan.
+- Data hasil scrape tidak disimpan ke database; semuanya hanya diproses pada halaman aktif.
+- Tersedia export langsung ke format `CSV`, `XLSX`, dan `PDF`.
+
+---
+
 ## Fitur Backup Data ApiKey
 
 Menu **Operations -> Backup Data ApiKey** menyediakan pengelolaan backup untuk data API key yang tersimpan di database.
@@ -707,6 +728,7 @@ php artisan test
 - **API Key Internet / Exchange Rate**: Modul Kurs Mata Uang mengambil key dari `api_keys` dengan identifier `apicoid_provider` dan mengirimkannya melalui header `x-api-co-id`.
 - **API Key Ferdev Provider**: Modul Downloader, Search -> Tokopedia, Search -> Unsplash, Search -> Google Image, Search -> TikTok Video, Search -> Youtube, Tools -> Cek Resi, dan Internet -> Whois mengambil key dari `api_keys` dengan identifier `downloader_provider` dan mengirimkannya sebagai parameter query `apikey`.
 - **API Key YouTube Data API**: Modul Search -> Youtube Finder dan Search -> Youtube Channel mengambil key dari `api_keys` dengan identifier `youtubeapi_provider` untuk request ke YouTube Data API v3.
+- **API Key Apify**: Modul Apify Scraper -> GMaps 1.0 mengambil key dari `api_keys` dengan identifier `apify_provider` untuk request ke Apify actor API.
 - **Backup API Key**: File backup API key berisi secret asli agar dapat direstore. Simpan file backup di lokasi aman dan jangan commit file dari `storage/app/private/api-key-backups`.
 - **Permission**: Batasi akses menu tertentu menggunakan role-based access control.
 

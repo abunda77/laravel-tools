@@ -19,6 +19,7 @@ class ApiKeySeeder extends Seeder
             ['name' => 'anthropic', 'label' => 'Claude / Anthropic', 'description' => 'API key untuk provider Claude / Anthropic di ChatBot.'],
             ['name' => 'perplexity', 'label' => 'Perplexity', 'description' => 'API key untuk Perplexity Sonar dan Search citations.'],
             ['name' => 'youtubeapi_provider', 'label' => 'YouTube Data API', 'description' => 'API key dari Google Cloud Console untuk YouTube Data API v3 (digunakan di fitur Youtube Channel).'],
+            ['name' => 'apify_provider', 'label' => 'Apify Provider', 'description' => 'API key untuk actor Apify Scraper, termasuk modul GMaps 1.0.'],
         ];
 
         foreach ($keys as $key) {

@@ -63,6 +63,9 @@ new class extends Component
                         ['label' => 'Live Commodity Prices', 'route' => 'apifreaks-tools.live-commodity-prices'],
                         ['label' => 'Historical Commodity Prices', 'route' => 'apifreaks-tools.historical-commodity-prices'],
                     ]],
+                    ['label' => 'Apify Scraper', 'route' => 'apify-scraper.gmaps-1-0', 'icon' => 'api', 'subItems' => [
+                        ['label' => 'GMaps 1.0', 'route' => 'apify-scraper.gmaps-1-0'],
+                    ]],
                 ],
             ],
             [
