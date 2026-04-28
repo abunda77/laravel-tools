@@ -92,6 +92,7 @@ app/
       YoutubeSearch.php
     Tools/
       CekResi.php
+      WallMeter.php
       SendWhatsapp.php
     Operations/
       ApiKeyBackupManager.php
@@ -211,6 +212,7 @@ Catatan modul Apify Scraper:
 
 Catatan modul Tools:
 - `Split Cash`
+- `Wall Meter`
 - `Cek Resi`
 - `Kirim WA / Send Whatsapp`
 
@@ -327,6 +329,18 @@ Menu **Modules -> Tools -> Cek Resi** menyediakan workbench untuk melacak paket 
 - Parameter query utama adalah `resi` dan `ekspedisi`, contoh `SPXID054330680586` dan `shopee-express`.
 - Hasil menampilkan data dari key `data`: resi, ekspedisi, kode ekspedisi, status, tanggal kirim, customer service, posisi terakhir, share link, dan history pengiriman.
 - History pengiriman ditampilkan sebagai timeline vertikal agar alur perjalanan paket mudah dibaca.
+
+---
+
+## Fitur Wall Meter
+
+Menu **Modules -> Tools -> Wall Meter** menyediakan workbench untuk menghitung tinggi dinding menggunakan metode trigonometri sudut elevasi.
+
+- Input utama memakai slider untuk `Jarak (d)`, `Sudut elevasi (alpha)`, dan `Tinggi alat (h1)`.
+- Rumus yang dipakai: `h2 = d x tan(alpha)` lalu `H = h1 + h2`.
+- Sistem juga menghitung `Panjang garis bidik (L) = d / cos(alpha)`.
+- Hasil dihitung real-time dan menampilkan langkah perhitungan numerik agar mudah diverifikasi.
+- Validasi rentang input mengikuti batas aman perhitungan sudut dan jarak.
 
 ---
 
@@ -698,6 +712,7 @@ php artisan test
 - [x] Modul Search: Youtube Finder (table view + pagination + YouTube Data API v3)
 - [x] Modul Search: Youtube Channel (profil channel + daftar upload + pencarian dalam channel)
 - [x] Modul Tools: Cek Resi (tracking paket + timeline vertikal)
+- [x] Modul Tools: Wall Meter (perhitungan tinggi dinding dengan slider trigonometri)
 - [x] Modul Internet: Kurs Mata Uang (API.co.id Exchange Rate)
 - [x] Modul Internet: Proxy Validate (filter, bulk select, validate, export, progress)
 - [x] Modul Internet: Whois (lookup domain + raw WHOIS record)

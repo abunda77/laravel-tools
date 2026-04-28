@@ -14,7 +14,7 @@
             </div>
         </div>
 
-        <div class="grid gap-6 lg:grid-cols-2 2xl:grid-cols-4">
+        <div class="grid gap-6 lg:grid-cols-2 2xl:grid-cols-5">
             <div class="surface-panel surface-panel--compact">
                 <div class="surface-panel__header">
                     <div>
@@ -54,6 +54,20 @@
                 </div>
                 <p class="surface-panel__text">
                     Lacak status paket berdasarkan nomor resi dan slug ekspedisi provider.
+                </p>
+            </div>
+
+            <div class="surface-panel surface-panel--compact">
+                <div class="surface-panel__header">
+                    <div>
+                        <h3>Wall Meter</h3>
+                    </div>
+                    <a href="{{ route('tools.wall-meter') }}" wire:navigate class="primary-action">
+                        Buka
+                    </a>
+                </div>
+                <p class="surface-panel__text">
+                    Hitung tinggi dinding berbasis jarak horizontal, sudut elevasi, dan tinggi alat menggunakan metode trigonometri.
                 </p>
             </div>
 
