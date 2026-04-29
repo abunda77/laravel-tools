@@ -87,6 +87,23 @@
                 <div class="surface-panel__header">
                     <div>
                         <p class="section-kicker">Available tools</p>
+                        <h3>Quotes Anime</h3>
+                    </div>
+                    <a href="{{ route('search.anime-quotes') }}" wire:navigate class="primary-action">
+                        Buka tool
+                    </a>
+                </div>
+
+                <p class="surface-panel__text">
+                    Ambil quote anime random lewat endpoint <code>/random/animequote</code> dengan API key
+                    <code>downloader_provider</code>, lalu lihat array <code>result</code> dalam tabel dan raw JSON.
+                </p>
+            </div>
+
+            <div class="surface-panel surface-panel--compact">
+                <div class="surface-panel__header">
+                    <div>
+                        <p class="section-kicker">Available tools</p>
                         <h3>Youtube</h3>
                     </div>
                     <a href="{{ route('search.youtube') }}" wire:navigate class="primary-action">

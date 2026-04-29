@@ -18,6 +18,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('search/unsplash', 'search.unsplash')->name('search.unsplash');
     Route::view('search/google-image', 'search.google-image')->name('search.google-image');
     Route::view('search/tiktok', 'search.tiktok')->name('search.tiktok');
+    Route::view('search/anime-quotes', 'search.anime-quotes')->name('search.anime-quotes');
     Route::view('search/youtube', 'search.youtube')->name('search.youtube');
     Route::view('search/youtube-finder', 'search.youtube-finder')->name('search.youtube-finder');
     Route::view('search/youtube-channel', 'search.youtube-channel')->name('search.youtube-channel');

@@ -28,6 +28,7 @@ new class extends Component
                         ['label' => 'Unsplash', 'route' => 'search.unsplash'],
                         ['label' => 'Google Image', 'route' => 'search.google-image'],
                         ['label' => 'TikTok Video', 'route' => 'search.tiktok'],
+                        ['label' => 'Quotes Anime', 'route' => 'search.anime-quotes'],
                         ['label' => 'Youtube', 'route' => 'search.youtube'],
                         ['label' => 'Youtube Finder', 'route' => 'search.youtube-finder'],
                         ['label' => 'Youtube Channel', 'route' => 'search.youtube-channel'],
