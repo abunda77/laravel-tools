@@ -16,6 +16,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('search', 'search')->name('search');
     Route::view('search/tokopedia', 'search.tokopedia')->name('search.tokopedia');
     Route::view('search/unsplash', 'search.unsplash')->name('search.unsplash');
+    Route::view('search/freepik-image', 'search.freepik-image')->name('search.freepik-image');
     Route::view('search/google-image', 'search.google-image')->name('search.google-image');
     Route::view('search/tiktok', 'search.tiktok')->name('search.tiktok');
     Route::view('search/anime-quotes', 'search.anime-quotes')->name('search.anime-quotes');

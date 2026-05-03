@@ -83,6 +83,7 @@ app/
       ProxyValidate.php
       Whois.php
     Search/
+      FreepikImage.php
       GoogleImageSearch.php
       TokopediaSearch.php
       UnsplashSearch.php
@@ -119,6 +120,7 @@ app/
       ProxyValidateService.php
       WhoisService.php
     Search/
+      FreepikImageSearchService.php
       GoogleImageSearchService.php
       TokopediaSearchService.php
       UnsplashSearchService.php
@@ -176,6 +178,7 @@ Catatan modul Search:
 - `Overview`
 - `Tokopedia`
 - `Unsplash`
+- `Freepik Image`
 - `Google Image`
 - `TikTok Video`
 - `Youtube`
@@ -247,6 +250,20 @@ Menu **Modules -> Search -> Unsplash** menyediakan workbench untuk mencari gamba
 - Parameter query utama adalah `query`, contoh `river in the mount`.
 - Hasil mengambil data dari array `result` dan menampilkan `title`, `download`, dan `preview`.
 - Setiap item dirender sebagai card gallery, tabel URL, dan raw JSON response.
+
+---
+
+## Fitur Search Freepik Image
+
+Menu **Modules -> Search -> Freepik Image** menyediakan workbench untuk mencari stock image dan template Freepik lewat **Magnific API**.
+
+- Menggunakan API key tersimpan di tabel `api_keys` dengan identifier `freepik_provider`.
+- Base URL yang dipakai adalah `https://api.magnific.com`.
+- Header auth yang dipakai adalah `x-magnific-api-key`.
+- Endpoint yang dipakai adalah `GET /v1/resources`, `GET /v1/resources/{id}`, dan `GET /v1/resources/{id}/download/{format}`.
+- Parameter query utama adalah `term`, dengan opsi `limit` dan `order`, contoh `white t-shirt mockup`.
+- Hasil pencarian dirender dalam card dan tabel dengan informasi `thumbnail`, `title`, `type`, `orientation`, `author`, `downloads`, `likes`, `published_at`, dan daftar format yang tersedia.
+- Saat satu resource dipilih, UI memuat detail resource, hasil download per format, dan raw JSON untuk inspeksi payload provider.
 
 ---
 
@@ -706,6 +723,7 @@ php artisan test
 - [ ] Tampil hasil response (JSON, image, link)
 - [x] Modul Search: Tokopedia (card view + table view + raw JSON)
 - [x] Modul Search: Unsplash (gallery card + table URL + raw JSON)
+- [x] Modul Search: Freepik Image (card + table + detail resource + download per format)
 - [x] Modul Search: Google Image (preview image + table URL + raw JSON)
 - [x] Modul Search: TikTok Video (preview video + table URL + raw JSON)
 - [x] Modul Search: Youtube (card view + table view + raw JSON)
@@ -742,6 +760,7 @@ php artisan test
 - **API Key**: Semua input `value` dari halaman manajemen API Keys akan dienkripsi dari bawaan sistem sebelum masuk ke database (`Crypt::encryptString`) untuk faktor keamanan.
 - **API Key Internet / Exchange Rate**: Modul Kurs Mata Uang mengambil key dari `api_keys` dengan identifier `apicoid_provider` dan mengirimkannya melalui header `x-api-co-id`.
 - **API Key Ferdev Provider**: Modul Downloader, Search -> Tokopedia, Search -> Unsplash, Search -> Google Image, Search -> TikTok Video, Search -> Youtube, Tools -> Cek Resi, dan Internet -> Whois mengambil key dari `api_keys` dengan identifier `downloader_provider` dan mengirimkannya sebagai parameter query `apikey`.
+- **API Key Freepik / Magnific Provider**: Modul Search -> Freepik Image, Image AI -> Generation Image, Image AI -> Image2Prompt, Image AI -> Improve Prompt, dan Video AI -> Generation Video mengambil key dari `api_keys` dengan identifier `freepik_provider`.
 - **API Key YouTube Data API**: Modul Search -> Youtube Finder dan Search -> Youtube Channel mengambil key dari `api_keys` dengan identifier `youtubeapi_provider` untuk request ke YouTube Data API v3.
 - **API Key Apify**: Modul Apify Scraper -> GMaps 1.0 mengambil key dari `api_keys` dengan identifier `apify_provider` untuk request ke Apify actor API.
 - **Backup API Key**: File backup API key berisi secret asli agar dapat direstore. Simpan file backup di lokasi aman dan jangan commit file dari `storage/app/private/api-key-backups`.

@@ -26,6 +26,7 @@ new class extends Component
                         ['label' => 'Overview', 'route' => 'search'],
                         ['label' => 'Tokopedia', 'route' => 'search.tokopedia'],
                         ['label' => 'Unsplash', 'route' => 'search.unsplash'],
+                        ['label' => 'Freepik Image', 'route' => 'search.freepik-image'],
                         ['label' => 'Google Image', 'route' => 'search.google-image'],
                         ['label' => 'TikTok Video', 'route' => 'search.tiktok'],
                         ['label' => 'Quotes Anime', 'route' => 'search.anime-quotes'],
