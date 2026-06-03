@@ -17,6 +17,8 @@ class ImageToPromptService
 {
     private const API_KEY_NAME = 'freepik_provider';
 
+    private const DISABLED_MESSAGE = 'Layanan Freepik sedang dinonaktifkan di dashboard.';
+
     private const API_URL = 'https://api.freepik.com/v1/ai/image-to-prompt';
 
     private const MIN_TIMEOUT_SECONDS = 5;
@@ -36,6 +38,7 @@ class ImageToPromptService
      */
     public function generate(string $image, ?string $webhookUrl = null): array
     {
+        $this->ensureEnabled();
         $payload = [
             'image' => $this->validateImage($image),
         ];
@@ -71,6 +74,7 @@ class ImageToPromptService
      */
     public function checkStatus(string $taskId): array
     {
+        $this->ensureEnabled();
         $taskId = $this->validateTaskId($taskId);
 
         try {
@@ -102,6 +106,13 @@ class ImageToPromptService
             ])
             ->timeout($this->timeoutSeconds())
             ->retry($this->retryTimes(), $this->retrySleepMilliseconds());
+    }
+
+    private function ensureEnabled(): void
+    {
+        if (! config('services.freepik.enabled')) {
+            throw new RuntimeException(self::DISABLED_MESSAGE);
+        }
     }
 
     private function apiKey(): string

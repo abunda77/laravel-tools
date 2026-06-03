@@ -171,14 +171,16 @@ Operations
 
 Ringkasan sidebar saat ini:
 - `Workspace`: `Dashboard`, `Downloader`, `Custom Scripts`
-- `Modules`: `Search`, `Tools`, `Image AI`, `Video AI`, `Internet`, `ApiFreaks Tools`, `Apify Scraper`
+- `Modules`: `Search`, `Tools`, `Internet`, `ApiFreaks Tools`, `Apify Scraper`
 - `Operations`: `Backup Data ApiKey`, `Execution History`, `Settings`, `Profile`
+
+Catatan:
+- Integrasi Freepik dimatikan secara default dengan `FREEPIK_ENABLED=false`, sehingga menu `Freepik Image`, `Image AI`, dan `Video AI` tidak tampil di dashboard.
 
 Catatan modul Search:
 - `Overview`
 - `Tokopedia`
 - `Unsplash`
-- `Freepik Image`
 - `Google Image`
 - `TikTok Video`
 - `Youtube`
@@ -222,7 +224,7 @@ Catatan modul Tools:
 ---
 
 Catatan modul Video AI:
-- `Generation Video`
+- `Generation Video` *(hanya tampil jika `FREEPIK_ENABLED=true`)*
 
 ---
 
@@ -255,7 +257,9 @@ Menu **Modules -> Search -> Unsplash** menyediakan workbench untuk mencari gamba
 
 ## Fitur Search Freepik Image
 
-Menu **Modules -> Search -> Freepik Image** menyediakan workbench untuk mencari stock image dan template Freepik lewat **Magnific API**.
+Integrasi ini saat ini **dinonaktifkan secara default** dan hanya muncul jika `FREEPIK_ENABLED=true`.
+
+Saat diaktifkan, menu **Modules -> Search -> Freepik Image** menyediakan workbench untuk mencari stock image dan template Freepik lewat **Magnific API**.
 
 - Menggunakan API key tersimpan di tabel `api_keys` dengan identifier `freepik_provider`.
 - Base URL yang dipakai adalah `https://api.magnific.com`.
@@ -502,7 +506,9 @@ Menu **Modules -> ApiFreaks Tools** menyediakan kumpulan workbench untuk endpoin
 
 ## Fitur Generation Video
 
-Menu **Modules -> Video AI -> Generation Video** menyediakan workbench untuk generate video memakai Freepik Kling v3 Standard dengan API key `freepik_provider`.
+Integrasi ini saat ini **dinonaktifkan secara default** dan hanya muncul jika `FREEPIK_ENABLED=true`.
+
+Saat diaktifkan, menu **Modules -> Video AI -> Generation Video** menyediakan workbench untuk generate video memakai Freepik Kling v3 Standard dengan API key `freepik_provider`.
 
 - Endpoint generate yang dipakai: `POST /v1/ai/video/kling-v3-std`
 - Endpoint history task: `GET /v1/ai/video/kling-v3`
@@ -723,7 +729,7 @@ php artisan test
 - [ ] Tampil hasil response (JSON, image, link)
 - [x] Modul Search: Tokopedia (card view + table view + raw JSON)
 - [x] Modul Search: Unsplash (gallery card + table URL + raw JSON)
-- [x] Modul Search: Freepik Image (card + table + detail resource + download per format)
+- [x] Modul Search: Freepik Image (card + table + detail resource + download per format, saat ini dimatikan default)
 - [x] Modul Search: Google Image (preview image + table URL + raw JSON)
 - [x] Modul Search: TikTok Video (preview video + table URL + raw JSON)
 - [x] Modul Search: Youtube (card view + table view + raw JSON)
@@ -760,7 +766,7 @@ php artisan test
 - **API Key**: Semua input `value` dari halaman manajemen API Keys akan dienkripsi dari bawaan sistem sebelum masuk ke database (`Crypt::encryptString`) untuk faktor keamanan.
 - **API Key Internet / Exchange Rate**: Modul Kurs Mata Uang mengambil key dari `api_keys` dengan identifier `apicoid_provider` dan mengirimkannya melalui header `x-api-co-id`.
 - **API Key Ferdev Provider**: Modul Downloader, Search -> Tokopedia, Search -> Unsplash, Search -> Google Image, Search -> TikTok Video, Search -> Youtube, Tools -> Cek Resi, dan Internet -> Whois mengambil key dari `api_keys` dengan identifier `downloader_provider` dan mengirimkannya sebagai parameter query `apikey`.
-- **API Key Freepik / Magnific Provider**: Modul Search -> Freepik Image, Image AI -> Generation Image, Image AI -> Image2Prompt, Image AI -> Improve Prompt, dan Video AI -> Generation Video mengambil key dari `api_keys` dengan identifier `freepik_provider`.
+- **API Key Freepik / Magnific Provider**: Dipakai hanya jika `FREEPIK_ENABLED=true`. Saat aktif, modul Search -> Freepik Image, Image AI -> Generation Image, Image AI -> Image2Prompt, Image AI -> Improve Prompt, dan Video AI -> Generation Video mengambil key dari `api_keys` dengan identifier `freepik_provider`.
 - **API Key YouTube Data API**: Modul Search -> Youtube Finder dan Search -> Youtube Channel mengambil key dari `api_keys` dengan identifier `youtubeapi_provider` untuk request ke YouTube Data API v3.
 - **API Key Apify**: Modul Apify Scraper -> GMaps 1.0 mengambil key dari `api_keys` dengan identifier `apify_provider` untuk request ke Apify actor API.
 - **Backup API Key**: File backup API key berisi secret asli agar dapat direstore. Simpan file backup di lokasi aman dan jangan commit file dari `storage/app/private/api-key-backups`.

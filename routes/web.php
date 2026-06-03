@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\View\View;
 
 Route::view('/', 'home.index');
 
@@ -16,7 +17,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('search', 'search')->name('search');
     Route::view('search/tokopedia', 'search.tokopedia')->name('search.tokopedia');
     Route::view('search/unsplash', 'search.unsplash')->name('search.unsplash');
-    Route::view('search/freepik-image', 'search.freepik-image')->name('search.freepik-image');
+    Route::get('search/freepik-image', function (): View {
+        abort_unless(config('services.freepik.enabled'), 404);
+
+        return view('search.freepik-image');
+    })->name('search.freepik-image');
     Route::view('search/google-image', 'search.google-image')->name('search.google-image');
     Route::view('search/tiktok', 'search.tiktok')->name('search.tiktok');
     Route::view('search/anime-quotes', 'search.anime-quotes')->name('search.anime-quotes');
@@ -29,10 +34,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('tools/wall-meter', 'tools.wall-meter')->name('tools.wall-meter');
     Route::view('tools/cek-resi', 'tools.cek-resi')->name('tools.cek-resi');
     Route::view('tools/send-whatsapp', 'tools.send-whatsapp')->name('tools.send-whatsapp');
-    Route::view('generation/image', 'generation.image')->name('generation.index');
-    Route::view('generation/video', 'generation.video')->name('generation.video');
-    Route::view('image-ai/image2prompt', 'image-ai.image2prompt')->name('image-ai.image2prompt');
-    Route::view('image-ai/improve-prompt', 'image-ai.improve-prompt')->name('image-ai.improve-prompt');
+    Route::get('generation/image', function (): View {
+        abort_unless(config('services.freepik.enabled'), 404);
+
+        return view('generation.image');
+    })->name('generation.index');
+    Route::get('generation/video', function (): View {
+        abort_unless(config('services.freepik.enabled'), 404);
+
+        return view('generation.video');
+    })->name('generation.video');
+    Route::get('image-ai/image2prompt', function (): View {
+        abort_unless(config('services.freepik.enabled'), 404);
+
+        return view('image-ai.image2prompt');
+    })->name('image-ai.image2prompt');
+    Route::get('image-ai/improve-prompt', function (): View {
+        abort_unless(config('services.freepik.enabled'), 404);
+
+        return view('image-ai.improve-prompt');
+    })->name('image-ai.improve-prompt');
     Route::view('internet', 'internet')->name('internet');
     Route::view('internet/currency-exchange-rate', 'internet.currency-exchange-rate')->name('internet.currency-exchange-rate');
     Route::view('internet/proxy-validate', 'internet.proxy-validate')->name('internet.proxy-validate');

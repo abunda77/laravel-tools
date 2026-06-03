@@ -17,6 +17,8 @@ class ImageGenerationService
 {
     private const API_KEY_NAME = 'freepik_provider';
 
+    private const DISABLED_MESSAGE = 'Layanan Freepik sedang dinonaktifkan di dashboard.';
+
     private const API_URL = 'https://api.freepik.com/v1/ai/text-to-image/z-image';
 
     private const MIN_TIMEOUT_SECONDS = 5;
@@ -55,6 +57,7 @@ class ImageGenerationService
      */
     public function generate(string $prompt, string $imageSize = 'square_hd', string $format = 'jpeg'): array
     {
+        $this->ensureEnabled();
         $prompt = $this->validatePrompt($prompt);
         $imageSize = $this->validateImageSize($imageSize);
         $format = $this->validateOutputFormat($format);
@@ -93,6 +96,7 @@ class ImageGenerationService
      */
     public function checkStatus(string $taskId): array
     {
+        $this->ensureEnabled();
         $taskId = $this->validateTaskId($taskId);
 
         try {
@@ -121,6 +125,7 @@ class ImageGenerationService
      */
     public function getTasksHistory(): array
     {
+        $this->ensureEnabled();
         try {
             $response = $this->request()
                 ->get(self::API_URL)
@@ -150,6 +155,13 @@ class ImageGenerationService
             ])
             ->timeout($this->timeoutSeconds())
             ->retry($this->retryTimes(), $this->retrySleepMilliseconds());
+    }
+
+    private function ensureEnabled(): void
+    {
+        if (! config('services.freepik.enabled')) {
+            throw new RuntimeException(self::DISABLED_MESSAGE);
+        }
     }
 
     private function apiKey(): string

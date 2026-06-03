@@ -16,6 +16,13 @@ class VideoGenerationTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config()->set('services.freepik.enabled', true);
+    }
+
     public function test_video_generation_page_is_displayed_for_authenticated_users(): void
     {
         $user = User::factory()->create();
@@ -26,6 +33,17 @@ class VideoGenerationTest extends TestCase
             ->assertOk()
             ->assertSee('Generation Video AI')
             ->assertSee('Text to Video Generation');
+    }
+
+    public function test_video_generation_page_returns_not_found_when_feature_is_disabled(): void
+    {
+        config()->set('services.freepik.enabled', false);
+
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->get('/generation/video')
+            ->assertNotFound();
     }
 
     public function test_video_generation_component_only_keeps_the_10_most_recent_tasks_in_history(): void

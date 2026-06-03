@@ -17,6 +17,13 @@ class ImageToPromptTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config()->set('services.freepik.enabled', true);
+    }
+
     public function test_image2prompt_page_is_displayed_for_authenticated_users(): void
     {
         $user = User::factory()->create();
@@ -27,6 +34,17 @@ class ImageToPromptTest extends TestCase
             ->assertOk()
             ->assertSee('Image2Prompt')
             ->assertSee('Buat Prompt dari Gambar');
+    }
+
+    public function test_image2prompt_page_returns_not_found_when_feature_is_disabled(): void
+    {
+        config()->set('services.freepik.enabled', false);
+
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->get('/image-ai/image2prompt')
+            ->assertNotFound();
     }
 
     public function test_forwarded_https_requests_generate_secure_urls(): void

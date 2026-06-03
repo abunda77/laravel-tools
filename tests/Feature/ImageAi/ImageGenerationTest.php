@@ -16,6 +16,13 @@ class ImageGenerationTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config()->set('services.freepik.enabled', true);
+    }
+
     public function test_generation_page_is_displayed_for_authenticated_users(): void
     {
         $user = User::factory()->create();
@@ -26,6 +33,17 @@ class ImageGenerationTest extends TestCase
             ->assertOk()
             ->assertSee('Generation Image Video')
             ->assertSee('Text to Image Generation');
+    }
+
+    public function test_generation_page_returns_not_found_when_feature_is_disabled(): void
+    {
+        config()->set('services.freepik.enabled', false);
+
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->get('/generation/image')
+            ->assertNotFound();
     }
 
     public function test_component_only_keeps_the_10_most_recent_tasks_in_history(): void

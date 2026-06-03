@@ -15,6 +15,13 @@ class FreepikImageSearchTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config()->set('services.freepik.enabled', true);
+    }
+
     public function test_freepik_image_page_requires_authentication(): void
     {
         $response = $this->get(route('search.freepik-image'));
@@ -30,6 +37,17 @@ class FreepikImageSearchTest extends TestCase
 
         $response->assertOk();
         $response->assertSeeLivewire(FreepikImage::class);
+    }
+
+    public function test_freepik_image_page_returns_not_found_when_feature_is_disabled(): void
+    {
+        config()->set('services.freepik.enabled', false);
+
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->get(route('search.freepik-image'))
+            ->assertNotFound();
     }
 
     public function test_freepik_image_can_search_resources_and_load_format_download_data_using_freepik_provider_key(): void

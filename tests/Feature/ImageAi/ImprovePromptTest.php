@@ -15,6 +15,13 @@ class ImprovePromptTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config()->set('services.freepik.enabled', true);
+    }
+
     public function test_improve_prompt_page_is_displayed_for_authenticated_users(): void
     {
         $user = User::factory()->create();
@@ -26,6 +33,17 @@ class ImprovePromptTest extends TestCase
             ->assertSee('Improve Prompt')
             ->assertSee('Tingkatkan Prompt')
             ->assertSee('Copy text');
+    }
+
+    public function test_improve_prompt_page_returns_not_found_when_feature_is_disabled(): void
+    {
+        config()->set('services.freepik.enabled', false);
+
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->get('/image-ai/improve-prompt')
+            ->assertNotFound();
     }
 
     public function test_component_creates_improve_prompt_task(): void

@@ -15,6 +15,13 @@ class VideoGenerationServiceTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config()->set('services.freepik.enabled', true);
+    }
+
     public function test_generate_sends_expected_payload_and_returns_json_response(): void
     {
         $this->configureRequestSettings();
@@ -101,6 +108,24 @@ class VideoGenerationServiceTest extends TestCase
         $this->expectExceptionMessage('Freepik Video API mengembalikan response yang tidak valid');
 
         app(VideoGenerationService::class)->generate('a valid prompt');
+    }
+
+    public function test_generate_rejects_requests_when_feature_is_disabled(): void
+    {
+        config()->set('services.freepik.enabled', false);
+        $this->configureRequestSettings();
+        $this->createFreepikApiKey();
+
+        Http::fake();
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Layanan Freepik sedang dinonaktifkan di dashboard.');
+
+        try {
+            app(VideoGenerationService::class)->generate('a valid prompt');
+        } finally {
+            Http::assertNothingSent();
+        }
     }
 
     private function configureRequestSettings(): void

@@ -49,22 +49,24 @@
                 </p>
             </div>
 
-            <div class="surface-panel surface-panel--compact">
-                <div class="surface-panel__header">
-                    <div>
-                        <p class="section-kicker">Available tools</p>
-                        <h3>Freepik Image</h3>
+            @if (config('services.freepik.enabled'))
+                <div class="surface-panel surface-panel--compact">
+                    <div class="surface-panel__header">
+                        <div>
+                            <p class="section-kicker">Available tools</p>
+                            <h3>Freepik Image</h3>
+                        </div>
+                        <a href="{{ route('search.freepik-image') }}" wire:navigate class="primary-action">
+                            Buka tool
+                        </a>
                     </div>
-                    <a href="{{ route('search.freepik-image') }}" wire:navigate class="primary-action">
-                        Buka tool
-                    </a>
-                </div>
 
-                <p class="surface-panel__text">
-                    Cari resource Freepik via <code>Magnific API</code> dengan API key
-                    <code>freepik_provider</code>, lalu lihat hasil dalam card, table, detail resource, dan panel download berdasarkan format resource.
-                </p>
-            </div>
+                    <p class="surface-panel__text">
+                        Cari resource Freepik via <code>Magnific API</code> dengan API key
+                        <code>freepik_provider</code>, lalu lihat hasil dalam card, table, detail resource, dan panel download berdasarkan format resource.
+                    </p>
+                </div>
+            @endif
 
             <div class="surface-panel surface-panel--compact">
                 <div class="surface-panel__header">

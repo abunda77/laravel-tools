@@ -32,6 +32,10 @@ return [
         'key' => env('PERPLEXITY_API_KEY'),
     ],
 
+    'freepik' => [
+        'enabled' => env('FREEPIK_ENABLED', false),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

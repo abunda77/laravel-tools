@@ -9,6 +9,8 @@ new class extends Component
 
     public function mount(): void
     {
+        $freepikEnabled = (bool) config('services.freepik.enabled');
+
         $this->sections = [
             [
                 'label' => 'Workspace',
@@ -26,7 +28,7 @@ new class extends Component
                         ['label' => 'Overview', 'route' => 'search'],
                         ['label' => 'Tokopedia', 'route' => 'search.tokopedia'],
                         ['label' => 'Unsplash', 'route' => 'search.unsplash'],
-                        ['label' => 'Freepik Image', 'route' => 'search.freepik-image'],
+                        ...($freepikEnabled ? [['label' => 'Freepik Image', 'route' => 'search.freepik-image']] : []),
                         ['label' => 'Google Image', 'route' => 'search.google-image'],
                         ['label' => 'TikTok Video', 'route' => 'search.tiktok'],
                         ['label' => 'Quotes Anime', 'route' => 'search.anime-quotes'],
@@ -41,14 +43,24 @@ new class extends Component
                         ['label' => 'Cek Resi', 'route' => 'tools.cek-resi'],
                         ['label' => 'Kirim WA / Send Whatsapp', 'route' => 'tools.send-whatsapp'],
                     ]],
-                    ['label' => 'Image AI', 'route' => 'image-ai', 'icon' => 'image', 'subItems' => [
-                        ['label' => 'Generation Image', 'route' => 'generation.index'],
-                        ['label' => 'Image2Prompt', 'route' => 'image-ai.image2prompt'],
-                        ['label' => 'Improve Prompt', 'route' => 'image-ai.improve-prompt'],
-                    ]],
-                    ['label' => 'Video AI', 'route' => 'video-ai', 'icon' => 'video', 'subItems' => [
-                        ['label' => 'Generation Video', 'route' => 'generation.video'],
-                    ]],
+                    ...($freepikEnabled ? [[
+                        'label' => 'Image AI',
+                        'route' => 'image-ai',
+                        'icon' => 'image',
+                        'subItems' => [
+                            ['label' => 'Generation Image', 'route' => 'generation.index'],
+                            ['label' => 'Image2Prompt', 'route' => 'image-ai.image2prompt'],
+                            ['label' => 'Improve Prompt', 'route' => 'image-ai.improve-prompt'],
+                        ],
+                    ]] : []),
+                    ...($freepikEnabled ? [[
+                        'label' => 'Video AI',
+                        'route' => 'video-ai',
+                        'icon' => 'video',
+                        'subItems' => [
+                            ['label' => 'Generation Video', 'route' => 'generation.video'],
+                        ],
+                    ]] : []),
                     ['label' => 'Internet', 'route' => 'internet', 'icon' => 'internet', 'subItems' => [
                         ['label' => 'Overview', 'route' => 'internet'],
                         ['label' => 'Kurs Mata Uang', 'route' => 'internet.currency-exchange-rate'],

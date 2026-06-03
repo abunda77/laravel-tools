@@ -15,6 +15,13 @@ class ImprovePromptServiceTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config()->set('services.freepik.enabled', true);
+    }
+
     public function test_improve_sends_expected_payload_and_returns_json_response(): void
     {
         $this->configureRequestSettings();

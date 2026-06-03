@@ -17,6 +17,8 @@ class VideoGenerationService
 {
     private const API_KEY_NAME = 'freepik_provider';
 
+    private const DISABLED_MESSAGE = 'Layanan Freepik sedang dinonaktifkan di dashboard.';
+
     private const GENERATE_URL = 'https://api.freepik.com/v1/ai/video/kling-v3-std';
 
     private const TASKS_URL = 'https://api.freepik.com/v1/ai/video/kling-v3';
@@ -45,6 +47,7 @@ class VideoGenerationService
         bool $generateAudio = true,
         float $cfgScale = 0.5,
     ): array {
+        $this->ensureEnabled();
         $prompt = $this->validatePrompt($prompt);
         $aspectRatio = $this->validateAspectRatio($aspectRatio);
         $duration = $this->validateDuration($duration);
@@ -83,6 +86,7 @@ class VideoGenerationService
      */
     public function checkStatus(string $taskId): array
     {
+        $this->ensureEnabled();
         $taskId = $this->validateTaskId($taskId);
 
         try {
@@ -109,6 +113,7 @@ class VideoGenerationService
      */
     public function getTasksHistory(): array
     {
+        $this->ensureEnabled();
         try {
             $response = $this->request()
                 ->get(self::TASKS_URL)
@@ -154,6 +159,13 @@ class VideoGenerationService
             ])
             ->timeout($this->timeoutSeconds())
             ->retry($this->retryTimes(), $this->retrySleepMilliseconds());
+    }
+
+    private function ensureEnabled(): void
+    {
+        if (! config('services.freepik.enabled')) {
+            throw new RuntimeException(self::DISABLED_MESSAGE);
+        }
     }
 
     private function apiKey(): string

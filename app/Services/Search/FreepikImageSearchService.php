@@ -17,6 +17,8 @@ class FreepikImageSearchService
 {
     public const API_KEY_NAME = 'freepik_provider';
 
+    private const DISABLED_MESSAGE = 'Layanan Freepik sedang dinonaktifkan di dashboard.';
+
     private const BASE_URL = 'https://api.magnific.com';
 
     private const MIN_TIMEOUT_SECONDS = 5;
@@ -38,6 +40,7 @@ class FreepikImageSearchService
      */
     public function search(string $query, int $page = 1, int $limit = 12, string $order = 'relevance'): array
     {
+        $this->ensureEnabled();
         $query = $this->validateQuery($query);
         $page = $this->validatePage($page);
         $limit = $this->validateLimit($limit);
@@ -69,6 +72,7 @@ class FreepikImageSearchService
      */
     public function getResourceDetails(int $resourceId): array
     {
+        $this->ensureEnabled();
         $resourceId = $this->validateResourceId($resourceId);
 
         try {
@@ -92,6 +96,7 @@ class FreepikImageSearchService
      */
     public function downloadResourceByFormat(int $resourceId, string $format): array
     {
+        $this->ensureEnabled();
         $resourceId = $this->validateResourceId($resourceId);
         $format = $this->validateFormat($format);
 
@@ -122,6 +127,13 @@ class FreepikImageSearchService
             ])
             ->timeout($this->timeoutSeconds())
             ->retry($this->retryTimes(), $this->retrySleepMilliseconds());
+    }
+
+    private function ensureEnabled(): void
+    {
+        if (! config('services.freepik.enabled')) {
+            throw new RuntimeException(self::DISABLED_MESSAGE);
+        }
     }
 
     private function apiKey(): string

@@ -298,10 +298,12 @@
                         <strong>Gemini Service</strong>
                         <p>Gunakan <code>name: gemini</code></p>
                     </article>
-                    <article>
-                        <strong>Freepik Generation Service</strong>
-                        <p>Gunakan <code>name: freepik_provider</code></p>
-                    </article>
+                    @if (config('services.freepik.enabled'))
+                        <article>
+                            <strong>Freepik Generation Service</strong>
+                            <p>Gunakan <code>name: freepik_provider</code></p>
+                        </article>
+                    @endif
                     <article>
                         <strong>Custom service lain</strong>
                         <p>Bebas mendefinisikan <code>name</code> sesuai kebutuhan.</p>
