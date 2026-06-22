@@ -29,6 +29,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('search/youtube-finder', 'search.youtube-finder')->name('search.youtube-finder');
     Route::view('search/youtube-channel', 'search.youtube-channel')->name('search.youtube-channel');
     Route::view('tools', 'tools')->name('tools');
+    Route::view('tools/character-sheet', 'tools.character-sheet')->name('tools.character-sheet');
     Route::view('tools/split-cash', 'tools.split-cash')->name('tools.split-cash');
     Route::view('tools/calculator-pvc', 'tools.pvc-calculator')->name('tools.calculator-pvc');
     Route::view('tools/wall-meter', 'tools.wall-meter')->name('tools.wall-meter');

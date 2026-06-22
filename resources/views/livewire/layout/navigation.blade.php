@@ -37,6 +37,7 @@ new class extends Component
                         ['label' => 'Youtube Channel', 'route' => 'search.youtube-channel'],
                     ]],
                     ['label' => 'Tools', 'route' => 'tools', 'icon' => 'tools', 'subItems' => [
+                        ['label' => 'Character Sheet', 'route' => 'tools.character-sheet'],
                         ['label' => 'Split Cash', 'route' => 'tools.split-cash'],
                         ['label' => 'Calculator PVC', 'route' => 'tools.calculator-pvc'],
                         ['label' => 'Wall Meter', 'route' => 'tools.wall-meter'],
