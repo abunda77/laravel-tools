@@ -62,27 +62,35 @@ Pendekatan utama adalah **config-driven modules**, sehingga menu dan submenu API
 
 ```text
 app/
+  Ai/
+    Agents/
+      ChatBotAgent.php
   Livewire/
     Actions/
     ExternalApi/
       DownloaderWorkbench.php
     Forms/
     Generation/
+      ImageGeneration.php
+      Index.php
       VideoGeneration.php
     ApiFreaks/
       CommoditySymbols.php
       CreditUsage.php
       DomainSearch.php
       DomainWhoisHistoryLookup.php
-      DomainWhoisLookup.php
-      HistoricalCommodityPrices.php
+      DomainWhoisLookupService.php
       LiveCommodityPrices.php
       SubdomainLookup.php
+    ImageAi/
+      ImageToPrompt.php
+      ImprovePrompt.php
     Internet/
       CurrencyExchangeRate.php
       ProxyValidate.php
       Whois.php
     Search/
+      AnimeQuoteSearch.php
       FreepikImage.php
       GoogleImageSearch.php
       TokopediaSearch.php
@@ -93,12 +101,27 @@ app/
       YoutubeSearch.php
     Tools/
       CekResi.php
+      CharacterSheet.php  (view-only, no Livewire component)
+      PvcCalculator.php
       WallMeter.php
       SendWhatsapp.php
+    Workspace/
+      ChatBot.php
     Operations/
       ApiKeyBackupManager.php
     Settings/
+  Models/
+    ChatAttachment.php
+    ChatCitation.php
+    ChatMessage.php
+    ChatSession.php
+    LlmModel.php
   Services/
+    Ai/
+      ChatResponder.php
+      ChatResponse.php
+      LlmCredentialResolver.php
+      PerplexityClient.php
     ApiKeys/
       ApiKeyBackupService.php
     ApiFreaks/
@@ -114,12 +137,16 @@ app/
     ExternalApi/
       DownloaderService.php
     Freepik/
+      ImageGenerationService.php
+      ImageToPromptService.php
+      ImprovePromptService.php
       VideoGenerationService.php
     Internet/
       CurrencyExchangeRateService.php
       ProxyValidateService.php
       WhoisService.php
     Search/
+      AnimeQuoteSearchService.php
       FreepikImageSearchService.php
       GoogleImageSearchService.php
       TokopediaSearchService.php
@@ -130,6 +157,7 @@ app/
       YoutubeSearchService.php
     Tools/
       CekResiService.php
+      PvcCalculatorService.php
       SendWhatsappService.php
   Support/
     Registries/
@@ -151,18 +179,56 @@ docs/
 ```text
 Workspace
 |-- Dashboard
+|-- ChatBot
 |-- Downloader
 `-- Custom Scripts
 
 Modules
 |-- Search
+|   |-- Overview
+|   |-- Tokopedia
+|   |-- Unsplash
+|   |-- Freepik Image (jika FREEPIK_ENABLED=true)
+|   |-- Google Image
+|   |-- TikTok Video
+|   |-- Quotes Anime
+|   |-- Youtube
+|   |-- Youtube Finder
+|   `-- Youtube Channel
 |-- Tools
-|   `-- Split Cash
-`-- Internet
+|   |-- Character Sheet
+|   |-- Split Cash
+|   |-- Calculator PVC
+|   |-- Wall Meter
+|   |-- Cek Resi
+|   `-- Kirim WA / Send Whatsapp
+|-- Image AI (jika FREEPIK_ENABLED=true)
+|   |-- Generation Image
+|   |-- Image2Prompt
+|   `-- Improve Prompt
+|-- Video AI (jika FREEPIK_ENABLED=true)
+|   `-- Generation Video
+|-- Internet
+|   |-- Overview
+|   |-- Kurs Mata Uang
+|   |-- Proxy Validate
+|   `-- Whois
+|-- ApiFreaks Tools
+|   |-- Overview
+|   |-- Credit Usage
+|   |-- Domain WHOIS Lookup
+|   |-- WHOIS History
+|   |-- Domain Search
+|   |-- Subdomain Lookup
+|   |-- Commodity Symbols
+|   |-- Live Commodity Prices
+|   `-- Historical Commodity Prices
+`-- Apify Scraper
+    `-- GMaps 1.0
 
 Operations
-|-- Backup Data ApiKey
 |-- Execution History
+|-- Backup Data ApiKey
 |-- Settings
 `-- Profile
 ```
@@ -170,22 +236,35 @@ Operations
 ---
 
 Ringkasan sidebar saat ini:
-- `Workspace`: `Dashboard`, `Downloader`, `Custom Scripts`
-- `Modules`: `Search`, `Tools`, `Internet`, `ApiFreaks Tools`, `Apify Scraper`
-- `Operations`: `Backup Data ApiKey`, `Execution History`, `Settings`, `Profile`
+- `Workspace`: `Dashboard`, `ChatBot`, `Downloader`, `Custom Scripts`
+- `Modules`: `Search`, `Tools`, `Image AI`*, `Video AI`*, `Internet`, `ApiFreaks Tools`, `Apify Scraper`
+- `Operations`: `Execution History`, `Backup Data ApiKey`, `Settings`, `Profile`
 
 Catatan:
 - Integrasi Freepik dimatikan secara default dengan `FREEPIK_ENABLED=false`, sehingga menu `Freepik Image`, `Image AI`, dan `Video AI` tidak tampil di dashboard.
+- Menu bertanda `*` hanya tampil jika `FREEPIK_ENABLED=true`.
 
 Catatan modul Search:
 - `Overview`
 - `Tokopedia`
 - `Unsplash`
+- `Freepik Image` *(jika `FREEPIK_ENABLED=true`)*
 - `Google Image`
 - `TikTok Video`
+- `Quotes Anime`
 - `Youtube`
 - `Youtube Finder`
 - `Youtube Channel`
+
+---
+
+Catatan modul Tools:
+- `Character Sheet`
+- `Split Cash`
+- `Calculator PVC`
+- `Wall Meter`
+- `Cek Resi`
+- `Kirim WA / Send Whatsapp`
 
 ---
 
@@ -215,16 +294,145 @@ Catatan modul Apify Scraper:
 
 ---
 
-Catatan modul Tools:
-- `Split Cash`
-- `Wall Meter`
-- `Cek Resi`
-- `Kirim WA / Send Whatsapp`
+Catatan modul Video AI:
+- `Generation Video` *(hanya tampil jika `FREEPIK_ENABLED=true`)*
+
+Catatan modul Image AI:
+- `Generation Image` *(hanya tampil jika `FREEPIK_ENABLED=true`)*
+- `Image2Prompt` *(hanya tampil jika `FREEPIK_ENABLED=true`)*
+- `Improve Prompt` *(hanya tampil jika `FREEPIK_ENABLED=true`)*
 
 ---
 
-Catatan modul Video AI:
-- `Generation Video` *(hanya tampil jika `FREEPIK_ENABLED=true`)*
+## Fitur ChatBot
+
+Menu **Workspace -> ChatBot** menyediakan antarmuka chat AI multi-provider dengan dukungan percakapan berkelanjutan.
+
+- Mendukung provider: `OpenAI`, `Gemini`, `Anthropic`, dan `Perplexity`.
+- Setiap provider memiliki daftar model aktif yang dikelola di tabel `llm_models`.
+- Sesi chat disimpan per user dengan title otomatis berdasarkan prompt pertama.
+- Mendukung upload attachment (image: jpg, jpeg, png, webp; document: pdf, txt, md, csv, json, doc, docx) dengan batas 12 MB.
+- Fitur **Web Search** menggabungkan hasil pencarian web dari Perplexity sebagai konteks tambahan sebelum dikirim ke LLM.
+- Conversation history disimpan di tabel `chat_sessions` dan `chat_messages`, dengan limit 40 pesan terakhir per request.
+- Citations dari respons LLM ditampilkan sebagai referensi sumber.
+- Sesi bisa dibuat baru, dipilih ulang, atau dihapus beserta attachment-nya.
+
+### Konfigurasi Environment
+
+```env
+OPENAI_API_KEY=
+GEMINI_API_KEY=
+ANTHROPIC_API_KEY=
+PERPLEXITY_API_KEY=
+```
+
+### Model yang Didukung
+
+Model LLM dikelola di tabel `llm_models` dengan field:
+- `provider`: `openai`, `gemini`, `anthropic`, `perplexity`
+- `name`: nama model (contoh: `gpt-4o`, `claude-sonnet-4-20250514`, `gemini-2.0-flash`)
+- `label`: nama tampilan di UI
+- `is_active`: status aktif/nonaktif
+- `sort_order`: urutan tampil
+
+---
+
+## Fitur Character Sheet
+
+Menu **Modules -> Tools -> Character Sheet** menyediakan resource hub berisi kumpulan shortcut ke generator character sheet, storyboard, dan prompt tools eksternal.
+
+- Halaman ini bersifat view-only (tidak menggunakan Livewire component), hanya mengumpulkan link ke tools eksternal.
+- Tools yang tersedia:
+  - **Character Sheet Generator** (ChatGPT) - Generator untuk menyusun character sheet dasar dari ide karakter.
+  - **Image to JSON Prompt Engineer** (ChatGPT) - Konversi referensi visual menjadi prompt JSON.
+  - **Story Board Generator** (ChatGPT) - Memecah alur visual menjadi urutan storyboard.
+  - **Image to JSON Prompt** (Gemini) - Alternatif Gemini untuk prompt JSON dari gambar.
+  - **Character Sheet Director** (Gemini) - Asisten untuk detail karakter, pose, dan ekspresi.
+  - **Video & Image Prompt Generator** (Gemini) - Generator prompt untuk gambar dan video.
+- Setiap tool ditampilkan sebagai card dengan provider badge, judul, deskripsi, dan tombol "Buka" yang mengarah ke URL eksternal.
+
+---
+
+## Fitur Calculator PVC
+
+Menu **Modules -> Tools -> Calculator PVC** menyediakan workbench untuk menghitung estimasi kebutuhan lembar PVC berdasarkan dimensi bidang.
+
+- Fitur utama:
+  - Pilih preset ukuran produk PVC (Panel strip, PVC board).
+  - Input dimensi bidang dalam satuan meter atau centimeter.
+  - Input dimensi per lembar PVC (lebar, panjang, tebal).
+  - Input harga per lembar (dalam Rupiah).
+  - Cadangan potongan (waste percentage) opsional, default 10%.
+- Hasil perhitungan:
+  - Luas bidang total (m²).
+  - Luas per lembar PVC (m²).
+  - Kebutuhan dasar (jumlah minimum lembar).
+  - Rekomendasi + cadangan (jumlah lembar setelah ditambah toleransi).
+  - Estimasi biaya total (tanpa cadangan dan dengan cadangan).
+- Preset harga mengacu pada kisaran harga pasar umum untuk panel strip 20x300 cm, 25x300 cm, dan PVC board 122x244 cm.
+- Sidebar referensi menyediakan catatan cara membaca hasil dan harga preset pasar.
+
+---
+
+## Fitur Quotes Anime
+
+Menu **Modules -> Search -> Quotes Anime** menyediakan workbench untuk menampilkan kutipan anime acak dari API publik.
+
+- Menggunakan API key tersimpan di tabel `api_keys` dengan identifier `downloader_provider`.
+- Base URL yang dipakai adalah `https://api.ferdev.my.id`.
+- Endpoint yang dipanggil adalah `/random/anime-quotes`.
+- Tidak memerlukan parameter query; setiap request mengembalikan satu kutipan acak.
+- Hasil menampilkan: `quote`, `character` (nama karakter), `anime` (judul anime), dan `url` (sumber kutipan).
+- Tersedia tombol refresh untuk mengambil kutipan baru.
+- Raw JSON response tetap ditampilkan untuk inspeksi payload provider.
+
+---
+
+## Fitur Generation Image
+
+Integrasi ini saat ini **dinonaktifkan secara default** dan hanya muncul jika `FREEPIK_ENABLED=true`.
+
+Saat diaktifkan, menu **Modules -> Image AI -> Generation Image** menyediakan workbench untuk generate gambar memakai Freepik Image Generation dengan API key `freepik_provider`.
+
+- Endpoint generate yang dipakai: Freepik Image Generation API.
+- Endpoint history task: `GET` task history.
+- Endpoint task by id: `GET /v1/ai/image/{task_id}`.
+- Parameter utama:
+  - `prompt`: deskripsi gambar yang akan dihasilkan.
+  - `imageSize`: `square`, `square_hd`, `portrait_3_4`, `portrait_9_16`, `landscape_4_3`, `landscape_16_9`.
+- Setelah submit, sistem menyimpan `task_id`, menampilkan status task, lalu melakukan polling berkala sampai task selesai atau gagal.
+- Jika task selesai, hasil gambar ditampilkan di halaman dan bisa diunduh langsung.
+- Riwayat task terbaru ditampilkan pada panel history (maksimal 10 task) dengan cache 30 detik.
+
+---
+
+## Fitur Image2Prompt
+
+Integrasi ini saat ini **dinonaktifkan secara default** dan hanya muncul jika `FREEPIK_ENABLED=true`.
+
+Saat diaktifkan, menu **Modules -> Image AI -> Image2Prompt** menyediakan workbench untuk menghasilkan deskripsi prompt dari sebuah gambar menggunakan Freepik API.
+
+- Input: `image URL` atau `upload file gambar` (maks 5 MB, format jpg, jpeg, png, webp).
+- Opsi `webhook URL` untuk callback notifikasi task selesai.
+- Setelah submit, sistem menyimpan `task_id` dan melakukan polling status task.
+- Hasil berupa array `generated` yang berisi deskripsi prompt berbasis gambar yang dianalisis.
+- Status task: `CREATED`, `PROCESSING`, `COMPLETED`, `FAILED`, `ERROR`.
+- Tersedia tombol "Clear Result" untuk mereset hasil sebelumnya.
+
+---
+
+## Fitur Improve Prompt
+
+Integrasi ini saat ini **dinonaktifkan secara default** dan hanya muncul jika `FREEPIK_ENABLED=true`.
+
+Saat diaktifkan, menu **Modules -> Image AI -> Improve Prompt** menyediakan workbench untuk meningkatkan kualitas prompt menggunakan Freepik API.
+
+- Input: `prompt` (maks 2500 karakter), `type` (`image` atau `video`), `language` (kode bahasa 2 karakter, contoh: `en`, `id`).
+- Opsi `webhook URL` untuk callback notifikasi task selesai.
+- Setelah submit, sistem menyimpan `task_id` dan melakukan polling status task.
+- Hasil berupa array `generated` yang berisi prompt-prompt yang sudah ditingkatkan kualitasnya.
+- Status task: `CREATED`, `PROCESSING`, `COMPLETED`, `FAILED`, `ERROR`.
+- Tersedia tombol "Clear Result" untuk mereset hasil sebelumnya.
 
 ---
 
@@ -719,7 +927,7 @@ php artisan test
 - [x] Install Breeze + Livewire + Volt
 - [x] Konfigurasi Tailwind CSS
 - [x] Buat layout dashboard + sidebar
-- [ ] Auth flow (login, logout, proteksi route)
+- [x] Auth flow (login, logout, proteksi route)
 
 ### Phase 2 - External API Module
 - [ ] Config registry dari folder `docs`
@@ -732,14 +940,26 @@ php artisan test
 - [x] Modul Search: Freepik Image (card + table + detail resource + download per format, saat ini dimatikan default)
 - [x] Modul Search: Google Image (preview image + table URL + raw JSON)
 - [x] Modul Search: TikTok Video (preview video + table URL + raw JSON)
+- [x] Modul Search: Quotes Anime (kutipan anime acak + raw JSON)
 - [x] Modul Search: Youtube (card view + table view + raw JSON)
 - [x] Modul Search: Youtube Finder (table view + pagination + YouTube Data API v3)
 - [x] Modul Search: Youtube Channel (profil channel + daftar upload + pencarian dalam channel)
-- [x] Modul Tools: Cek Resi (tracking paket + timeline vertikal)
+- [x] Modul Tools: Character Sheet (resource hub view-only)
+- [x] Modul Tools: Split Cash
+- [x] Modul Tools: Calculator PVC (estimasi kebutuhan lembar PVC + kalkulasi biaya)
 - [x] Modul Tools: Wall Meter (perhitungan tinggi dinding dengan slider trigonometri)
+- [x] Modul Tools: Cek Resi (tracking paket + timeline vertikal)
+- [x] Modul Tools: Kirim WA / Send Whatsapp
 - [x] Modul Internet: Kurs Mata Uang (API.co.id Exchange Rate)
 - [x] Modul Internet: Proxy Validate (filter, bulk select, validate, export, progress)
 - [x] Modul Internet: Whois (lookup domain + raw WHOIS record)
+- [x] Modul ApiFreaks Tools: Credit Usage, Domain WHOIS Lookup/History, Domain Search, Subdomain Lookup, Commodity Symbols, Live/Historical Commodity Prices
+- [x] Modul Apify Scraper: GMaps 1.0 (data bisnis Google Maps + export CSV/XLSX/PDF)
+- [x] Modul Image AI: Generation Image (Freepik text-to-image + task polling + history)
+- [x] Modul Image AI: Image2Prompt (gambar ke deskripsi prompt + task polling)
+- [x] Modul Image AI: Improve Prompt (peningkatan kualitas prompt + task polling)
+- [x] Modul Video AI: Generation Video (Freepik Kling v3 text-to-video + task polling + history)
+- [x] Modul Workspace: ChatBot (multi-provider AI chat dengan conversation persistence, file upload, web search)
 
 ### Phase 3 - Custom Script Module
 - [ ] Registry custom script
@@ -749,6 +969,7 @@ php artisan test
 ### Phase 4 - Settings & Security
 - [x] Settings management (API key terpusat, timeout, queue mode)
 - [x] Backup dan restore API key dari file backup
+- [x] AI ChatBot dengan multi-provider (OpenAI, Gemini, Anthropic, Perplexity)
 - [ ] Role & Permission (spatie/laravel-permission)
 - [ ] Audit log (spatie/laravel-activitylog)
 
@@ -765,10 +986,12 @@ php artisan test
 - **Custom Script Executor**: Hindari menjalankan shell command bebas dari input user. Prioritaskan `Artisan command` atau `PHP class handler`. Jika shell command diperlukan, gunakan **whitelist** command yang diizinkan.
 - **API Key**: Semua input `value` dari halaman manajemen API Keys akan dienkripsi dari bawaan sistem sebelum masuk ke database (`Crypt::encryptString`) untuk faktor keamanan.
 - **API Key Internet / Exchange Rate**: Modul Kurs Mata Uang mengambil key dari `api_keys` dengan identifier `apicoid_provider` dan mengirimkannya melalui header `x-api-co-id`.
-- **API Key Ferdev Provider**: Modul Downloader, Search -> Tokopedia, Search -> Unsplash, Search -> Google Image, Search -> TikTok Video, Search -> Youtube, Tools -> Cek Resi, dan Internet -> Whois mengambil key dari `api_keys` dengan identifier `downloader_provider` dan mengirimkannya sebagai parameter query `apikey`.
+- **API Key Ferdev Provider**: Modul Downloader, Search -> Tokopedia, Search -> Unsplash, Search -> Google Image, Search -> TikTok Video, Search -> Quotes Anime, Search -> Youtube, Tools -> Cek Resi, dan Internet -> Whois mengambil key dari `api_keys` dengan identifier `downloader_provider` dan mengirimkannya sebagai parameter query `apikey`.
 - **API Key Freepik / Magnific Provider**: Dipakai hanya jika `FREEPIK_ENABLED=true`. Saat aktif, modul Search -> Freepik Image, Image AI -> Generation Image, Image AI -> Image2Prompt, Image AI -> Improve Prompt, dan Video AI -> Generation Video mengambil key dari `api_keys` dengan identifier `freepik_provider`.
 - **API Key YouTube Data API**: Modul Search -> Youtube Finder dan Search -> Youtube Channel mengambil key dari `api_keys` dengan identifier `youtubeapi_provider` untuk request ke YouTube Data API v3.
 - **API Key Apify**: Modul Apify Scraper -> GMaps 1.0 mengambil key dari `api_keys` dengan identifier `apify_provider` untuk request ke Apify actor API.
+- **API Key ChatBot Providers**: Modul Workspace -> ChatBot menggunakan API key dari environment `OPENAI_API_KEY`, `GEMINI_API_KEY`, `ANTHROPIC_API_KEY`, dan `PERPLEXITY_API_KEY`. API key Perplexity dipakai juga sebagai web search grounding untuk provider lain selain Perplexity itu sendiri.
+- **Attachment ChatBot**: File attachment dari ChatBot disimpan di disk `local` pada direktori `chatbot-attachments`. Akses file dibatasi per sesi chat milik masing-masing user.
 - **Backup API Key**: File backup API key berisi secret asli agar dapat direstore. Simpan file backup di lokasi aman dan jangan commit file dari `storage/app/private/api-key-backups`.
 - **Permission**: Batasi akses menu tertentu menggunakan role-based access control.
 
