@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Support\Settings\SystemSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -132,7 +133,7 @@ class GmapsScraperTest extends TestCase
             ->assertFileDownloaded('apify-gmaps-1-0.pdf');
     }
 
-    private function seedExportableResults(): \Livewire\Features\SupportTesting\Testable
+    private function seedExportableResults(): Testable
     {
         $user = User::factory()->create();
 

@@ -44,16 +44,11 @@ new class extends Component
                         ['label' => 'Cek Resi', 'route' => 'tools.cek-resi'],
                         ['label' => 'Kirim WA / Send Whatsapp', 'route' => 'tools.send-whatsapp'],
                     ]],
-                    ...($freepikEnabled ? [[
-                        'label' => 'Image AI',
-                        'route' => 'image-ai',
-                        'icon' => 'image',
-                        'subItems' => [
-                            ['label' => 'Generation Image', 'route' => 'generation.index'],
-                            ['label' => 'Image2Prompt', 'route' => 'image-ai.image2prompt'],
-                            ['label' => 'Improve Prompt', 'route' => 'image-ai.improve-prompt'],
-                        ],
-                    ]] : []),
+                    ['label' => 'Image AI', 'route' => 'image-ai', 'icon' => 'image', 'subItems' => [
+                        ...($freepikEnabled ? [['label' => 'Generation Image', 'route' => 'generation.index']] : []),
+                        ['label' => 'Image2Prompt', 'route' => 'image-ai.image2prompt'],
+                        ...($freepikEnabled ? [['label' => 'Improve Prompt', 'route' => 'image-ai.improve-prompt']] : []),
+                    ]],
                     ...($freepikEnabled ? [[
                         'label' => 'Video AI',
                         'route' => 'video-ai',

@@ -3,6 +3,7 @@
 namespace App\Livewire\ImageAi;
 
 use App\Services\Freepik\ImprovePromptService;
+use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use RuntimeException;
@@ -72,7 +73,7 @@ class ImprovePrompt extends Component
         $this->generatedPrompts = [];
     }
 
-    public function render(): \Illuminate\Contracts\View\View
+    public function render(): View
     {
         return view('livewire.image-ai.improve-prompt');
     }

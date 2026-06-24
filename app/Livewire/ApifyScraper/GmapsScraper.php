@@ -116,7 +116,7 @@ class GmapsScraper extends Component
     public function exportXlsx(): StreamedResponse
     {
         return response()->streamDownload(function (): void {
-            $spreadsheet = new Spreadsheet();
+            $spreadsheet = new Spreadsheet;
             $sheet = $spreadsheet->getActiveSheet();
             $sheet->fromArray($this->columns, null, 'A1');
 

@@ -3,16 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Crypt;
 
 /**
- * @property int         $id
- * @property string      $name        Identifier unik, e.g. downloader_provider
- * @property string      $label       Nama tampilan, e.g. Downloader Provider
+ * @property int $id
+ * @property string $name Identifier unik, e.g. downloader_provider
+ * @property string $label Nama tampilan, e.g. Downloader Provider
  * @property string|null $description Deskripsi kegunaan
- * @property string|null $raw_value   Raw encrypted value stored in DB (use ->getDecryptedValue() instead)
- * @property bool        $is_active
+ * @property string|null $raw_value Raw encrypted value stored in DB (use ->getDecryptedValue() instead)
+ * @property bool $is_active
  */
 class ApiKey extends Model
 {
@@ -76,9 +77,9 @@ class ApiKey extends Model
     /**
      * Scope active API keys only.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  Builder  $query
      */
-    public function scopeActive($query): \Illuminate\Database\Eloquent\Builder
+    public function scopeActive($query): Builder
     {
         return $query->where('is_active', true);
     }

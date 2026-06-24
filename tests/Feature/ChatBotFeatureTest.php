@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\Workspace\ChatBot;
 use App\Livewire\Settings\LlmModelManager;
+use App\Livewire\Workspace\ChatBot;
 use App\Models\ChatSession;
 use App\Models\LlmModel;
 use App\Models\User;

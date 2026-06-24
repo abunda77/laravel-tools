@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Search;
+namespace App\Services\ImageAi;
 
 use App\Models\ApiKey;
 use App\Support\Settings\SystemSettings;
@@ -13,11 +13,11 @@ use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use RuntimeException;
 
-class UnsplashSearchService
+class Image2PromptService
 {
     public const API_KEY_NAME = 'downloader_provider';
 
-    public const ENDPOINT = '/search/unsplash';
+    private const ENDPOINT = '/tools/img2prompt';
 
     private const BASE_URL = 'https://api.ferdev.my.id';
 
@@ -29,22 +29,22 @@ class UnsplashSearchService
     ) {}
 
     /**
-     * @return array<string, mixed>
+     * @return array{result: string, author: string}
      */
-    public function search(string $query): array
+    public function generate(string $imageLink): array
     {
-        $query = $this->validateQuery($query);
+        $imageLink = $this->validateLink($imageLink);
 
         try {
             $response = $this->request()
                 ->get(self::ENDPOINT, [
-                    'query' => $query,
+                    'link' => $imageLink,
                     'apikey' => $this->apiKey(),
                 ])
                 ->throw();
         } catch (ConnectionException $exception) {
             throw new RuntimeException(
-                'Tidak dapat terhubung ke API search Unsplash. Periksa koneksi internet atau coba beberapa saat lagi.',
+                'Tidak dapat terhubung ke API Image2Prompt. Periksa koneksi internet atau coba beberapa saat lagi.',
                 previous: $exception,
             );
         } catch (RequestException $exception) {
@@ -54,7 +54,7 @@ class UnsplashSearchService
             );
         }
 
-        return $this->mapResponse($query, $response);
+        return $this->mapResponse($response);
     }
 
     private function request(): PendingRequest
@@ -76,7 +76,7 @@ class UnsplashSearchService
 
         if (blank($apiKey)) {
             throw new RuntimeException(
-                'API key Unsplash search belum diatur atau tidak aktif. Tambahkan di Settings -> API Keys dengan name "'.self::API_KEY_NAME.'".',
+                'API key Image2Prompt belum diatur atau tidak aktif. Tambahkan di Settings -> API Keys dengan name "'.self::API_KEY_NAME.'".',
             );
         }
 
@@ -98,50 +98,47 @@ class UnsplashSearchService
         return max(0, (int) $this->settings->get('request_retry_sleep_ms'));
     }
 
-    private function validateQuery(string $query): string
+    private function validateLink(string $link): string
     {
-        $query = trim($query);
+        $link = trim($link);
 
-        if (blank($query)) {
-            throw new InvalidArgumentException('Query pencarian Unsplash tidak boleh kosong.');
+        if (blank($link)) {
+            throw new InvalidArgumentException('URL gambar tidak boleh kosong.');
         }
 
-        return $query;
+        if (! filter_var($link, FILTER_VALIDATE_URL)) {
+            throw new InvalidArgumentException('URL gambar tidak valid.');
+        }
+
+        return $link;
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array{result: string, author: string}
      */
-    private function mapResponse(string $query, Response $response): array
+    private function mapResponse(Response $response): array
     {
         $payload = $response->json();
 
         if (! is_array($payload)) {
-            throw new RuntimeException('API Unsplash search mengembalikan response yang tidak valid (bukan JSON).');
+            throw new RuntimeException('API Image2Prompt mengembalikan response yang tidak valid (bukan JSON).');
         }
 
         if (Arr::get($payload, 'success') !== true || (int) Arr::get($payload, 'status', 0) >= 400) {
             throw new RuntimeException(
-                (string) (Arr::get($payload, 'message') ?: 'API Unsplash search mengembalikan status gagal.'),
+                (string) (Arr::get($payload, 'message') ?: 'API Image2Prompt mengembalikan status gagal.'),
             );
         }
 
-        $images = collect(Arr::wrap(Arr::get($payload, 'result', [])))
-            ->filter(fn (mixed $item): bool => is_array($item))
-            ->map(fn (array $item): array => [
-                'title' => (string) Arr::get($item, 'title', ''),
-                'download' => (string) Arr::get($item, 'download', ''),
-                'preview' => (string) Arr::get($item, 'preview', ''),
-            ])
-            ->values()
-            ->all();
+        $result = Arr::get($payload, 'result');
+
+        if (! is_string($result) || blank($result)) {
+            throw new RuntimeException('API Image2Prompt tidak mengembalikan prompt yang valid.');
+        }
 
         return [
-            'query' => $query,
+            'result' => $result,
             'author' => (string) Arr::get($payload, 'author', ''),
-            'total' => count($images),
-            'images' => $images,
-            'responseData' => Arr::wrap(Arr::get($payload, 'result', [])),
         ];
     }
 
@@ -156,10 +153,10 @@ class UnsplashSearchService
                 ?: Arr::get($payload, 'detail');
 
             if (is_string($message) && filled($message)) {
-                return 'API Unsplash search error: '.$message;
+                return 'API Image2Prompt error: '.$message;
             }
         }
 
-        return 'API Unsplash search error: request gagal dengan status '.($response?->status() ?? 'unknown').'.';
+        return 'API Image2Prompt error: request gagal dengan status '.($response?->status() ?? 'unknown').'.';
     }
 }

@@ -24,8 +24,7 @@ class YoutubeChannelService
     public function __construct(
         private readonly SystemSettings $settings,
         private readonly HttpFactory $http,
-    ) {
-    }
+    ) {}
 
     /**
      * Fetch channel info + first page of uploaded videos.

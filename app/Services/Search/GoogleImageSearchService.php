@@ -26,8 +26,7 @@ class GoogleImageSearchService
     public function __construct(
         private readonly SystemSettings $settings,
         private readonly HttpFactory $http,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<string, mixed>

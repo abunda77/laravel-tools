@@ -20,7 +20,7 @@ class ApiKeyBackupService
     private const VERSION = 1;
 
     /**
-     * @return array<int, array{filename: string, path: string, size: int, last_modified: \Illuminate\Support\Carbon}>
+     * @return array<int, array{filename: string, path: string, size: int, last_modified: Carbon}>
      */
     public function backups(): array
     {

@@ -26,8 +26,7 @@ class GmapsScraperService
     public function __construct(
         private readonly SystemSettings $settings,
         private readonly HttpFactory $http,
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $input

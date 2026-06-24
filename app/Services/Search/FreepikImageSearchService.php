@@ -26,8 +26,7 @@ class FreepikImageSearchService
     public function __construct(
         private readonly SystemSettings $settings,
         private readonly HttpFactory $http,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array{
@@ -321,7 +320,6 @@ class FreepikImageSearchService
     }
 
     /**
-     * @param  mixed  $formats
      * @return array<string, array{total:int,items:array<int, array<string, mixed>>}>
      */
     private function normalizeAvailableFormats(mixed $formats): array

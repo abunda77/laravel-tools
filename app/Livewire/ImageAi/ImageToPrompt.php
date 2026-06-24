@@ -2,118 +2,102 @@
 
 namespace App\Livewire\ImageAi;
 
-use App\Services\Freepik\ImageToPromptService;
-use Livewire\Attributes\Validate;
+use App\Models\ApiKey;
+use App\Services\ImageAi\FreeimageHostService;
+use App\Services\ImageAi\Image2PromptService;
+use Illuminate\Contracts\View\View;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
-use RuntimeException;
 
 class ImageToPrompt extends Component
 {
     use WithFileUploads;
 
-    #[Validate('nullable|url|required_without:imageFile')]
     public string $imageUrl = '';
 
-    #[Validate('nullable|image|max:5120|required_without:imageUrl')]
     public ?TemporaryUploadedFile $imageFile = null;
 
-    #[Validate('nullable|url')]
-    public string $webhookUrl = '';
+    public bool $hasSavedApiKey = false;
 
-    public ?string $taskId = null;
+    public ?string $result = null;
 
-    public string $taskStatus = '';
+    public ?string $errorMessage = null;
 
-    public array $generatedPrompts = [];
-
-    public function generatePrompt(ImageToPromptService $service): void
+    public function mount(): void
     {
-        $this->validate([
-            'imageUrl' => ['nullable', 'url', 'required_without:imageFile'],
-            'imageFile' => ['nullable', 'image', 'max:5120', 'required_without:imageUrl'],
-            'webhookUrl' => ['nullable', 'url'],
-        ]);
-
-        try {
-            $response = $service->generate(
-                $this->imageInput(),
-                filled($this->webhookUrl) ? $this->webhookUrl : null,
-            );
-
-            $this->applyTaskResponse($response);
-            session()->flash('success', 'Task Image2Prompt berhasil dibuat.');
-        } catch (\Throwable $exception) {
-            session()->flash('error', $exception->getMessage());
-        }
+        $this->hasSavedApiKey = filled(
+            ApiKey::query()
+                ->active()
+                ->where('name', Image2PromptService::API_KEY_NAME)
+                ->first()
+                ?->value,
+        );
     }
 
-    public function checkTaskStatus(ImageToPromptService $service): void
+    public function generate(Image2PromptService $image2Prompt, FreeimageHostService $freeimageHost): void
     {
-        if (! $this->taskId) {
+        $this->reset(['result', 'errorMessage']);
+
+        if (blank($this->imageUrl) && ! $this->imageFile instanceof TemporaryUploadedFile) {
+            $this->errorMessage = 'Masukkan URL gambar atau upload file gambar.';
+
             return;
         }
 
         try {
-            $this->applyTaskResponse($service->checkStatus($this->taskId));
-        } catch (\Throwable $exception) {
-            $this->taskId = null;
-            session()->flash('error', $exception->getMessage());
+            $link = $this->resolveImageLink($freeimageHost);
+            $response = $image2Prompt->generate($link);
+            $this->result = $response['result'];
+            $this->hasSavedApiKey = true;
+        } catch (\Throwable $throwable) {
+            $this->result = null;
+            $this->errorMessage = $throwable->getMessage();
         }
     }
 
     public function clearResult(): void
     {
-        $this->taskId = null;
-        $this->taskStatus = '';
-        $this->generatedPrompts = [];
+        $this->reset(['result', 'errorMessage', 'imageUrl']);
+        $this->imageFile = null;
     }
 
-    public function render(): \Illuminate\Contracts\View\View
+    public function render(): View
     {
         return view('livewire.image-ai.image-to-prompt');
     }
 
-    private function imageInput(): string
+    private function resolveImageLink(FreeimageHostService $freeimageHost): string
     {
-        if (filled($this->imageUrl)) {
-            return trim($this->imageUrl);
+        $url = trim($this->imageUrl);
+
+        if (filled($url)) {
+            if (! filter_var($url, FILTER_VALIDATE_URL)) {
+                throw new \RuntimeException('URL gambar tidak valid.');
+            }
+
+            return $url;
         }
 
         if (! $this->imageFile instanceof TemporaryUploadedFile) {
-            throw new RuntimeException('Pilih URL gambar atau upload file gambar terlebih dahulu.');
+            throw new \RuntimeException('Masukkan URL gambar atau upload file gambar.');
         }
+
+        $this->validateOnly('imageFile', [
+            'imageFile' => ['nullable', 'image', 'max:5120'],
+        ]);
 
         $contents = file_get_contents($this->imageFile->getRealPath());
 
         if ($contents === false) {
-            throw new RuntimeException('File gambar tidak dapat dibaca.');
+            throw new \RuntimeException('Gagal membaca file gambar.');
         }
 
-        return base64_encode($contents);
-    }
+        $mimeType = $this->imageFile->getMimeType() ?: 'image/jpeg';
+        $base64 = base64_encode($contents);
 
-    /**
-     * @param  array<string, mixed>  $response
-     */
-    private function applyTaskResponse(array $response): void
-    {
-        $data = $response['data'] ?? $response;
+        $uploadResult = $freeimageHost->uploadFromBase64($base64, $mimeType);
 
-        if (! is_array($data)) {
-            throw new RuntimeException('Freepik API mengembalikan response task yang tidak valid.');
-        }
-
-        $this->taskId = isset($data['task_id']) && is_string($data['task_id']) ? $data['task_id'] : $this->taskId;
-        $this->taskStatus = isset($data['status']) && is_string($data['status']) ? $data['status'] : $this->taskStatus;
-
-        if (isset($data['generated']) && is_array($data['generated']) && $data['generated'] !== []) {
-            $this->generatedPrompts = array_values(array_filter($data['generated'], is_string(...)));
-        }
-
-        if ($this->generatedPrompts !== [] || in_array($this->taskStatus, ['COMPLETED', 'FAILED', 'ERROR'], true)) {
-            $this->taskId = null;
-        }
+        return $uploadResult['url'];
     }
 }

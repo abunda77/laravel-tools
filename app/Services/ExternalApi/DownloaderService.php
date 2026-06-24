@@ -49,14 +49,13 @@ class DownloaderService
     public function __construct(
         private readonly SystemSettings $settings,
         private readonly HttpFactory $http,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<string, mixed>
      *
-     * @throws InvalidArgumentException  When provider or link is invalid.
-     * @throws RuntimeException          When API call fails or returns an error.
+     * @throws InvalidArgumentException When provider or link is invalid.
+     * @throws RuntimeException When API call fails or returns an error.
      */
     public function execute(string $provider, string $link, ?string $apiKeyOverride = null): array
     {
