@@ -82,9 +82,13 @@ app/
       DomainWhoisLookupService.php
       LiveCommodityPrices.php
       SubdomainLookup.php
-    ImageAi/
-      ImageToPrompt.php
-      ImprovePrompt.php
+     ImageAi/
+       ImageToPrompt.php
+       ImprovePrompt.php
+   Services/
+     ImageAi/
+       FreeimageHostService.php
+       Image2PromptService.php
     Internet/
       CurrencyExchangeRate.php
       ProxyValidate.php
@@ -418,6 +422,7 @@ Saat diaktifkan, menu **Modules -> Image AI -> Image2Prompt** menyediakan workbe
 - Hasil berupa array `generated` yang berisi deskripsi prompt berbasis gambar yang dianalisis.
 - Status task: `CREATED`, `PROCESSING`, `COMPLETED`, `FAILED`, `ERROR`.
 - Tersedia tombol "Clear Result" untuk mereset hasil sebelumnya.
+- **Upload File**: File gambar diupload ke Freeimage.host dulu oleh `FreeimageHostService` (API key `freeimage_host`) untuk mendapatkan URL publik, lalu URL dikirim ke API Image2Prompt. Mendukung format base64 dengan validasi ukuran maksimum 5120 KB.
 
 ---
 
@@ -991,6 +996,7 @@ php artisan test
 - **API Key YouTube Data API**: Modul Search -> Youtube Finder dan Search -> Youtube Channel mengambil key dari `api_keys` dengan identifier `youtubeapi_provider` untuk request ke YouTube Data API v3.
 - **API Key Apify**: Modul Apify Scraper -> GMaps 1.0 mengambil key dari `api_keys` dengan identifier `apify_provider` untuk request ke Apify actor API.
 - **API Key ChatBot Providers**: Modul Workspace -> ChatBot menggunakan API key dari environment `OPENAI_API_KEY`, `GEMINI_API_KEY`, `ANTHROPIC_API_KEY`, dan `PERPLEXITY_API_KEY`. API key Perplexity dipakai juga sebagai web search grounding untuk provider lain selain Perplexity itu sendiri.
+- **API Key FreeimageHost**: Modul Image AI -> Image2Prompt menggunakan `FreeimageHostService` yang mengambil key dari `api_keys` dengan identifier `freeimage_host`. Key ini dipakai untuk upload gambar ke Freeimage.host API v1 (`POST /api/1/upload`) guna mendapatkan URL publik sebelum dikirim ke endpoint Image2Prompt.
 - **Attachment ChatBot**: File attachment dari ChatBot disimpan di disk `local` pada direktori `chatbot-attachments`. Akses file dibatasi per sesi chat milik masing-masing user.
 - **Backup API Key**: File backup API key berisi secret asli agar dapat direstore. Simpan file backup di lokasi aman dan jangan commit file dari `storage/app/private/api-key-backups`.
 - **Permission**: Batasi akses menu tertentu menggunakan role-based access control.
