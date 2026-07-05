@@ -26,9 +26,11 @@ Pendekatan utama adalah **config-driven modules**, sehingga menu dan submenu API
 | Frontend | Tailwind CSS + Alpine.js |
 | Queue | Database queue (upgrade ke Redis/Horizon bila perlu) |
 | HTTP Client | Laravel Http Facade (berbasis Guzzle) |
+| AI SDK | Laravel AI (`laravel/ai`) |
+| Export | dompdf/dompdf (PDF), phpoffice/phpspreadsheet (XLSX) |
+| Testing | PHPUnit |
 | Permission | spatie/laravel-permission *(planned)* |
 | Activity Log | spatie/laravel-activitylog *(planned)* |
-| Testing | PHPUnit / Pest *(planned)* |
 
 ---
 
@@ -67,67 +69,72 @@ app/
       ChatBotAgent.php
   Livewire/
     Actions/
-    ExternalApi/
-      DownloaderWorkbench.php
-    Forms/
-    Generation/
-      ImageGeneration.php
-      Index.php
-      VideoGeneration.php
+      Logout.php
     ApiFreaks/
+      ApiFreaksComponent.php  (base class)
       CommoditySymbols.php
       CreditUsage.php
       DomainSearch.php
       DomainWhoisHistoryLookup.php
-      DomainWhoisLookupService.php
+      DomainWhoisLookup.php
+      HistoricalCommodityPrices.php
       LiveCommodityPrices.php
       SubdomainLookup.php
-     ImageAi/
-       ImageToPrompt.php
-       ImprovePrompt.php
-   Services/
-     ImageAi/
-       FreeimageHostService.php
-       Image2PromptService.php
+    ApifyScraper/
+      GmapsScraper.php
+    ExternalApi/
+      DownloaderWorkbench.php
+    Forms/
+      LoginForm.php
+    Generation/
+      ImageGeneration.php
+      Index.php
+      VideoGeneration.php
+    ImageAi/
+      ImageToPrompt.php
+      ImprovePrompt.php
     Internet/
       CurrencyExchangeRate.php
       ProxyValidate.php
       Whois.php
+    Operations/
+      ApiKeyBackupManager.php
     Search/
       AnimeQuoteSearch.php
       FreepikImage.php
       GoogleImageSearch.php
+      TiktokVideoSearch.php
       TokopediaSearch.php
       UnsplashSearch.php
-      TiktokVideoSearch.php
       YoutubeChannel.php
       YoutubeFinder.php
       YoutubeSearch.php
+    Settings/
+      ApiKeyManager.php
+      GeneralSettings.php
+      LlmModelManager.php
     Tools/
       CekResi.php
-      CharacterSheet.php  (view-only, no Livewire component)
       PvcCalculator.php
-      WallMeter.php
       SendWhatsapp.php
+      WallMeter.php
     Workspace/
       ChatBot.php
-    Operations/
-      ApiKeyBackupManager.php
-    Settings/
   Models/
+    ApiKey.php
+    AppSetting.php
     ChatAttachment.php
     ChatCitation.php
     ChatMessage.php
     ChatSession.php
     LlmModel.php
+    User.php
   Services/
     Ai/
       ChatResponder.php
       ChatResponse.php
       LlmCredentialResolver.php
       PerplexityClient.php
-    ApiKeys/
-      ApiKeyBackupService.php
     ApiFreaks/
       ApiFreaksService.php
       CommoditySymbolsService.php
@@ -138,6 +145,10 @@ app/
       HistoricalCommodityPricesService.php
       LiveCommodityPricesService.php
       SubdomainLookupService.php
+    ApiKeys/
+      ApiKeyBackupService.php
+    Apify/
+      GmapsScraperService.php
     ExternalApi/
       DownloaderService.php
     Freepik/
@@ -145,6 +156,9 @@ app/
       ImageToPromptService.php
       ImprovePromptService.php
       VideoGenerationService.php
+    ImageAi/
+      FreeimageHostService.php
+      Image2PromptService.php
     Internet/
       CurrencyExchangeRateService.php
       ProxyValidateService.php
@@ -153,20 +167,22 @@ app/
       AnimeQuoteSearchService.php
       FreepikImageSearchService.php
       GoogleImageSearchService.php
+      TiktokVideoSearchService.php
       TokopediaSearchService.php
       UnsplashSearchService.php
-      TiktokVideoSearchService.php
       YoutubeChannelService.php
       YoutubeFinderService.php
       YoutubeSearchService.php
     Tools/
       CekResiService.php
-      PvcCalculatorService.php
       SendWhatsappService.php
   Support/
     Registries/
+    Settings/
+      SystemSettings.php
 config/
-  api-modules.php  (planned)
+  ai.php
+  tools.php
 database/
   migrations/
   seeders/
@@ -174,6 +190,11 @@ docs/
   table.md
   table (1-5).md
   file.md
+resources/
+  views/
+    tools/
+      character-sheet.blade.php  (view-only, no Livewire component)
+      split-cash.blade.php       (view-only, Alpine.js logic)
 ```
 
 ---
@@ -231,9 +252,11 @@ Modules
     `-- GMaps 1.0
 
 Operations
-|-- Execution History
 |-- Backup Data ApiKey
 |-- Settings
+|   |-- API Keys
+|   |-- LLM Models
+|   `-- General Settings
 `-- Profile
 ```
 
@@ -242,11 +265,13 @@ Operations
 Ringkasan sidebar saat ini:
 - `Workspace`: `Dashboard`, `ChatBot`, `Downloader`, `Custom Scripts`
 - `Modules`: `Search`, `Tools`, `Image AI`*, `Video AI`*, `Internet`, `ApiFreaks Tools`, `Apify Scraper`
-- `Operations`: `Execution History`, `Backup Data ApiKey`, `Settings`, `Profile`
+- `Operations`: `Backup Data ApiKey`, `Settings` (`API Keys`, `LLM Models`, `General Settings`), `Profile`
 
 Catatan:
 - Integrasi Freepik dimatikan secara default dengan `FREEPIK_ENABLED=false`, sehingga menu `Freepik Image`, `Image AI`, dan `Video AI` tidak tampil di dashboard.
 - Menu bertanda `*` hanya tampil jika `FREEPIK_ENABLED=true`.
+- `Custom Scripts` (Workspace) dan `Execution History` (Operations) tercatat di sidebar namun belum terimplementasi (masih planned, lihat Roadmap).
+- Submenu `Settings` mencakup `API Keys` (`ApiKeyManager`), `LLM Models` (`LlmModelManager`), dan `General Settings` (`GeneralSettings`).
 
 Catatan modul Search:
 - `Overview`
@@ -354,6 +379,17 @@ Menu **Modules -> Tools -> Character Sheet** menyediakan resource hub berisi kum
   - **Character Sheet Director** (Gemini) - Asisten untuk detail karakter, pose, dan ekspresi.
   - **Video & Image Prompt Generator** (Gemini) - Generator prompt untuk gambar dan video.
 - Setiap tool ditampilkan sebagai card dengan provider badge, judul, deskripsi, dan tombol "Buka" yang mengarah ke URL eksternal.
+
+---
+
+## Fitur Split Cash
+
+Menu **Modules -> Tools -> Split Cash** menyediakan kalkulator untuk membagi sejumlah uang tunai ke beberapa porsi secara acak dengan hasil yang pas dan bulat.
+
+- Halaman ini bersifat view-only (tidak menggunakan Livewire component); seluruh logika berjalan di sisi klien memakai Alpine.js (`splitCash()` di `resources/js/app.js`).
+- Input utama: total uang (Rp) dan jumlah porsi.
+- Algoritma membagi total ke dalam porsi acak yang masing-masing bulat (tanpa sisa) dan jumlahnya persis sama dengan total.
+- Hasil pembagian ditampilkan sebagai daftar porsi beserta nilainya.
 
 ---
 
@@ -771,9 +807,67 @@ Menu **Operations -> Backup Data ApiKey** menyediakan pengelolaan backup untuk d
 
 ---
 
-## Struktur Database (Planned)
+## Fitur General Settings
 
-### `api_modules`
+Menu **Operations -> Settings -> General Settings** menyediakan konfigurasi global aplikasi yang berlaku untuk seluruh modul API eksternal.
+
+- Mengatur `request_timeout_seconds` (batas waktu request, default 30 detik).
+- Mengatur `request_retry_times` (jumlah retry, default 1) dan `request_retry_sleep_ms` (delay antar retry, default 500ms).
+- Mengatur `queue_connection` untuk eksekusi task berat (`sync` atau `database`).
+- Nilai disimpan via `App\Support\Settings\SystemSettings` (singleton) ke tabel `app_settings`.
+- Perubahan langsung memengaruhi perilaku service-service yang memakai pengaturan dari `config('tools.*')`.
+
+---
+
+## Fitur LLM Model Manager
+
+Menu **Operations -> Settings -> LLM Models** menyediakan pengelolaan daftar model LLM per provider yang dipakai oleh ChatBot.
+
+- Mengelola entitas pada tabel `llm_models` (provider, name, label, is_active, sort_order).
+- Provider yang didukung: `openai`, `gemini`, `anthropic`, `perplexity`.
+- Hanya model dengan `is_active=true` yang muncul di pilihan model pada UI ChatBot.
+- Mendukung toggle aktif/nonaktif dan pengaturan urutan tampil.
+
+---
+
+## Struktur Database
+
+### `api_keys` *(aktif)*
+Penyimpanan tersentralisasi untuk semua API key yang dibutuhkan modul eksternal. Nilai API key dienkripsi di database (`Crypt::encryptString` via accessor/mutator `ApiKey`).
+
+| Kolom | Tipe | Keterangan |
+|---|---|---|
+| id | bigint | Primary key |
+| name | string | Identifier unik (contoh: `downloader_provider`) |
+| label | string | Nama tampilan di UI |
+| description | text | Deskripsi kegunaan (opsional) |
+| value | text | Nilai API key (encrypted) |
+| is_active | boolean | Status aktif/nonaktif key |
+
+### `app_settings` *(aktif)*
+Konfigurasi global aplikasi (Timeout, Retry, Queue Mode). Backed by `App\Models\AppSetting`.
+
+| Kolom | Tipe |
+|---|---|
+| key | string |
+| value | text |
+
+### `llm_models` *(aktif)*
+Daftar model LLM per provider yang dikelola lewat `LlmModelManager`.
+
+| Kolom | Tipe | Keterangan |
+|---|---|---|
+| id | bigint | Primary key |
+| provider | string | `openai`, `gemini`, `anthropic`, `perplexity` |
+| name | string | Nama model (contoh: `gpt-4o`) |
+| label | string | Nama tampilan di UI |
+| is_active | boolean | Status aktif/nonaktif |
+| sort_order | integer | Urutan tampil |
+
+### `chat_sessions` & `chat_messages` *(aktif)*
+Menyimpan percakapan ChatBot per user, beserta `chat_attachments` dan `chat_citations`.
+
+### `api_modules` *(planned)*
 Definisi modul API yang bisa diatur via admin.
 
 | Kolom | Tipe | Keterangan |
@@ -788,7 +882,7 @@ Definisi modul API yang bisa diatur via admin.
 | is_active | boolean | Status aktif/nonaktif |
 | sort_order | integer | Urutan tampil |
 
-### `custom_scripts`
+### `custom_scripts` *(planned)*
 Definisi script internal yang bisa dijalankan.
 
 | Kolom | Tipe | Keterangan |
@@ -803,7 +897,7 @@ Definisi script internal yang bisa dijalankan.
 | is_active | boolean | Status aktif |
 | queueable | boolean | Jalankan di queue |
 
-### `execution_histories`
+### `execution_histories` *(planned)*
 Log setiap eksekusi API atau script.
 
 | Kolom | Tipe | Keterangan |
@@ -818,26 +912,6 @@ Log setiap eksekusi API atau script.
 | duration_ms | integer | Durasi dalam ms |
 | error_message | text | Pesan error (jika ada) |
 | executed_at | timestamp | Waktu eksekusi |
-
-### `api_keys`
-Penyimpanan tersentralisasi untuk semua API key yang dibutuhkan modul eksternal. Nilai API key dienkripsi di database.
-
-| Kolom | Tipe | Keterangan |
-|---|---|---|
-| id | bigint | Primary key |
-| name | string | Identifier unik (contoh: `downloader_provider`) |
-| label | string | Nama tampilan di UI |
-| description | text | Deskripsi kegunaan (opsional) |
-| value | text | Nilai API key (encrypted) |
-| is_active | boolean | Status aktif/nonaktif key |
-
-### `app_settings`
-Konfigurasi global aplikasi (Timeout, Retry, Queue Mode).
-
-| Kolom | Tipe |
-|---|---|
-| key | string |
-| value | text |
 
 ---
 
@@ -857,20 +931,15 @@ Konfigurasi global aplikasi (Timeout, Retry, Queue Mode).
 git clone <repo-url>
 cd laravel-tools
 
-# Install dependencies
+# Full first-time setup (install + migrate + build)
+composer run setup
+
+# Atau jalankan langkah manual:
 composer install
 npm install
-
-# Salin file environment
 cp .env.example .env
-
-# Generate application key
 php artisan key:generate
-
-# Jalankan migrasi database
 php artisan migrate
-
-# Build asset frontend
 npm run build
 ```
 
@@ -885,8 +954,17 @@ APP_URL=http://localhost
 DB_CONNECTION=sqlite
 # atau sesuaikan untuk MySQL/PostgreSQL
 
-# Catatan: API Key untuk layanan eksternal kini dikelola langsung
-# melalui antarmuka web (Menu Settings -> API Keys), bukan via .env.
+# API Key untuk layanan eksternal dikelola lewat UI (Settings -> API Keys),
+# BUKAN via .env. Pengecualian hanya untuk ChatBot AI provider keys di bawah.
+
+# ChatBot AI provider keys (satu-satunya key yang berasal dari .env)
+OPENAI_API_KEY=
+GEMINI_API_KEY=
+ANTHROPIC_API_KEY=
+PERPLEXITY_API_KEY=
+
+# Freepik integration gate (default false)
+FREEPIK_ENABLED=false
 ```
 
 ---
@@ -916,18 +994,24 @@ php artisan serve
 ## Testing
 
 ```bash
-# Jalankan test suite
+# Jalankan test suite (clears config, then runs PHPUnit dengan in-memory SQLite)
 composer run test
 
 # Atau langsung dengan PHP artisan
 php artisan test
+
+# Run a single test file / filter
+php artisan test --compact tests/Feature/Search/TokopediaSearchTest.php
+php artisan test --compact --filter=test_can_search
 ```
+
+Tests memakai PHPUnit (bukan Pest) dengan in-memory SQLite, array cache, dan sync queue. Test fitur berada di `tests/Feature/<Domain>/` mengikuti struktur Livewire component.
 
 ---
 
 ## Tahapan Pengembangan (Roadmap)
 
-### Phase 1 - Foundation *(sedang berjalan)*
+### Phase 1 - Foundation *(selesai)*
 - [x] Inisialisasi Laravel 13
 - [x] Install Breeze + Livewire + Volt
 - [x] Konfigurasi Tailwind CSS
@@ -972,17 +1056,18 @@ php artisan test
 - [ ] Log eksekusi script
 
 ### Phase 4 - Settings & Security
-- [x] Settings management (API key terpusat, timeout, queue mode)
+- [x] Settings management (API key terpusat, timeout, queue mode, LLM model manager)
 - [x] Backup dan restore API key dari file backup
 - [x] AI ChatBot dengan multi-provider (OpenAI, Gemini, Anthropic, Perplexity)
 - [ ] Role & Permission (spatie/laravel-permission)
 - [ ] Audit log (spatie/laravel-activitylog)
+- [ ] Execution History (logging eksekusi API/script)
 
 ### Phase 5 - Reliability
 - [ ] Queue untuk task berat (downloader, OCR, dll.)
 - [ ] Retry & timeout configuration
 - [ ] Health check provider API
-- [ ] Test automation
+- [x] Test automation (PHPUnit)
 
 ---
 
