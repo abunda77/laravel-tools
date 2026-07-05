@@ -1,3 +1,82 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+**Laravel Tools** is an internal admin panel (UI text and docs are in Bahasa Indonesia) that centralizes external API integrations and custom scripts behind one dashboard. Built on Laravel 13 + Livewire 3 + Volt, auth via Laravel Breeze. Author: ERIE PUTRANTO.
+
+## Common Commands
+
+```bash
+# Full first-time setup (install + migrate + build)
+composer run setup
+
+# Concurrent dev: php artisan serve + queue:listen + pail logs + npm run dev
+composer run dev
+
+# Tests (clears config, then runs PHPUnit). Tests use in-memory SQLite.
+composer run test
+
+# Run a single test file / filter
+php artisan test --compact tests/Feature/Search/TokopediaSearchTest.php
+php artisan test --compact --filter=test_can_search
+
+# Frontend build (Tailwind/Vite). Run if UI changes aren't reflected.
+npm run build
+npm run dev
+
+# Code formatting (run after editing any PHP file)
+vendor/bin/pint --dirty --format agent
+
+# Discover commands / inspect routes
+php artisan list
+php artisan route:list --except-vendor
+```
+
+## Architecture
+
+### Livewire-first (controllers are minimal)
+Nearly all UI logic lives in `app/Livewire/<Domain>/` components paired with Blade in `resources/views/livewire/<domain>/` (kebab-case). Traditional controllers only exist for auth (`app/Http/Controllers/Auth/VerifyEmailController.php`). Volt is mounted at `resources/views/livewire` and `resources/views/pages` (see `VoltServiceProvider`). When adding a feature, default to a Livewire/Volt component, not a controller.
+
+### Service layer for external APIs
+Each third-party integration is wrapped by a service class in `app/Services/<Domain>/` that uses Laravel's `Http` facade. Livewire components call services; services never call Livewire. Patterns to follow: `app/Services/Search/TokopediaSearchService.php`, `app/Services/ApiFreaks/ApiFreaksService.php` (base class for that domain). The `PvcCalculator` tool is an exception — its logic lives directly in the Livewire component.
+
+### Centralized, encrypted API key storage
+Third-party API keys are **not** read from `.env`. They are stored encrypted in the `api_keys` table (`Crypt::encryptString` via `ApiKey` model accessor/mutator) and managed through the Settings UI (`app/Livewire/Settings/ApiKeyManager.php`). Resolve keys at runtime with `ApiKey::valueByName($name)` / `ApiKey::findByName($name)`. Known identifiers: `downloader_provider`, `apicoid_provider`, `apifreaks_provider`, `freepik_provider`, `youtubeapi_provider`, `apify_provider`, `freeimage_host`. **Only** ChatBot AI provider keys (OpenAI/Gemini/Anthropic/Perplexity) come from `.env`.
+
+### Feature gating
+Freepik-dependent features (Image AI, Video AI, Freepik Image search) are gated by `config('services.freepik.enabled')` (env `FREEPIK_ENABLED`, defaults `false`). Routes use `abort_unless(config('services.freepik.enabled'), 404)`.
+
+### Laravel AI SDK (`laravel/ai`)
+Installed with its own config (`config/ai.php`), migrations extending `Laravel\Ai\Migrations\AiMigration` (`agent_conversations`, `agent_conversation_messages`), and stubs in `stubs/`. The ChatBot uses `app/Ai/Agents/ChatBotAgent.php` and `app/Services/Ai/` (`ChatResponder`, `LlmCredentialResolver`, `PerplexityClient`). LLM models are configurable per-provider via the `llm_models` table and `app/Livewire/Settings/LlmModelManager.php`.
+
+### Config-driven modules
+`config/tools.php` holds tool-wide settings (request timeout, retry count/sleep, queue connection) and WhatsApp config. New API menu modules are added via configuration rather than code changes — follow existing module conventions in `routes/web.php` and `app/Livewire/`.
+
+### Singletons & support
+`App\Support\Settings\SystemSettings` is registered as a singleton in `AppServiceProvider`. `app/Models/AppSetting.php` backs global key/value settings.
+
+### MCP
+`routes/ai.php` registers the Laravel Boost MCP web endpoint at `/mcp/laravel-boost`. The Boost MCP server (`laravel/boost`) provides database, logs, and version-specific docs tooling — see the guidelines below.
+
+### Exports
+`dompdf/dompdf` (PDF) and `phpoffice/phpspreadsheet` (XLSX) are used for export, e.g. Apify scraper results.
+
+## Testing Notes
+- PHPUnit only (no Pest). Tests use in-memory SQLite, array cache, sync queue.
+- Feature tests mirror the Livewire component structure under `tests/Feature/<Domain>/`.
+- Use model factories when creating test data; do not create models in tinker without approval.
+- Do not remove tests or test files without approval.
+
+## Conventions Specific to This Repo
+- UI strings, comments, and documentation are primarily in **Bahasa Indonesia** — match the surrounding language when editing.
+- `Generation/` controller directory exists but is intentionally empty (logic is in Livewire).
+- `temp-laravel13/` is a leftover temp directory — do not treat it as project source.
+- Multiple sibling AI-assistant config files exist (`AGENTS.md`, `GEMINI.md`, `PLANNING.md`); this file is the canonical one for Claude Code.
+
+---
+
 <laravel-boost-guidelines>
 === foundation rules ===
 
@@ -10,7 +89,9 @@ The Laravel Boost guidelines are specifically curated by Laravel maintainers for
 This application is a Laravel application and its main Laravel ecosystems package & versions are below. You are an expert with them all. Ensure you abide by these specific packages & versions.
 
 - php - 8.3
+- laravel/ai (AI) - v0
 - laravel/framework (LARAVEL) - v13
+- laravel/octane (OCTANE) - v2
 - laravel/prompts (PROMPTS) - v0
 - livewire/livewire (LIVEWIRE) - v3
 - livewire/volt (VOLT) - v1
@@ -21,15 +102,6 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - laravel/pint (PINT) - v1
 - phpunit/phpunit (PHPUNIT) - v12
 - tailwindcss (TAILWINDCSS) - v3
-
-## Skills Activation
-
-This project has domain-specific skills available. You MUST activate the relevant skill whenever you work in that domain—don't wait until you're stuck.
-
-- `laravel-best-practices` — Apply this skill whenever writing, reviewing, or refactoring Laravel PHP code. This includes creating or modifying controllers, models, migrations, form requests, policies, jobs, scheduled commands, service classes, and Eloquent queries. Triggers for N+1 and query performance issues, caching strategies, authorization and security patterns, validation, error handling, queue and job configuration, route definitions, and architectural decisions. Also use for Laravel code reviews and refactoring existing Laravel code to follow best practices. Covers any task involving Laravel backend PHP code patterns.
-- `livewire-development` — Use for any task or question involving Livewire. Activate if user mentions Livewire, wire: directives, or Livewire-specific concepts like wire:model, wire:click, invoke this skill. Covers building new components, debugging reactivity issues, real-time form validation, loading states, migrating from Livewire 2 to 3, converting component formats (SFC/MFC/class-based), and performance optimization. Do not use for non-Livewire reactive UI (React, Vue, Alpine-only, Inertia.js) or standard Laravel forms without Livewire.
-- `volt-development` — Develops single-file Livewire components with Volt. Activates when creating Volt components, converting Livewire to Volt, working with @volt directive, functional or class-based Volt APIs; or when the user mentions Volt, single-file components, functional Livewire, or inline component logic in Blade files.
-- `tailwindcss-development` — Always invoke when the user's message includes 'tailwind' in any form. Also invoke for: building responsive grid layouts (multi-column card grids, product grids), flex/grid page structures (dashboards with sidebars, fixed topbars, mobile-toggle navs), styling UI components (cards, tables, navbars, pricing sections, forms, inputs, badges), adding dark mode variants, fixing spacing or typography, and Tailwind v3/v4 work. The core use case: writing or fixing Tailwind utility classes in HTML templates (Blade, JSX, Vue). Skip for backend PHP logic, database queries, API routes, JavaScript with no HTML/CSS component, CSS file audits, build tool configuration, and vanilla CSS.
 
 ## Conventions
 
@@ -62,34 +134,11 @@ This project has domain-specific skills available. You MUST activate the relevan
 
 # Laravel Boost
 
-## Tools
-
-- Laravel Boost is an MCP server with tools designed specifically for this application. Prefer Boost tools over manual alternatives like shell commands or file reads.
-- Use `database-query` to run read-only queries against the database instead of writing raw SQL in tinker.
-- Use `database-schema` to inspect table structure before writing migrations or models.
-- Use `get-absolute-url` to resolve the correct scheme, domain, and port for project URLs. Always use this before sharing a URL with the user.
-- Use `browser-logs` to read browser logs, errors, and exceptions. Only recent logs are useful, ignore old entries.
-
-## Searching Documentation (IMPORTANT)
-
-- Always use `search-docs` before making code changes. Do not skip this step. It returns version-specific docs based on installed packages automatically.
-- Pass a `packages` array to scope results when you know which packages are relevant.
-- Use multiple broad, topic-based queries: `['rate limiting', 'routing rate limiting', 'routing']`. Expect the most relevant results first.
-- Do not add package names to queries because package info is already shared. Use `test resource table`, not `filament 4 test resource table`.
-
-### Search Syntax
-
-1. Use words for auto-stemmed AND logic: `rate limit` matches both "rate" AND "limit".
-2. Use `"quoted phrases"` for exact position matching: `"infinite scroll"` requires adjacent words in order.
-3. Combine words and phrases for mixed queries: `middleware "rate limit"`.
-4. Use multiple queries for OR logic: `queries=["authentication", "middleware"]`.
-
 ## Artisan
 
 - Run Artisan commands directly via the command line (e.g., `php artisan route:list`). Use `php artisan list` to discover available commands and `php artisan [command] --help` to check parameters.
 - Inspect routes with `php artisan route:list`. Filter with: `--method=GET`, `--name=users`, `--path=api`, `--except-vendor`, `--only-vendor`.
 - Read configuration values using dot notation: `php artisan config:show app.name`, `php artisan config:show database.default`. Or read config files directly from the `config/` directory.
-- To check environment variables, read the `.env` file directly.
 
 ## Tinker
 
@@ -107,6 +156,12 @@ This project has domain-specific skills available. You MUST activate the relevan
 - Use TitleCase for Enum keys: `FavoritePerson`, `BestLake`, `Monthly`.
 - Prefer PHPDoc blocks over inline comments. Only add inline comments for exceptionally complex logic.
 - Use array shape type definitions in PHPDoc blocks.
+
+=== deployments rules ===
+
+# Deployment
+
+- Laravel can be deployed using [Laravel Cloud](https://cloud.laravel.com/), which is the fastest way to deploy and scale production Laravel applications.
 
 === tests rules ===
 
@@ -144,6 +199,18 @@ This project has domain-specific skills available. You MUST activate the relevan
 ## Vite Error
 
 - If you receive an "Illuminate\Foundation\ViteException: Unable to locate file in Vite manifest" error, you can run `npm run build` or ask the user to run `npm run dev` or `composer run dev`.
+
+=== octane/core rules ===
+
+# Laravel Octane
+
+This application uses Laravel Octane, a long-running PHP server. The application bootstraps once and handles many requests within the same process.
+
+- Never store request-specific state in singletons or static properties, because it can leak across requests.
+- Use `config('octane.server')` to detect the active driver (`swoole`, `roadrunner`, or `frankenphp`).
+- Prefer scoped bindings (`$this->app->scoped()`) over singletons for per-request services.
+
+When working on Octane-specific features (concurrency, shared tables, memory, driver configuration, testing), invoke `octane-development` for detailed rules.
 
 === livewire/core rules ===
 

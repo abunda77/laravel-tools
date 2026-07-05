@@ -1,9 +1,14 @@
 {
     "agents": [
-        "codex"
+        "antigravity"
     ],
-    "guidelines": true,
-    "packages": [
-        "laravel/ai"
+    "cloud": false,
+    "skills": [
+        "ai-sdk-development",
+        "laravel-best-practices",
+        "octane-development",
+        "livewire-development",
+        "volt-development",
+        "tailwindcss-development"
     ]
 }
