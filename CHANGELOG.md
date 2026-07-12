@@ -13,6 +13,7 @@ dan proyek ini mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Downloader: YouTube Shorts provider (endpoint `/downloader/ytshorts`) + sidebar menu "Download Youtube Short"
 - Image AI: Image2Prompt
 - ApiFreaks: IP Geolocation Lookup
+- Dependency: `binarybuilds/laritor-client` (^3.0)
 
 ### Changed
 - Downloader: workbench `mount()` menerima `selectedProvider` opsional agar halaman ytshorts bisa pre-select provider
