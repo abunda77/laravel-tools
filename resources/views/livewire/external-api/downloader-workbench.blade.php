@@ -2,7 +2,7 @@
     <section class="external-hero">
         <article class="external-hero__intro">
             <p class="section-kicker">Downloader module</p>
-            <h3>Instagram, TikTok, dan Facebook downloader dalam satu workbench.</h3>
+            <h3>Instagram, TikTok, Facebook, dan YouTube Shorts downloader dalam satu workbench.</h3>
             <p>
                 Modul pertama ini memakai parameter `link` dan `apikey`, dengan API key bisa mengambil default dari halaman Settings atau diisi manual sebagai override.
             </p>
@@ -15,7 +15,7 @@
             </div>
             <div class="mini-stat">
                 <span>Providers</span>
-                <strong>3 active</strong>
+                <strong>{{ count($providers) }} active</strong>
             </div>
             <div class="mini-stat">
                 <span>Method</span>
@@ -63,9 +63,9 @@
                             type="url"
                             wire:model="link"
                             class="form-input"
-                            placeholder="https://www.instagram.com/... atau https://vt.tiktok.com/..."
+                            placeholder="https://www.instagram.com/... atau https://vt.tiktok.com/... atau https://www.youtube.com/shorts/..."
                         />
-                        <p class="form-help">Masukkan link Instagram, TikTok, atau Facebook sesuai provider yang dipilih.</p>
+                        <p class="form-help">Masukkan link Instagram, TikTok, Facebook, atau YouTube Shorts sesuai provider yang dipilih.</p>
                         @error('link') <p class="form-error">{{ $message }}</p> @enderror
                     </div>
 

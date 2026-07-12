@@ -208,6 +208,8 @@ Workspace
 |-- Dashboard
 |-- ChatBot
 |-- Downloader
+|   |-- Overview
+|   `-- Download Youtube Short
 `-- Custom Scripts
 
 Modules
@@ -367,6 +369,24 @@ Model LLM dikelola di tabel `llm_models` dengan field:
 - `label`: nama tampilan di UI
 - `is_active`: status aktif/nonaktif
 - `sort_order`: urutan tampil
+
+---
+
+## Fitur Downloader
+
+Menu **Workspace -> Downloader** menyediakan satu workbench untuk mengunduh konten media (video) dari beberapa provider dalam satu antarmuka.
+
+- Menggunakan API key tersimpan di tabel `api_keys` dengan identifier `downloader_provider`.
+- Base URL yang dipakai adalah `https://api.ferdev.my.id`.
+- Semua endpoint memakai method `GET` dengan parameter query `link` dan `apikey`.
+- Provider yang didukung:
+  - **Instagram Downloader** — endpoint `/downloader/instagram`.
+  - **TikTok Downloader** — endpoint `/downloader/tiktok`.
+  - **Facebook Downloader** — endpoint `/downloader/facebook`.
+  - **YouTube Shorts Downloader** — endpoint `/downloader/ytshorts`.
+- Tombol download otomatis muncul sesuai key URL video yang tersedia di payload (mis. `hd`, `sd`, `dlink`, `play`, `download`).
+- API key bersifat fleksibel: bisa memakai saved setting dari halaman Settings atau override manual langsung di form.
+- Halaman **Download Youtube Short** (`external-api/ytshorts`) me-render workbench yang sama dengan provider otomatis ter-select ke `ytshorts`.
 
 ---
 
@@ -1037,6 +1057,7 @@ Tests memakai PHPUnit (bukan Pest) dengan in-memory SQLite, array cache, dan syn
 - [ ] Halaman daftar tools per kategori
 - [ ] Form parameter dinamis + execute endpoint
 - [ ] Tampil hasil response (JSON, image, link)
+- [x] Modul Downloader: Instagram, TikTok, Facebook, YouTube Shorts (provider switcher + auto download button)
 - [x] Modul Search: Tokopedia (card view + table view + raw JSON)
 - [x] Modul Search: Unsplash (gallery card + table URL + raw JSON)
 - [x] Modul Search: Freepik Image (card + table + detail resource + download per format, saat ini dimatikan default)
@@ -1089,7 +1110,7 @@ Tests memakai PHPUnit (bukan Pest) dengan in-memory SQLite, array cache, dan syn
 - **Custom Script Executor**: Hindari menjalankan shell command bebas dari input user. Prioritaskan `Artisan command` atau `PHP class handler`. Jika shell command diperlukan, gunakan **whitelist** command yang diizinkan.
 - **API Key**: Semua input `value` dari halaman manajemen API Keys akan dienkripsi dari bawaan sistem sebelum masuk ke database (`Crypt::encryptString`) untuk faktor keamanan.
 - **API Key Internet / Exchange Rate**: Modul Kurs Mata Uang mengambil key dari `api_keys` dengan identifier `apicoid_provider` dan mengirimkannya melalui header `x-api-co-id`.
-- **API Key Ferdev Provider**: Modul Downloader, Search -> Tokopedia, Search -> Unsplash, Search -> Google Image, Search -> TikTok Video, Search -> Quotes Anime, Search -> Youtube, Tools -> Cek Resi, dan Internet -> Whois mengambil key dari `api_keys` dengan identifier `downloader_provider` dan mengirimkannya sebagai parameter query `apikey`.
+- **API Key Ferdev Provider**: Modul Downloader (Instagram, TikTok, Facebook, YouTube Shorts), Search -> Tokopedia, Search -> Unsplash, Search -> Google Image, Search -> TikTok Video, Search -> Quotes Anime, Search -> Youtube, Tools -> Cek Resi, dan Internet -> Whois mengambil key dari `api_keys` dengan identifier `downloader_provider` dan mengirimkannya sebagai parameter query `apikey`.
 - **API Key Freepik / Magnific Provider**: Dipakai hanya jika `FREEPIK_ENABLED=true`. Saat aktif, modul Search -> Freepik Image, Image AI -> Generation Image, Image AI -> Image2Prompt, Image AI -> Improve Prompt, dan Video AI -> Generation Video mengambil key dari `api_keys` dengan identifier `freepik_provider`.
 - **API Key YouTube Data API**: Modul Search -> Youtube Finder dan Search -> Youtube Channel mengambil key dari `api_keys` dengan identifier `youtubeapi_provider` untuk request ke YouTube Data API v3.
 - **API Key Apify**: Modul Apify Scraper -> GMaps 1.0 mengambil key dari `api_keys` dengan identifier `apify_provider` untuk request ke Apify actor API.

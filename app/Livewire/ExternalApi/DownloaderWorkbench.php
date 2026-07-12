@@ -25,9 +25,14 @@ class DownloaderWorkbench extends Component
      */
     public array $providers = [];
 
-    public function mount(): void
+    public function mount(?string $selectedProvider = null): void
     {
         $this->providers = DownloaderService::providers();
+
+        if ($selectedProvider !== null && array_key_exists($selectedProvider, $this->providers)) {
+            $this->selectedProvider = $selectedProvider;
+        }
+
         $this->hasSavedApiKey = filled(ApiKey::valueByName(DownloaderService::API_KEY_NAME));
     }
 
@@ -44,7 +49,7 @@ class DownloaderWorkbench extends Component
     public function run(DownloaderService $downloaderService): void
     {
         $this->validate([
-            'selectedProvider' => ['required', 'in:instagram,tiktok,facebook'],
+            'selectedProvider' => ['required', 'in:instagram,tiktok,facebook,ytshorts'],
             'link' => ['required', 'url', 'max:2048'],
             'apiKeyOverride' => ['nullable', 'string', 'max:2048'],
         ]);

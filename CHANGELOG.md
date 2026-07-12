@@ -10,11 +10,14 @@ dan proyek ini mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ## [Unreleased]
 
 ### Added
+- Downloader: YouTube Shorts provider (endpoint `/downloader/ytshorts`) + sidebar menu "Download Youtube Short"
 - Image AI: Image2Prompt
 - ApiFreaks: IP Geolocation Lookup
 
 ### Changed
-- Update README
+- Downloader: workbench `mount()` menerima `selectedProvider` opsional agar halaman ytshorts bisa pre-select provider
+- Downloader: validation rule `selectedProvider` ditambah `ytshorts`; stat provider count dijadikan dinamis
+- Update README — dokumentasi fitur Downloader (Instagram, TikTok, Facebook, YouTube Shorts)
 - Update CLAUDE.md
 
 ---

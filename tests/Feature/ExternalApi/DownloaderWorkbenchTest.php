@@ -146,6 +146,51 @@ class DownloaderWorkbenchTest extends TestCase
             ->assertSet('result.downloadOptions.1.url', 'https://video.example.com/video-sd.mp4');
     }
 
+    public function test_downloader_can_execute_ytshorts_request_using_download_payload(): void
+    {
+        $this->configureDownloaderSettings();
+        $this->createDownloaderApiKey();
+
+        Http::fake([
+            'https://api.ferdev.my.id/downloader/ytshorts*' => Http::response([
+                'success' => true,
+                'status' => 200,
+                'author' => 'Feri',
+                'data' => [
+                    'title' => 'top 5 kelakuan pasangan lucu #memengakakkocak #lucu #komedi',
+                    'download' => 'https://ydl.ymcdn.org/api/v1/download/0460a7f9483628878cbac0b68e820251/aVCpCbEQVDk',
+                ],
+            ], 200),
+        ]);
+
+        $user = User::factory()->create();
+
+        Livewire::actingAs($user)
+            ->test(DownloaderWorkbench::class)
+            ->set('selectedProvider', 'ytshorts')
+            ->set('link', 'https://www.youtube.com/shorts/aVCpCbEQVDk')
+            ->call('run')
+            ->assertHasNoErrors()
+            ->assertSet('result.title', 'top 5 kelakuan pasangan lucu #memengakakkocak #lucu #komedi')
+            ->assertSet('result.downloadUrl', 'https://ydl.ymcdn.org/api/v1/download/0460a7f9483628878cbac0b68e820251/aVCpCbEQVDk')
+            ->assertSet('result.downloadOptions.0.label', 'Download (download)')
+            ->assertSet('result.downloadOptions.0.url', 'https://ydl.ymcdn.org/api/v1/download/0460a7f9483628878cbac0b68e820251/aVCpCbEQVDk');
+
+        Http::assertSent(function ($request) {
+            return $request->url() === 'https://api.ferdev.my.id/downloader/ytshorts?link=https%3A%2F%2Fwww.youtube.com%2Fshorts%2FaVCpCbEQVDk&apikey=saved-api-key';
+        });
+    }
+
+    public function test_ytshorts_page_preselects_ytshorts_provider(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get(route('external-api.ytshorts'));
+
+        $response->assertOk();
+        $response->assertSeeLivewire(DownloaderWorkbench::class);
+    }
+
     private function configureDownloaderSettings(): void
     {
         app(SystemSettings::class)->putMany([
