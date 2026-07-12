@@ -11,6 +11,7 @@ dan proyek ini mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 - Image AI: Image2Prompt
+- ApiFreaks: IP Geolocation Lookup
 
 ### Changed
 - Update README

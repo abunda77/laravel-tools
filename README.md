@@ -78,6 +78,7 @@ app/
       DomainWhoisHistoryLookup.php
       DomainWhoisLookup.php
       HistoricalCommodityPrices.php
+      IpGeolocationLookup.php
       LiveCommodityPrices.php
       SubdomainLookup.php
     ApifyScraper/
@@ -143,6 +144,7 @@ app/
       DomainWhoisHistoryLookupService.php
       DomainWhoisLookupService.php
       HistoricalCommodityPricesService.php
+      IpGeolocationService.php
       LiveCommodityPricesService.php
       SubdomainLookupService.php
     ApiKeys/
@@ -247,7 +249,8 @@ Modules
 |   |-- Subdomain Lookup
 |   |-- Commodity Symbols
 |   |-- Live Commodity Prices
-|   `-- Historical Commodity Prices
+|   |-- Historical Commodity Prices
+|   `-- IP Geolocation
 `-- Apify Scraper
     `-- GMaps 1.0
 
@@ -315,6 +318,7 @@ Catatan modul ApiFreaks Tools:
 - `Commodity Symbols`
 - `Live Commodity Prices`
 - `Historical Commodity Prices`
+- `IP Geolocation`
 
 ---
 
@@ -751,6 +755,15 @@ Menu **Modules -> ApiFreaks Tools** menyediakan kumpulan workbench untuk endpoin
 - Parameter utama: `symbols`, `date`
 - Menampilkan tabel historical OHLC per symbol dengan kolom `date`, `open`, `high`, `low`, dan `close`.
 
+### IP Geolocation Lookup API
+
+- Route: `apifreaks-tools.ip-geolocation-lookup`
+- Endpoint: `/v2.0/geolocation/lookup`
+- Method: `GET`
+- Parameter utama: `ip`, `lang` (`en`/`id`), `fields` (contoh: `location`), `include` (contoh: `security,hostnameFallbackLive`)
+- Menampilkan tabel per-section: Location, Country Metadata, Network, Currency, ASN, Company, dan Time Zone (termasuk DST start/end jika tersedia).
+- Mendukung parameter `lang` untuk response dalam Bahasa Inggris (`en`) atau Bahasa Indonesia (`id`).
+
 ---
 
 ## Fitur Generation Video
@@ -1042,7 +1055,7 @@ Tests memakai PHPUnit (bukan Pest) dengan in-memory SQLite, array cache, dan syn
 - [x] Modul Internet: Kurs Mata Uang (API.co.id Exchange Rate)
 - [x] Modul Internet: Proxy Validate (filter, bulk select, validate, export, progress)
 - [x] Modul Internet: Whois (lookup domain + raw WHOIS record)
-- [x] Modul ApiFreaks Tools: Credit Usage, Domain WHOIS Lookup/History, Domain Search, Subdomain Lookup, Commodity Symbols, Live/Historical Commodity Prices
+- [x] Modul ApiFreaks Tools: Credit Usage, Domain WHOIS Lookup/History, Domain Search, Subdomain Lookup, Commodity Symbols, Live/Historical Commodity Prices, IP Geolocation
 - [x] Modul Apify Scraper: GMaps 1.0 (data bisnis Google Maps + export CSV/XLSX/PDF)
 - [x] Modul Image AI: Generation Image (Freepik text-to-image + task polling + history)
 - [x] Modul Image AI: Image2Prompt (gambar ke deskripsi prompt + task polling)
