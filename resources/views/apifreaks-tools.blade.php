@@ -25,6 +25,7 @@
                 ['title' => 'Commodity Symbols', 'route' => 'apifreaks-tools.commodity-symbols', 'description' => 'Ambil daftar symbol komoditas aktif beserta kategori, mata uang, unit, dan interval update.'],
                 ['title' => 'Live Commodity Prices API', 'route' => 'apifreaks-tools.live-commodity-prices', 'description' => 'Harga komoditas live berdasarkan symbol, update period, dan quote currency.'],
                 ['title' => 'Historical Commodity Prices API', 'route' => 'apifreaks-tools.historical-commodity-prices', 'description' => 'Harga open, high, low, close komoditas pada tanggal tertentu.'],
+                ['title' => 'IP Geolocation API', 'route' => 'apifreaks-tools.ip-geolocation-lookup', 'description' => 'Lookup informasi geolokasi, ASN, timezone, dan currency dari alamat IP.'],
             ] as $tool)
                 <div class="surface-panel surface-panel--compact">
                     <div class="surface-panel__header">

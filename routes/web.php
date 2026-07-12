@@ -64,6 +64,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('apifreaks-tools/commodity-symbols', 'apifreaks-tools.commodity-symbols')->name('apifreaks-tools.commodity-symbols');
     Route::view('apifreaks-tools/live-commodity-prices', 'apifreaks-tools.live-commodity-prices')->name('apifreaks-tools.live-commodity-prices');
     Route::view('apifreaks-tools/historical-commodity-prices', 'apifreaks-tools.historical-commodity-prices')->name('apifreaks-tools.historical-commodity-prices');
+    Route::view('apifreaks-tools/ip-geolocation-lookup', 'apifreaks-tools.ip-geolocation-lookup')->name('apifreaks-tools.ip-geolocation-lookup');
     Route::view('apify-scraper/gmaps-1-0', 'apify-scraper.gmaps-1-0')->name('apify-scraper.gmaps-1-0');
 });
 

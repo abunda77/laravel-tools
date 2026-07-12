@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Laravel Tools** is an internal admin panel (UI text and docs are in Bahasa Indonesia) that centralizes external API integrations and custom scripts behind one dashboard. Built on Laravel 13 + Livewire 3 + Volt, auth via Laravel Breeze. Author: ERIE PUTRANTO.
+**Laravel Tools** is an internal admin panel (UI text and docs in Bahasa Indonesia) that centralizes external API integrations and custom scripts behind one dashboard. Built on Laravel 13 + Livewire 3 + Volt, auth via Laravel Breeze. Author: ERIE PUTRANTO.
 
 ## Common Commands
 
@@ -62,6 +62,73 @@ Installed with its own config (`config/ai.php`), migrations extending `Laravel\A
 
 ### Exports
 `dompdf/dompdf` (PDF) and `phpoffice/phpspreadsheet` (XLSX) are used for export, e.g. Apify scraper results.
+
+## Service Pattern (canonical example)
+
+Every service follows this structure (use `TokopediaSearchService` as reference):
+
+```php
+class SomeService
+{
+    public const API_KEY_NAME = 'some_provider';  // identifier in api_keys table
+    public const ENDPOINT = '/path/to/endpoint';
+    private const BASE_URL = 'https://api.example.com';
+    private const MIN_TIMEOUT_SECONDS = 5;
+
+    public function __construct(
+        private readonly SystemSettings $settings,
+        private readonly HttpFactory $http,
+    ) {}
+
+    public function execute(string $input): array
+    {
+        // 1. Validate input (throw InvalidArgumentException in Bahasa)
+        // 2. Build PendingRequest with timeout/retry from $this->settings
+        // 3. Call endpoint with $this->apiKey() as auth
+        // 4. Map & return typed array
+    }
+
+    private function request(): PendingRequest
+    {
+        return $this->http
+            ->baseUrl(self::BASE_URL)
+            ->acceptJson()
+            ->timeout($this->timeoutSeconds())
+            ->retry($this->retryTimes(), $this->retrySleepMilliseconds());
+    }
+
+    private function apiKey(): string
+    {
+        $apiKey = ApiKey::query()->active()
+            ->where('name', self::API_KEY_NAME)->first()?->value;
+        if (blank($apiKey)) {
+            throw new RuntimeException('API key ... belum diatur.');
+        }
+        return $apiKey;
+    }
+
+    // timeoutSeconds(), retryTimes(), retrySleepMilliseconds() — all read from
+    // $this->settings->get('request_timeout_seconds') etc. with sensible minimums.
+}
+```
+
+Key conventions:
+- Constructor uses property promotion with `readonly`
+- `SystemSettings` provides timeout/retry config; `ApiKey` model provides credentials
+- Error messages are in Bahasa Indonesia
+- Methods return `@return array<string, mixed>` with explicit mapping
+- `ConnectionException` → "Tidak dapat terhubung" message; `RequestException` → extract error from JSON body
+
+## Livewire Component Pattern
+
+Components live in `app/Livewire/<Domain>/` and follow this structure:
+- Public properties for form inputs and result state
+- `mount()` for initialization
+- A primary action method (e.g. `search()`, `execute()`) that calls the service
+- `render()` returns the corresponding Blade view in `resources/views/livewire/<domain>/`
+- `#[Layout]` attribute for the wrapping layout
+
+Volt components (single-file, `resources/views/livewire/`) use functional API style — check existing Volt components for the convention. Some pages are view-only Blade with no Livewire backing (e.g. `character-sheet.blade.php`, `split-cash.blade.php`) — their logic is in Alpine.js in `resources/js/app.js`.
 
 ## Testing Notes
 - PHPUnit only (no Pest). Tests use in-memory SQLite, array cache, sync queue.

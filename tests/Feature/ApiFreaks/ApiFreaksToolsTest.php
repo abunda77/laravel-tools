@@ -8,6 +8,7 @@ use App\Livewire\ApiFreaks\DomainSearch;
 use App\Livewire\ApiFreaks\DomainWhoisHistoryLookup;
 use App\Livewire\ApiFreaks\DomainWhoisLookup;
 use App\Livewire\ApiFreaks\HistoricalCommodityPrices;
+use App\Livewire\ApiFreaks\IpGeolocationLookup;
 use App\Livewire\ApiFreaks\LiveCommodityPrices;
 use App\Livewire\ApiFreaks\SubdomainLookup;
 use App\Models\ApiKey;
@@ -291,6 +292,69 @@ class ApiFreaksToolsTest extends TestCase
             ->call('run')
             ->assertSet('result.date', '2026-04-18')
             ->assertSee('3230.55');
+    }
+
+    public function test_ip_geolocation_can_lookup_ip_address(): void
+    {
+        $this->configureRequestSettings();
+        $this->createApiFreaksApiKey();
+
+        Http::fake([
+            'https://api.apifreaks.com/v2.0/geolocation/lookup*' => Http::response([
+                'ip' => '8.8.8.8',
+                'location' => [
+                    'continent_code' => 'NA',
+                    'continent_name' => 'North America',
+                    'country_code2' => 'US',
+                    'country_code3' => 'USA',
+                    'country_name' => 'United States',
+                    'country_capital' => 'Washington, D.C.',
+                    'state_prov' => 'California',
+                    'city' => 'Mountain View',
+                    'zipcode' => '94043-1351',
+                    'latitude' => '37.42240',
+                    'longitude' => '-122.08421',
+                    'is_eu' => false,
+                ],
+                'country_metadata' => [
+                    'calling_code' => '+1',
+                    'tld' => '.us',
+                    'languages' => ['en-US', 'es-US', 'haw', 'fr'],
+                ],
+                'network' => [
+                    'route' => '8.8.8.0/24',
+                    'is_anycast' => true,
+                ],
+                'currency' => [
+                    'code' => 'USD',
+                    'name' => 'US Dollar',
+                    'symbol' => '$',
+                ],
+                'asn' => [
+                    'as_number' => 'AS15169',
+                    'organization' => 'Google LLC',
+                ],
+                'company' => [
+                    'name' => 'Google LLC',
+                    'type' => 'HOSTING',
+                ],
+                'time_zone' => [
+                    'name' => 'America/Los_Angeles',
+                    'offset' => -8,
+                    'is_dst' => true,
+                ],
+            ], 200),
+        ]);
+
+        $user = User::factory()->create();
+
+        Livewire::actingAs($user)
+            ->test(IpGeolocationLookup::class)
+            ->set('ip', '8.8.8.8')
+            ->call('run')
+            ->assertSet('result.ip', '8.8.8.8')
+            ->assertSee('Mountain View')
+            ->assertSee('Google LLC');
     }
 
     public function test_apifreaks_tools_require_active_saved_api_key(): void
