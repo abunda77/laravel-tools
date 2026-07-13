@@ -1,7 +1,10 @@
 <?php
 
+use App\Services\QrCodeTemporaryFileService;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Livewire\Volt\Volt;
 
 Route::view('/', 'home.index');
 
@@ -36,6 +39,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('tools/wall-meter', 'tools.wall-meter')->name('tools.wall-meter');
     Route::view('tools/cek-resi', 'tools.cek-resi')->name('tools.cek-resi');
     Route::view('tools/send-whatsapp', 'tools.send-whatsapp')->name('tools.send-whatsapp');
+    Route::get('qr-code/download/{filename}', function (string $filename, QrCodeTemporaryFileService $temporaryFileService) {
+        $path = $temporaryFileService->path($filename);
+        $storage = Storage::disk($temporaryFileService->disk());
+
+        abort_unless($storage->exists($path), 404);
+
+        return response()->streamDownload(function () use ($storage, $path): void {
+            echo $storage->get($path);
+        }, $filename, [
+            'Content-Type' => $temporaryFileService->mimeType($filename),
+        ]);
+    })->name('qr-code.download');
+    Volt::route('qr-code/generate', 'qr-code.generate')->name('qr-code.generate');
     Route::get('generation/image', function (): View {
         abort_unless(config('services.freepik.enabled'), 404);
 

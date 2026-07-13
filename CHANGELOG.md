@@ -14,6 +14,9 @@ dan proyek ini mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Image AI: Image2Prompt
 - ApiFreaks: IP Geolocation Lookup
 - Dependency: `binarybuilds/laritor-client` (^3.0)
+- Tools: QR Code Generator (menu **Modules -> Tools -> QR Code**) dengan generate PNG/JPG, preview base64, download file temporary, dan cleanup otomatis/manual
+- Dependency: `bacon/bacon-qr-code` (^3.1) untuk render QR Code
+- Command: `cleanup:temporary-uploads` untuk membersihkan temporary upload Livewire dan file QR Code kedaluwarsa
 
 ### Changed
 - Downloader: workbench `mount()` menerima `selectedProvider` opsional agar halaman ytshorts bisa pre-select provider

@@ -230,7 +230,8 @@ Modules
 |   |-- Calculator PVC
 |   |-- Wall Meter
 |   |-- Cek Resi
-|   `-- Kirim WA / Send Whatsapp
+|   |-- Kirim WA / Send Whatsapp
+|   `-- QR Code
 |-- Image AI (jika FREEPIK_ENABLED=true)
 |   |-- Generation Image
 |   |-- Image2Prompt
@@ -299,6 +300,7 @@ Catatan modul Tools:
 - `Wall Meter`
 - `Cek Resi`
 - `Kirim WA / Send Whatsapp`
+- `QR Code`
 
 ---
 
@@ -651,7 +653,25 @@ Menu **Modules -> Tools -> Kirim WA / Send Whatsapp** menyediakan workbench untu
 
 ---
 
-## Fitur Kurs Mata Uang
+## Fitur QR Code
+
+Menu **Modules -> Tools -> QR Code** menyediakan workbench untuk membuat QR Code langsung dari dashboard tanpa layanan eksternal.
+
+- Menerima input teks bebas (URL, teks, kontak) maksimal 5000 karakter; wajib diisi.
+- Generate file QR Code dalam format **PNG** dan **JPG** sekaligus, masing-masing dengan nama file unik berbasis UUID.
+- Menampilkan **preview langsung** dari hasil generate menggunakan data URI base64 (tanpa file publik).
+- Menyediakan tombol **Download PNG** dan **Download JPG** lewat route `qr-code.download` dengan validasi nama file (UUID-like, ekstensi `png`/`jpg`) dan header MIME otomatis.
+- Pembersihan file temporary:
+  - Otomatis saat generate baru (service menghapus file yang lebih tua dari 24 jam).
+  - Manual lewat tombol **Hapus Temporary** di halaman.
+  - Terpusat via command `php artisan cleanup:temporary-uploads`.
+- File hasil disimpan di disk `local` pada direktori `qr-codes-tmp` (`storage/app/qr-codes-tmp`) dan kedaluwarsa setelah 24 jam.
+- Implementasi utama:
+  - `app/Services/QrCodeTemporaryFileService.php` — generate, delete, deleteMany, cleanupExpiredFiles, validasi path, dan mimeType (memakai `BaconQrCode\Writer` + `GDLibRenderer`, ukuran 800px, margin 4).
+  - `resources/views/pages/qr-code/generate.blade.php` — Volt single-file component (input, `generate()`, `clearTemporaryFiles()`, preview & download).
+  - `routes/web.php` — route halaman `qr-code.generate` (Volt) dan route download `qr-code.download`.
+
+---
 
 Menu **Modules -> Internet -> Kurs Mata Uang** menyediakan workbench untuk mengambil kurs mata uang real-time dari API.co.id.
 
@@ -1073,6 +1093,7 @@ Tests memakai PHPUnit (bukan Pest) dengan in-memory SQLite, array cache, dan syn
 - [x] Modul Tools: Wall Meter (perhitungan tinggi dinding dengan slider trigonometri)
 - [x] Modul Tools: Cek Resi (tracking paket + timeline vertikal)
 - [x] Modul Tools: Kirim WA / Send Whatsapp
+- [x] Modul Tools: QR Code (generator PNG/JPG + preview + download + cleanup temporary)
 - [x] Modul Internet: Kurs Mata Uang (API.co.id Exchange Rate)
 - [x] Modul Internet: Proxy Validate (filter, bulk select, validate, export, progress)
 - [x] Modul Internet: Whois (lookup domain + raw WHOIS record)
