@@ -15,7 +15,7 @@ dan proyek ini mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - ApiFreaks: IP Geolocation Lookup
 - Dependency: `binarybuilds/laritor-client` (^3.0)
 - Tools: QR Code Generator (menu **Modules -> Tools -> QR Code**) dengan generate PNG/JPG, preview base64, download file temporary, dan cleanup otomatis/manual
-- Dependency: `bacon/bacon-qr-code` (^3.1) untuk render QR Code
+- Tools: Holiday (menu **Modules -> Tools -> Holiday**) untuk jadwal libur nasional Indonesia menggunakan API.co.id (`apicoid_provider`): daftar libur per tahun, cek tanggal, dan libur mendatang (dihitung dari field `is_upcoming`/`days_until` pada endpoint `/holidays/indonesia` karena endpoint `/holidays/indonesia/upcoming` tidak tersedia di API)
 - Command: `cleanup:temporary-uploads` untuk membersihkan temporary upload Livewire dan file QR Code kedaluwarsa
 
 ### Changed

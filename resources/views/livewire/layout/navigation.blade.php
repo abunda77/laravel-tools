@@ -45,6 +45,7 @@ new class extends Component
                         ['label' => 'Calculator PVC', 'route' => 'tools.calculator-pvc'],
                         ['label' => 'Wall Meter', 'route' => 'tools.wall-meter'],
                         ['label' => 'Cek Resi', 'route' => 'tools.cek-resi'],
+                        ['label' => 'Holiday', 'route' => 'tools.holiday'],
                         ['label' => 'Kirim WA / Send Whatsapp', 'route' => 'tools.send-whatsapp'],
                         ['label' => 'QR Code', 'route' => 'qr-code.generate'],
                     ]],

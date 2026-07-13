@@ -46,6 +46,9 @@ Pendekatan utama adalah **config-driven modules**, sehingga menu dan submenu API
 - ApiFreaks docs: [https://apifreaks.com](https://apifreaks.com)
 - ApiFreaks endpoint base URL: `https://api.apifreaks.com`
 - ApiFreaks authentication header: `X-apiKey`
+- Holiday API docs: [https://docs.api.co.id/products/holiday/](https://docs.api.co.id/products/holiday/)
+- Holiday endpoint base URL: `https://use.api.co.id`
+- Holiday authentication header: `x-api-co-id`
 
 ### Kategori API yang Tersedia
 
@@ -116,6 +119,7 @@ app/
       LlmModelManager.php
     Tools/
       CekResi.php
+      Holiday.php
       PvcCalculator.php
       SendWhatsapp.php
       WallMeter.php
@@ -163,6 +167,7 @@ app/
       Image2PromptService.php
     Internet/
       CurrencyExchangeRateService.php
+      HolidayService.php
       ProxyValidateService.php
       WhoisService.php
     Search/
@@ -230,6 +235,7 @@ Modules
 |   |-- Calculator PVC
 |   |-- Wall Meter
 |   |-- Cek Resi
+|   |-- Holiday
 |   |-- Kirim WA / Send Whatsapp
 |   `-- QR Code
 |-- Image AI (jika FREEPIK_ENABLED=true)
@@ -299,6 +305,7 @@ Catatan modul Tools:
 - `Calculator PVC`
 - `Wall Meter`
 - `Cek Resi`
+- `Holiday`
 - `Kirim WA / Send Whatsapp`
 - `QR Code`
 
@@ -625,6 +632,26 @@ Menu **Modules -> Tools -> Cek Resi** menyediakan workbench untuk melacak paket 
 - Parameter query utama adalah `resi` dan `ekspedisi`, contoh `SPXID054330680586` dan `shopee-express`.
 - Hasil menampilkan data dari key `data`: resi, ekspedisi, kode ekspedisi, status, tanggal kirim, customer service, posisi terakhir, share link, dan history pengiriman.
 - History pengiriman ditampilkan sebagai timeline vertikal agar alur perjalanan paket mudah dibaca.
+
+---
+
+## Fitur Holiday
+
+Menu **Modules -> Tools -> Holiday** menyediakan workbench untuk melihat jadwal libur nasional Indonesia, cuti bersama, dan hari kebesaran melalui API.co.id.
+
+- Menggunakan API key tersimpan di tabel `api_keys` dengan identifier `apicoid_provider`.
+- Base URL yang dipakai adalah `https://use.api.co.id`.
+- Semua request memakai header autentikasi `x-api-co-id`.
+- Endpoint yang dipakai: `GET /holidays/indonesia` (daftar per tahun) dan `GET /holidays/indonesia/check/date` (cek satu tanggal).
+- Tiga fitur utama:
+  - **Daftar libur per tahun** — input tahun (2000–2100), menampilkan daftar libur dengan nama, tanggal, tipe, status cuti bersama, dan hari kebesaran.
+  - **Cek tanggal tertentu** — input tanggal format `YYYY-MM-DD`, menampilkan status libur, hari, dan akhir pekan.
+  - **Libur mendatang** — dihitung dari field `is_upcoming` / `days_until` pada endpoint `/holidays/indonesia` tahun berjalan (endpoint `/holidays/indonesia/upcoming` tidak tersedia di API; dikerjakan lewat filter client-side).
+- Hasil setiap request menampilkan ringkasan, daftar item, dan raw JSON response untuk inspeksi.
+- Implementasi:
+  - `app/Services/Internet/HolidayService.php` — service class dengan wrapper `listHolidays()`, `checkDate()`, dan `upcomingHolidays()`.
+  - `app/Livewire/Tools/Holiday.php` — Livewire component.
+  - `resources/views/livewire/tools/holiday.blade.php` — UI blade.
 
 ---
 
@@ -1095,6 +1122,7 @@ Tests memakai PHPUnit (bukan Pest) dengan in-memory SQLite, array cache, dan syn
 - [x] Modul Tools: Kirim WA / Send Whatsapp
 - [x] Modul Tools: QR Code (generator PNG/JPG + preview + download + cleanup temporary)
 - [x] Modul Internet: Kurs Mata Uang (API.co.id Exchange Rate)
+- [x] Modul Internet / Tools: Holiday (API.co.id Holiday Calendar — daftar libur, cek tanggal, libur mendatang)
 - [x] Modul Internet: Proxy Validate (filter, bulk select, validate, export, progress)
 - [x] Modul Internet: Whois (lookup domain + raw WHOIS record)
 - [x] Modul ApiFreaks Tools: Credit Usage, Domain WHOIS Lookup/History, Domain Search, Subdomain Lookup, Commodity Symbols, Live/Historical Commodity Prices, IP Geolocation
@@ -1130,7 +1158,7 @@ Tests memakai PHPUnit (bukan Pest) dengan in-memory SQLite, array cache, dan syn
 
 - **Custom Script Executor**: Hindari menjalankan shell command bebas dari input user. Prioritaskan `Artisan command` atau `PHP class handler`. Jika shell command diperlukan, gunakan **whitelist** command yang diizinkan.
 - **API Key**: Semua input `value` dari halaman manajemen API Keys akan dienkripsi dari bawaan sistem sebelum masuk ke database (`Crypt::encryptString`) untuk faktor keamanan.
-- **API Key Internet / Exchange Rate**: Modul Kurs Mata Uang mengambil key dari `api_keys` dengan identifier `apicoid_provider` dan mengirimkannya melalui header `x-api-co-id`.
+- **API Key Internet / Exchange Rate & Holiday**: Modul Kurs Mata Uang dan Holiday mengambil key dari `api_keys` dengan identifier `apicoid_provider` dan mengirimkannya melalui header `x-api-co-id`.
 - **API Key Ferdev Provider**: Modul Downloader (Instagram, TikTok, Facebook, YouTube Shorts), Search -> Tokopedia, Search -> Unsplash, Search -> Google Image, Search -> TikTok Video, Search -> Quotes Anime, Search -> Youtube, Tools -> Cek Resi, dan Internet -> Whois mengambil key dari `api_keys` dengan identifier `downloader_provider` dan mengirimkannya sebagai parameter query `apikey`.
 - **API Key Freepik / Magnific Provider**: Dipakai hanya jika `FREEPIK_ENABLED=true`. Saat aktif, modul Search -> Freepik Image, Image AI -> Generation Image, Image AI -> Image2Prompt, Image AI -> Improve Prompt, dan Video AI -> Generation Video mengambil key dari `api_keys` dengan identifier `freepik_provider`.
 - **API Key YouTube Data API**: Modul Search -> Youtube Finder dan Search -> Youtube Channel mengambil key dari `api_keys` dengan identifier `youtubeapi_provider` untuk request ke YouTube Data API v3.

@@ -38,6 +38,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('tools/calculator-pvc', 'tools.pvc-calculator')->name('tools.calculator-pvc');
     Route::view('tools/wall-meter', 'tools.wall-meter')->name('tools.wall-meter');
     Route::view('tools/cek-resi', 'tools.cek-resi')->name('tools.cek-resi');
+    Route::view('tools/holiday', 'tools.holiday')->name('tools.holiday');
     Route::view('tools/send-whatsapp', 'tools.send-whatsapp')->name('tools.send-whatsapp');
     Route::get('qr-code/download/{filename}', function (string $filename, QrCodeTemporaryFileService $temporaryFileService) {
         $path = $temporaryFileService->path($filename);

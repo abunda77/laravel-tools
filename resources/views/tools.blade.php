@@ -74,6 +74,20 @@
             <div class="surface-panel surface-panel--compact">
                 <div class="surface-panel__header">
                     <div>
+                        <h3>Holiday</h3>
+                    </div>
+                    <a href="{{ route('tools.holiday') }}" wire:navigate class="primary-action">
+                        Buka
+                    </a>
+                </div>
+                <p class="surface-panel__text">
+                    Tampilkan jadwal libur nasional, cuti bersama, dan hari kebesaran Indonesia per tahun.
+                </p>
+            </div>
+
+            <div class="surface-panel surface-panel--compact">
+                <div class="surface-panel__header">
+                    <div>
                         <h3>Kirim WA / Send Whatsapp</h3>
                     </div>
                     <a href="{{ route('tools.send-whatsapp') }}" wire:navigate class="primary-action">
