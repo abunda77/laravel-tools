@@ -48,6 +48,7 @@ new class extends Component
                         ['label' => 'Kirim WA / Send Whatsapp', 'route' => 'tools.send-whatsapp'],
                     ]],
                     ['label' => 'Image AI', 'route' => 'image-ai', 'icon' => 'image', 'subItems' => [
+                        ['label' => 'Generate Image Z', 'route' => 'image-ai.generate-image-z'],
                         ...($freepikEnabled ? [['label' => 'Generation Image', 'route' => 'generation.index']] : []),
                         ['label' => 'Image2Prompt', 'route' => 'image-ai.image2prompt'],
                         ...($freepikEnabled ? [['label' => 'Improve Prompt', 'route' => 'image-ai.improve-prompt']] : []),

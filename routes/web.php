@@ -47,6 +47,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('generation.video');
     })->name('generation.video');
     Route::view('image-ai/image2prompt', 'image-ai.image2prompt')->name('image-ai.image2prompt');
+    Route::view('image-ai/generate-image-z', 'image-ai.generate-image-z')->name('image-ai.generate-image-z');
     Route::get('image-ai/improve-prompt', function (): View {
         abort_unless(config('services.freepik.enabled'), 404);
 

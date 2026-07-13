@@ -1,3 +1,50 @@
+# AGENTS.md
+
+Guidance for AI coding agents working in **Laravel Tools** — an internal admin panel (UI/docs in Bahasa Indonesia) that centralizes external API integrations and custom scripts behind one dashboard. Laravel 13 + Livewire 3 + Volt + Breeze. Author: ERIE PUTRANTO.
+
+Sibling AI configs exist (`CLAUDE.md`, `GEMINI.md`, `PLANNING.md`); this file is the canonical one for Kilo sessions.
+
+## Commands
+
+```bash
+composer run setup   # first-time: install + key:generate + migrate + npm install + build
+composer run dev     # concurrent: artisan serve + queue:listen + pail + npm run dev
+composer run test    # clears config, then PHPUnit
+
+php artisan test --compact tests/Feature/Search/TokopediaSearchTest.php
+php artisan test --compact --filter=test_can_search   # run one test after a change
+
+npm run build        # Tailwind/Vite. Run if UI changes aren't reflected (ViteException = build needed)
+vendor/bin/pint --dirty --format agent   # run after editing ANY PHP file
+```
+
+`composer run test` must run before finalizing — it calls `config:clear` first, so a plain `php artisan test` can miss config-cache issues.
+
+## Architecture
+
+- **Livewire-first.** Nearly all UI logic is in `app/Livewire/<Domain>/` paired with `resources/views/livewire/<domain>/` (kebab-case). Real controllers are only for auth. Default to a Livewire/Volt component, not a controller. `app/Http/Controllers/Generation/` is intentionally empty.
+- **Service layer for external APIs.** Each integration is wrapped by a service in `app/Services/<Domain>/` using the `Http` facade. Livewire calls services; services never call Livewire. Use `app/Services/Search/TokopediaSearchService.php` as the canonical pattern (readonly-promoted constructor with `SystemSettings` + `HttpFactory`, constant `API_KEY_NAME`/`ENDPOINT`/`BASE_URL`, timeout/retry from settings, Bahasa Indonesia errors). `PvcCalculator` is the exception — logic lives in the component.
+- **Centralized, encrypted API keys (NOT in `.env`).** Keys live in the `api_keys` table (`Crypt::encryptString` via the `ApiKey` model) and are managed in Settings UI. Resolve at runtime with `ApiKey::valueByName($name)` / `ApiKey::findByName($name)`. Known identifiers: `downloader_provider`, `apicoid_provider`, `apifreaks_provider`, `freepik_provider`, `youtubeapi_provider`, `apify_provider`, `freeimage_host`. **Only** ChatBot AI keys (`OPENAI_API_KEY`, `GEMINI_API_KEY`, `ANTHROPIC_API_KEY`, `PERPLEXITY_API_KEY`) come from `.env`.
+- **Feature gating.** Freepik-dependent routes (Image AI, Video AI, Freepik Image, Improve Prompt) are gated by `config('services.freepik.enabled')` (env `FREEPIK_ENABLED`, default `false`) via `abort_unless(..., 404)`. Don't assume those pages exist when `FREEPIK_ENABLED=false`.
+- **Global settings.** `App\Support\Settings\SystemSettings` is a singleton (registered in `AppServiceProvider`) backed by the `app_settings` table. It reads `config('tools.settings.*')` for `request_timeout_seconds`, `request_retry_times`, `request_retry_sleep_ms`, `queue_connection`. `SystemSettings::get()` throws for undefined keys — define new settings in `config/tools.php` first.
+- **Laravel AI SDK (`laravel/ai`).** ChatBot uses `app/Ai/Agents/ChatBotAgent.php` + `app/Services/Ai/` (`ChatResponder`, `LlmCredentialResolver`, `PerplexityClient`). LLM models are per-provider rows in `llm_models` (managed via `LlmModelManager`); only `is_active` ones show in the UI. Perplexity also serves as web-search grounding for other providers.
+- **MCP.** `routes/ai.php` registers the Boost MCP endpoint at `/mcp/laravel-boost`.
+- **Exports.** `dompdf/dompdf` (PDF) and `phpoffice/phpspreadsheet` (XLSX), e.g. Apify scraper results.
+
+## Testing
+
+- PHPUnit only (no Pest). In-memory SQLite (`:memory:`), array cache, sync queue — see `phpunit.xml`.
+- Feature tests mirror the Livewire component structure under `tests/Feature/<Domain>/`. Use model factories; do not create models in tinker without approval. Never remove tests or test files without approval.
+- External-API service tests typically use mocked `Http` responses — real providers need paid keys, so don't hit live endpoints in tests.
+
+## Conventions
+
+- UI strings, comments, and docs are primarily **Bahasa Indonesia** — match the surrounding language when editing.
+- `temp-laravel13/` is a leftover temp directory; ignore it, it is not project source.
+- Don't change dependencies or create new base folders without approval.
+
+---
+
 <laravel-boost-guidelines>
 === foundation rules ===
 

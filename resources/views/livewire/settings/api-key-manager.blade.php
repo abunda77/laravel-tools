@@ -305,6 +305,10 @@
                         </article>
                     @endif
                     <article>
+                        <strong>Z-Image Generation Service</strong>
+                        <p>Gunakan <code>name: kieai_provider</code></p>
+                    </article>
+                    <article>
                         <strong>Custom service lain</strong>
                         <p>Bebas mendefinisikan <code>name</code> sesuai kebutuhan.</p>
                     </article>
