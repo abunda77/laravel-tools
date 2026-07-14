@@ -46,6 +46,7 @@ new class extends Component
                         ['label' => 'Wall Meter', 'route' => 'tools.wall-meter'],
                         ['label' => 'Cek Resi', 'route' => 'tools.cek-resi'],
                         ['label' => 'Holiday', 'route' => 'tools.holiday'],
+                        ['label' => 'Wilayah API', 'route' => 'tools.wilayah-api'],
                         ['label' => 'Kirim WA / Send Whatsapp', 'route' => 'tools.send-whatsapp'],
                         ['label' => 'QR Code', 'route' => 'qr-code.generate'],
                     ]],

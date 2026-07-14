@@ -49,6 +49,9 @@ Pendekatan utama adalah **config-driven modules**, sehingga menu dan submenu API
 - Holiday API docs: [https://docs.api.co.id/products/holiday/](https://docs.api.co.id/products/holiday/)
 - Holiday endpoint base URL: `https://use.api.co.id`
 - Holiday authentication header: `x-api-co-id`
+- Wilayah Indonesia API docs: [https://docs.api.co.id/products/indonesia-regional/](https://docs.api.co.id/products/indonesia-regional/)
+- Wilayah Indonesia endpoint base URL: `https://use.api.co.id`
+- Wilayah Indonesia authentication header: `x-api-co-id`
 
 ### Kategori API yang Tersedia
 
@@ -123,6 +126,7 @@ app/
       PvcCalculator.php
       SendWhatsapp.php
       WallMeter.php
+      WilayahApi.php
     Workspace/
       ChatBot.php
   Models/
@@ -183,6 +187,7 @@ app/
     Tools/
       CekResiService.php
       SendWhatsappService.php
+      WilayahApiService.php
   Support/
     Registries/
     Settings/
@@ -236,6 +241,7 @@ Modules
 |   |-- Wall Meter
 |   |-- Cek Resi
 |   |-- Holiday
+|   |-- Wilayah API
 |   |-- Kirim WA / Send Whatsapp
 |   `-- QR Code
 |-- Image AI (jika FREEPIK_ENABLED=true)
@@ -306,6 +312,7 @@ Catatan modul Tools:
 - `Wall Meter`
 - `Cek Resi`
 - `Holiday`
+- `Wilayah API`
 - `Kirim WA / Send Whatsapp`
 - `QR Code`
 
@@ -652,6 +659,30 @@ Menu **Modules -> Tools -> Holiday** menyediakan workbench untuk melihat jadwal 
   - `app/Services/Internet/HolidayService.php` — service class dengan wrapper `listHolidays()`, `checkDate()`, dan `upcomingHolidays()`.
   - `app/Livewire/Tools/Holiday.php` — Livewire component.
   - `resources/views/livewire/tools/holiday.blade.php` — UI blade.
+
+---
+
+## Fitur Wilayah API
+
+Menu **Modules -> Tools -> Wilayah API** menyediakan workbench untuk menelusuri wilayah administrasi Indonesia melalui API.co.id.
+
+- Menggunakan API key tersimpan di tabel `api_keys` dengan identifier `apicoid_provider`.
+- Base URL yang dipakai adalah `https://use.api.co.id`.
+- Semua request memakai header autentikasi `x-api-co-id`.
+- Endpoint yang dipakai (hierarki bertahap):
+  - `GET /regional/indonesia/provinces` — daftar provinsi (filter nama opsional).
+  - `GET /regional/indonesia/provinces/{code}/regencies` — daftar kabupaten/kota dalam provinsi.
+  - `GET /regional/indonesia/regencies/{code}/districts` — daftar kecamatan dalam kabupaten/kota.
+  - `GET /regional/indonesia/districts/{code}/villages` — daftar desa/kelurahan dalam kecamatan (memuat `postal_codes` dan `is_courier_support`).
+- Alur penggunaan: pilih provinsi → kabupaten/kota → kecamatan → desa/kelurahan secara bertahap (setiap level memunculkan level berikutnya).
+- Setiap level mendukung filter nama untuk mempersempit pencarian.
+- Tiap desa/kelurahan menampilkan kode pos dan status `is_courier_support` (apakah wilayah sudah didukung untuk cek ongkos kirim).
+- Hasil setiap request menampilkan ringkasan, daftar item, dan raw JSON response untuk inspeksi.
+- Catatan: endpoint premium (search dan postal-code) tidak diimplementasikan pada modul ini.
+- Implementasi:
+  - `app/Services/Tools/WilayahApiService.php` — service class dengan wrapper `listProvinces()`, `listRegencies()`, `listDistricts()`, dan `listVillages()`.
+  - `app/Livewire/Tools/WilayahApi.php` — Livewire component.
+  - `resources/views/livewire/tools/wilayah-api.blade.php` — UI blade.
 
 ---
 
@@ -1123,6 +1154,7 @@ Tests memakai PHPUnit (bukan Pest) dengan in-memory SQLite, array cache, dan syn
 - [x] Modul Tools: QR Code (generator PNG/JPG + preview + download + cleanup temporary)
 - [x] Modul Internet: Kurs Mata Uang (API.co.id Exchange Rate)
 - [x] Modul Internet / Tools: Holiday (API.co.id Holiday Calendar — daftar libur, cek tanggal, libur mendatang)
+- [x] Modul Tools: Wilayah API (API.co.id Indonesia Regional — hierarki provinsi, kabupaten/kota, kecamatan, desa/kelurahan)
 - [x] Modul Internet: Proxy Validate (filter, bulk select, validate, export, progress)
 - [x] Modul Internet: Whois (lookup domain + raw WHOIS record)
 - [x] Modul ApiFreaks Tools: Credit Usage, Domain WHOIS Lookup/History, Domain Search, Subdomain Lookup, Commodity Symbols, Live/Historical Commodity Prices, IP Geolocation
@@ -1158,7 +1190,7 @@ Tests memakai PHPUnit (bukan Pest) dengan in-memory SQLite, array cache, dan syn
 
 - **Custom Script Executor**: Hindari menjalankan shell command bebas dari input user. Prioritaskan `Artisan command` atau `PHP class handler`. Jika shell command diperlukan, gunakan **whitelist** command yang diizinkan.
 - **API Key**: Semua input `value` dari halaman manajemen API Keys akan dienkripsi dari bawaan sistem sebelum masuk ke database (`Crypt::encryptString`) untuk faktor keamanan.
-- **API Key Internet / Exchange Rate & Holiday**: Modul Kurs Mata Uang dan Holiday mengambil key dari `api_keys` dengan identifier `apicoid_provider` dan mengirimkannya melalui header `x-api-co-id`.
+- **API Key Internet / Exchange Rate, Holiday & Wilayah**: Modul Kurs Mata Uang, Holiday, dan Wilayah API mengambil key dari `api_keys` dengan identifier `apicoid_provider` dan mengirimkannya melalui header `x-api-co-id`.
 - **API Key Ferdev Provider**: Modul Downloader (Instagram, TikTok, Facebook, YouTube Shorts), Search -> Tokopedia, Search -> Unsplash, Search -> Google Image, Search -> TikTok Video, Search -> Quotes Anime, Search -> Youtube, Tools -> Cek Resi, dan Internet -> Whois mengambil key dari `api_keys` dengan identifier `downloader_provider` dan mengirimkannya sebagai parameter query `apikey`.
 - **API Key Freepik / Magnific Provider**: Dipakai hanya jika `FREEPIK_ENABLED=true`. Saat aktif, modul Search -> Freepik Image, Image AI -> Generation Image, Image AI -> Image2Prompt, Image AI -> Improve Prompt, dan Video AI -> Generation Video mengambil key dari `api_keys` dengan identifier `freepik_provider`.
 - **API Key YouTube Data API**: Modul Search -> Youtube Finder dan Search -> Youtube Channel mengambil key dari `api_keys` dengan identifier `youtubeapi_provider` untuk request ke YouTube Data API v3.

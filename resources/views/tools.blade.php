@@ -98,6 +98,20 @@
                     Kirim pesan WhatsApp lewat endpoint provider dengan basic auth yang dibaca dari environment.
                 </p>
             </div>
+
+            <div class="surface-panel surface-panel--compact">
+                <div class="surface-panel__header">
+                    <div>
+                        <h3>Wilayah API</h3>
+                    </div>
+                    <a href="{{ route('tools.wilayah-api') }}" wire:navigate class="primary-action">
+                        Buka
+                    </a>
+                </div>
+                <p class="surface-panel__text">
+                    Telusuri hierarki wilayah Indonesia (provinsi, kabupaten/kota, kecamatan, desa) dari API.co.id.
+                </p>
+            </div>
         </div>
     </section>
 </x-app-layout>
