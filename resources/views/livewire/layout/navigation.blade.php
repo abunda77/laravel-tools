@@ -20,6 +20,7 @@ new class extends Component
                     ['label' => 'Downloader', 'route' => 'external-api', 'icon' => 'api', 'subItems' => [
                         ['label' => 'Overview', 'route' => 'external-api'],
                         ['label' => 'Download Youtube Short', 'route' => 'external-api.ytshorts'],
+                        ['label' => 'Download Youtube MP4', 'route' => 'external-api.ytmp4'],
                     ]],
                     ['label' => 'Custom Scripts', 'route' => 'custom-scripts', 'icon' => 'scripts'],
                 ],

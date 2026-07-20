@@ -48,6 +48,10 @@ class DownloaderService
             'label' => 'YouTube Shorts Downloader',
             'endpoint' => '/downloader/ytshorts',
         ],
+        'ytmp4' => [
+            'label' => 'YouTube MP4 Downloader',
+            'endpoint' => '/downloader/ytmp4',
+        ],
     ];
 
     public function __construct(

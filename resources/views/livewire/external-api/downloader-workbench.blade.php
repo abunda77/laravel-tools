@@ -2,7 +2,7 @@
     <section class="external-hero">
         <article class="external-hero__intro">
             <p class="section-kicker">Downloader module</p>
-            <h3>Instagram, TikTok, Facebook, dan YouTube Shorts downloader dalam satu workbench.</h3>
+            <h3>Instagram, TikTok, Facebook, YouTube Shorts, dan YouTube MP4 downloader dalam satu workbench.</h3>
             <p>
                 Modul pertama ini memakai parameter `link` dan `apikey`, dengan API key bisa mengambil default dari halaman Settings atau diisi manual sebagai override.
             </p>

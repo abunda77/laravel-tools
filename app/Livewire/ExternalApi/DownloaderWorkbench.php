@@ -49,7 +49,7 @@ class DownloaderWorkbench extends Component
     public function run(DownloaderService $downloaderService): void
     {
         $this->validate([
-            'selectedProvider' => ['required', 'in:instagram,tiktok,facebook,ytshorts'],
+            'selectedProvider' => ['required', 'in:instagram,tiktok,facebook,ytshorts,ytmp4'],
             'link' => ['required', 'url', 'max:2048'],
             'apiKeyOverride' => ['nullable', 'string', 'max:2048'],
         ]);

@@ -191,6 +191,54 @@ class DownloaderWorkbenchTest extends TestCase
         $response->assertSeeLivewire(DownloaderWorkbench::class);
     }
 
+    public function test_downloader_can_execute_ytmp4_request_using_dlink_payload(): void
+    {
+        $this->configureDownloaderSettings();
+        $this->createDownloaderApiKey();
+
+        Http::fake([
+            'https://api.ferdev.my.id/downloader/ytmp4*' => Http::response([
+                'success' => true,
+                'status' => 200,
+                'author' => 'Feri',
+                'data' => [
+                    'metadata' => [
+                        'title' => 'Baby Shark Dance | #babyshark Most Viewed Video',
+                        'quality' => '360p',
+                    ],
+                    'dlink' => 'https://redirector.googlevideo.com/videoplayback?expire=1784529659&ei=m25datm6DuGwp-',
+                ],
+            ], 200),
+        ]);
+
+        $user = User::factory()->create();
+
+        Livewire::actingAs($user)
+            ->test(DownloaderWorkbench::class)
+            ->set('selectedProvider', 'ytmp4')
+            ->set('link', 'https://www.youtube.com/watch?v=XqZsoesa55w')
+            ->call('run')
+            ->assertHasNoErrors()
+            ->assertSet('result.title', 'Baby Shark Dance | #babyshark Most Viewed Video')
+            ->assertSet('result.downloadUrl', 'https://redirector.googlevideo.com/videoplayback?expire=1784529659&ei=m25datm6DuGwp-')
+            ->assertSet('result.downloadOptions.0.label', 'Download (dlink)')
+            ->assertSet('result.downloadOptions.0.url', 'https://redirector.googlevideo.com/videoplayback?expire=1784529659&ei=m25datm6DuGwp-');
+
+        Http::assertSent(function ($request) {
+            return $request->url() === 'https://api.ferdev.my.id/downloader/ytmp4?link=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DXqZsoesa55w&apikey=saved-api-key';
+        });
+    }
+
+    public function test_ytmp4_page_preselects_ytmp4_provider(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get(route('external-api.ytmp4'));
+
+        $response->assertOk();
+        $response->assertSeeLivewire(DownloaderWorkbench::class);
+    }
+
     private function configureDownloaderSettings(): void
     {
         app(SystemSettings::class)->putMany([

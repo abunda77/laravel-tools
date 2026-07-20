@@ -13,6 +13,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('workspace/chatbot', 'workspace.chatbot')->name('workspace.chatbot');
     Route::view('external-api', 'external-api')->name('external-api');
     Route::view('external-api/ytshorts', 'external-api.ytshorts')->name('external-api.ytshorts');
+    Route::view('external-api/ytmp4', 'external-api.ytmp4')->name('external-api.ytmp4');
     Route::view('custom-scripts', 'custom-scripts')->name('custom-scripts');
     Route::view('execution-history', 'execution-history')->name('execution-history');
     Route::view('operations/api-key-backups', 'operations.api-key-backups')->name('operations.api-key-backups');
