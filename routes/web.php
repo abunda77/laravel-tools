@@ -76,6 +76,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('internet/currency-exchange-rate', 'internet.currency-exchange-rate')->name('internet.currency-exchange-rate');
     Route::view('internet/proxy-validate', 'internet.proxy-validate')->name('internet.proxy-validate');
     Route::view('internet/whois', 'internet.whois')->name('internet.whois');
+    Route::view('internet/bookmark', 'internet.bookmark')->name('internet.bookmark');
     Route::view('apifreaks-tools', 'apifreaks-tools')->name('apifreaks-tools');
     Route::view('apifreaks-tools/credit-usage', 'apifreaks-tools.credit-usage')->name('apifreaks-tools.credit-usage');
     Route::view('apifreaks-tools/domain-whois-lookup', 'apifreaks-tools.domain-whois-lookup')->name('apifreaks-tools.domain-whois-lookup');

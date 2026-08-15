@@ -46,6 +46,22 @@
                     Muat daftar proxy dari source GitHub publik, lihat dalam tabel, lalu copy cepat nilai <code>IP:PORT</code> per baris.
                 </p>
             </div>
+
+            <div class="surface-panel surface-panel--compact">
+                <div class="surface-panel__header">
+                    <div>
+                        <p class="section-kicker">Available tools</p>
+                        <h3>Bookmark</h3>
+                    </div>
+                    <a href="{{ route('internet.bookmark') }}" wire:navigate class="primary-action">
+                        Buka tool
+                    </a>
+                </div>
+
+                <p class="surface-panel__text">
+                    Simpan tautan dari internet dengan title, gambar OG, dan deskripsi otomatis — seperti link preview di Facebook/WhatsApp.
+                </p>
+            </div>
         </div>
     </section>
 </x-app-layout>

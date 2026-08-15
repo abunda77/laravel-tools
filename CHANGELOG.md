@@ -10,7 +10,11 @@ dan proyek ini mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ## [Unreleased]
 
 ### Added
+- Bookmark (menu **Modules -> Internet -> Bookmark**): simpan tautan dengan link preview otomatis (title, Open Graph image, deskripsi via `BookmarkPreviewService`), kategori dinamis, pencarian & filter, dan soft delete
+- Bookmark: REST API `v1` (`/api/v1/bookmarks` & `/api/v1/bookmark-categories`) menggunakan Laravel Sanctum Personal Access Token — list + pagination + filter, simpan, detail, update, hapus, preview metadata tanpa simpan
+- Dependency: `laravel/sanctum` untuk autentikasi API (Personal Access Token)
 - Downloader: YouTube Shorts provider (endpoint `/downloader/ytshorts`) + sidebar menu "Download Youtube Short"
+- Downloader: YouTube MP4 provider (endpoint `/downloader/ytmp4`) + sidebar menu "Download Youtube MP4"
 - Image AI: Image2Prompt
 - ApiFreaks: IP Geolocation Lookup
 - Dependency: `binarybuilds/laritor-client` (^3.0)
@@ -20,9 +24,11 @@ dan proyek ini mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Command: `cleanup:temporary-uploads` untuk membersihkan temporary upload Livewire dan file QR Code kedaluwarsa
 
 ### Changed
+- Bookmark: dokumentasi lengkap di `BOOKMARK.md` (fitur, struktur database, endpoint API `v1`, format response, error handling, contoh integrasi cURL/JS/Dart/Kotlin/PHP)
 - Downloader: workbench `mount()` menerima `selectedProvider` opsional agar halaman ytshorts bisa pre-select provider
 - Downloader: validation rule `selectedProvider` ditambah `ytshorts`; stat provider count dijadikan dinamis
-- Update README — dokumentasi fitur Downloader (Instagram, TikTok, Facebook, YouTube Shorts)
+- Downloader: validation rule `selectedProvider` ditambah `ytmp4`; provider `ytmp4` ditambah ke `DownloaderService::PROVIDERS` (endpoint `/downloader/ytmp4`)
+- Update README — dokumentasi fitur Downloader (Instagram, TikTok, Facebook, YouTube Shorts, YouTube MP4)
 - Update CLAUDE.md
 
 ---
