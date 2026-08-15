@@ -9,6 +9,7 @@
         "php": "^8.3",
         "bacon/bacon-qr-code": "^3.1",
         "binarybuilds/laritor-client": "^3.0",
+        "dedoc/scramble": "^0.13.40",
         "dompdf/dompdf": "^3.1",
         "laravel/ai": "^0.5.0",
         "laravel/framework": "^13.0",

@@ -10,6 +10,8 @@ dan proyek ini mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ## [Unreleased]
 
 ### Added
+- Authentication: HTTP Basic Authentication untuk endpoint dokumentasi API (`/docs/api`) dengan konfigurasi environment `DOCS_BASIC_AUTH_USERNAME` dan `DOCS_BASIC_AUTH_PASSWORD` (middleware `DocsBasicAuth`, config `docs.basic_auth`, Gate `viewApiDocs`, dokumentasi di `docs/api-docs-authentication.md`)
+- Authentication: REST API `v1` (`/api/v1/auth/*`) menggunakan Laravel Sanctum Personal Access Token — login, logout, logout-all (hapus semua token), me (info user), tokens (daftar token aktif), revoke-token (hapus token tertentu)
 - Bookmark (menu **Modules -> Internet -> Bookmark**): simpan tautan dengan link preview otomatis (title, Open Graph image, deskripsi via `BookmarkPreviewService`), kategori dinamis, pencarian & filter, dan soft delete
 - Bookmark: REST API `v1` (`/api/v1/bookmarks` & `/api/v1/bookmark-categories`) menggunakan Laravel Sanctum Personal Access Token — list + pagination + filter, simpan, detail, update, hapus, preview metadata tanpa simpan
 - Dependency: `laravel/sanctum` untuk autentikasi API (Personal Access Token)
