@@ -90,7 +90,10 @@ class BookmarkIndex extends Component
     {
         $this->reset('successMessage', 'errorMessage');
 
-        $this->validate();
+        $this->validate([
+            'url' => ['required', 'string', 'max:2048'],
+            'description' => ['nullable', 'string', 'max:1000'],
+        ]);
 
         try {
             $service = app(BookmarkService::class);

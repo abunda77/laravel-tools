@@ -39,7 +39,7 @@
                         <input
                             id="bookmark_url"
                             type="url"
-                            wire:model="url"
+                            wire:model.live.debounce.500ms="url"
                             class="form-input"
                             placeholder="https://example.com/artikel"
                             autocomplete="off"
