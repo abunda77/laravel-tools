@@ -29,6 +29,7 @@ new #[Layout('layouts.guest')] class extends Component
     <div class="auth-ambient auth-ambient--two"></div>
 
     <main class="auth-login-stage">
+        {{-- Left: brand + copy ──────────────────────────────────────────── --}}
         <section class="auth-login-intro" aria-labelledby="login-heading">
             <a href="/" wire:navigate class="auth-login-brand" aria-label="{{ config('app.name', 'Laravel Tools') }}">
                 <x-application-logo class="auth-login-logo" />
@@ -36,13 +37,14 @@ new #[Layout('layouts.guest')] class extends Component
             </a>
 
             <div class="auth-login-copy">
-                <p class="auth-login-kicker">Secure workspace</p>
+                <p class="auth-login-kicker">Panel internal</p>
                 <h1 id="login-heading">Masuk ke dashboard operasional.</h1>
                 <p>
                     Kelola automasi, API, dan workflow internal dari satu ruang kerja yang rapi.
                 </p>
             </div>
 
+            {{-- Decorative capability list --------------------------------- --}}
             <div class="auth-signal-panel" aria-hidden="true">
                 <div class="auth-signal-panel__header">
                     <span></span>
@@ -57,15 +59,19 @@ new #[Layout('layouts.guest')] class extends Component
                         <span></span>
                         <span></span>
                         <span></span>
+                        <span></span>
+                        <span></span>
                     </div>
+                    <div class="auth-signal-panel__meter" style="width:45%"></div>
                 </div>
             </div>
         </section>
 
-        <section class="auth-login-panel" aria-label="Login form">
+        {{-- Right: form ─────────────────────────────────────────────────── --}}
+        <section class="auth-login-panel" aria-label="Formulir masuk">
             <div class="auth-login-panel__heading">
-                <p>Welcome back</p>
-                <h2>Sign in</h2>
+                <p>Selamat datang kembali</p>
+                <h2>Masuk</h2>
             </div>
 
             <x-auth-session-status class="auth-session-status" :status="session('status')" />
@@ -82,13 +88,13 @@ new #[Layout('layouts.guest')] class extends Component
                         required
                         autofocus
                         autocomplete="username"
-                        placeholder="you@example.com"
+                        placeholder="kamu@contoh.com"
                     >
                     <x-input-error :messages="$errors->get('form.email')" class="auth-login-error" />
                 </div>
 
                 <div class="auth-login-field">
-                    <label for="password">Password</label>
+                    <label for="password">Kata sandi</label>
                     <input
                         wire:model="form.password"
                         id="password"
@@ -97,7 +103,7 @@ new #[Layout('layouts.guest')] class extends Component
                         name="password"
                         required
                         autocomplete="current-password"
-                        placeholder="Enter your password"
+                        placeholder="Masukkan kata sandi"
                     >
                     <x-input-error :messages="$errors->get('form.password')" class="auth-login-error" />
                 </div>
@@ -105,24 +111,24 @@ new #[Layout('layouts.guest')] class extends Component
                 <div class="auth-login-options">
                     <label for="remember" class="auth-login-check">
                         <input wire:model="form.remember" id="remember" type="checkbox" name="remember">
-                        <span>{{ __('Remember me') }}</span>
+                        <span>Ingat saya</span>
                     </label>
 
                     @if (Route::has('password.request'))
                         <a href="{{ route('password.request') }}" wire:navigate>
-                            {{ __('Forgot your password?') }}
+                            Lupa kata sandi?
                         </a>
                     @endif
                 </div>
 
                 <button type="submit" class="auth-login-submit">
-                    <span wire:loading.remove wire:target="login">{{ __('Log in') }}</span>
+                    <span wire:loading.remove wire:target="login">Masuk</span>
                     <span wire:loading wire:target="login" class="auth-login-submit__loading">
                         <svg class="size-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                         </svg>
-                        Processing
+                        Memproses...
                     </span>
                 </button>
             </form>
