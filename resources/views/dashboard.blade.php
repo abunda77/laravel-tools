@@ -26,8 +26,11 @@
         ];
     @endphp
 
-    <section class="page-stack">
-        <div class="hero-panel">
+    <section class="page-stack"
+        x-data="{ visible: false }"
+        x-init="$nextTick(() => { visible = true })"
+    >
+        <div class="hero-panel dashboard-entry" :class="{ 'is-visible': visible }">
             <div>
                 <p class="section-kicker">Operations surface</p>
                 <h2 class="hero-panel__title">Panel kerja untuk eksekusi API eksternal dan custom script.</h2>
@@ -46,7 +49,7 @@
             </div>
         </div>
 
-        <div class="content-grid">
+        <div class="content-grid dashboard-entry dashboard-entry--delay" :class="{ 'is-visible': visible }">
             <section class="surface-panel">
                 <div class="surface-panel__header">
                     <div>
@@ -67,7 +70,7 @@
                         <span>02</span>
                         <div>
                             <h4>Bangun executor request</h4>
-                            <p>Tambah service class HTTP, settings `base_url`, `apikey`, timeout, dan retry.</p>
+                            <p>Tambah service class HTTP, settings <code>base_url</code>, <code>apikey</code>, timeout, dan retry.</p>
                         </div>
                     </article>
                     <article>

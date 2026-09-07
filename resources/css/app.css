@@ -5,15 +5,49 @@
 @layer base {
     :root {
         color-scheme: light;
-        --app-bg: 246 245 240;
-        --app-surface: 255 252 247;
+        /* Palet Tokopedia — mode terang */
+        --app-bg: 248 248 248;
+        --app-surface: 255 255 255;
         --app-surface-strong: 255 255 255;
-        --app-ink: 28 31 36;
-        --app-muted: 101 110 123;
-        --app-line: 214 209 199;
-        --app-brand: 12 112 93;
-        --app-brand-deep: 10 76 73;
-        --app-accent: 205 118 45;
+        --app-surface-overlay: 242 242 242;
+        --app-ink: 26 26 26;
+        --app-muted: 99 99 99;
+        --app-line: 224 224 224;
+        --app-brand: 3 172 14;
+        --app-brand-deep: 0 136 11;
+        --app-brand-soft: 3 172 14;
+        --app-accent: 255 103 0;
+        --app-accent-soft: 255 103 0;
+        --app-sidebar-bg: 255 255 255;
+        --app-sidebar-ink: 26 26 26;
+        --app-sidebar-muted: 99 99 99;
+        --app-sidebar-active-bg: 232 247 233;
+        --app-sidebar-active-ink: 0 136 11;
+        --app-topbar-bg: 255 255 255;
+        --app-transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    [data-theme="dark"] {
+        color-scheme: dark;
+        /* Mode gelap — nuansa Tokopedia dark */
+        --app-bg: 18 18 18;
+        --app-surface: 26 26 26;
+        --app-surface-strong: 36 36 36;
+        --app-surface-overlay: 44 44 44;
+        --app-ink: 242 242 242;
+        --app-muted: 163 163 163;
+        --app-line: 56 56 56;
+        --app-brand: 3 172 14;
+        --app-brand-deep: 4 212 17;
+        --app-brand-soft: 3 172 14;
+        --app-accent: 255 103 0;
+        --app-accent-soft: 255 103 0;
+        --app-sidebar-bg: 26 26 26;
+        --app-sidebar-ink: 242 242 242;
+        --app-sidebar-muted: 163 163 163;
+        --app-sidebar-active-bg: 0 136 11;
+        --app-sidebar-active-ink: 255 255 255;
+        --app-topbar-bg: 26 26 26;
     }
 
     html {
@@ -25,10 +59,7 @@
         font-family: 'Manrope', sans-serif;
         color: rgb(var(--app-ink));
         background-color: rgb(var(--app-bg));
-        background-image:
-            radial-gradient(circle at top left, rgb(255 255 255 / 0.92), transparent 28%),
-            radial-gradient(circle at bottom right, rgb(12 112 93 / 0.14), transparent 22%),
-            linear-gradient(180deg, rgb(250 248 243) 0%, rgb(246 245 240) 100%);
+        transition: background-color var(--app-transition), color var(--app-transition);
     }
 
     [x-cloak] {
@@ -57,10 +88,10 @@
     }
 
     .app-sidebar {
-        @apply fixed inset-y-0 left-0 z-40 flex w-[18.5rem] -translate-x-full flex-col px-5 py-5 transition-transform duration-300 lg:static lg:translate-x-0;
+        @apply fixed inset-y-0 left-0 z-40 flex w-64 -translate-x-full flex-col px-4 py-4 transition-all duration-300 lg:static lg:translate-x-0;
         border-right: 1px solid rgb(var(--app-line));
-        background: linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(249, 245, 237, 0.96));
-        box-shadow: 0 24px 70px rgb(15 23 42 / 0.12);
+        background-color: rgb(var(--app-sidebar-bg));
+        box-shadow: 0 24px 70px rgb(15 23 42 / 0.08);
     }
 
     @screen lg {
@@ -82,9 +113,9 @@
     }
 
     .app-sidebar__logo-mark {
-        @apply inline-flex size-11 items-center justify-center rounded-2xl text-sm font-extrabold uppercase tracking-[0.28em] text-white;
+        @apply inline-flex size-9 items-center justify-center rounded-xl text-sm font-extrabold uppercase tracking-[0.28em] text-white;
         background: rgb(var(--app-brand-deep));
-        box-shadow: 0 20px 45px rgb(12 112 93 / 0.22);
+        box-shadow: 0 8px 20px rgb(3 172 14 / 0.25);
     }
 
     .app-sidebar__brand-title {
@@ -98,14 +129,17 @@
     }
 
     .app-sidebar__close {
-        @apply inline-flex size-10 items-center justify-center rounded-full bg-white/80 text-slate-500 lg:hidden;
+        @apply inline-flex size-9 items-center justify-center rounded-full lg:hidden;
+        background-color: rgb(var(--app-surface-overlay));
         border: 1px solid rgb(var(--app-line));
+        color: rgb(var(--app-muted));
     }
 
     .app-sidebar__meta {
-        @apply mt-8 rounded-[1.75rem] p-4 backdrop-blur;
-        border: 1px solid rgb(255 255 255 / 0.8);
-        background: rgb(255 255 255 / 0.7);
+        @apply mt-5 rounded-xl p-3;
+        border: 1px solid rgb(var(--app-line));
+        background-color: rgb(var(--app-surface-overlay));
+        transition: background-color var(--app-transition), border-color var(--app-transition);
     }
 
     .app-sidebar__meta-label {
@@ -143,32 +177,23 @@
     }
 
     .app-sidebar__nav {
-        @apply mt-8 flex-1 space-y-6 overflow-y-auto pb-6;
-    }
-
-    .app-sidebar__section-label {
-        @apply mb-3 text-[0.65rem] font-semibold uppercase tracking-[0.24em];
-        color: rgb(var(--app-muted));
-    }
-
-    .app-sidebar__links {
-        @apply space-y-1.5;
+        @apply mt-5 flex-1 space-y-5 overflow-y-auto pb-4;
     }
 
     .app-sidebar__link {
-        @apply flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium;
-        color: rgb(var(--app-muted));
+        @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150;
+        color: rgb(var(--app-sidebar-muted));
     }
 
     .app-sidebar__link:hover {
-        @apply bg-white;
-        color: rgb(var(--app-ink));
+        background-color: rgb(var(--app-surface-overlay));
+        color: rgb(var(--app-sidebar-ink));
     }
 
     .app-sidebar__link.is-active {
-        @apply text-white;
-        background: rgb(var(--app-brand-deep));
-        box-shadow: 0 18px 35px rgb(6 78 59 / 0.2);
+        background-color: rgb(var(--app-sidebar-active-bg));
+        color: rgb(var(--app-sidebar-active-ink));
+        font-weight: 600;
     }
 
     .app-sidebar__footer {
@@ -177,33 +202,33 @@
     }
 
     .app-sidebar__logout {
-        @apply inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-white/80 px-4 py-3 text-sm font-semibold transition;
+        @apply inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-150;
         border: 1px solid rgb(var(--app-line));
+        background-color: rgb(var(--app-surface-overlay));
         color: rgb(var(--app-ink));
     }
 
     .app-sidebar__logout:hover {
         border-color: rgb(var(--app-brand));
-        color: rgb(var(--app-brand-deep));
-    }
-
-    .app-content {
-        @apply min-w-0;
+        color: rgb(var(--app-brand));
+        background-color: rgb(3 172 14 / 0.06);
     }
 
     .app-topbar {
-        @apply sticky top-0 z-20 flex items-start justify-between gap-4 px-5 py-5 backdrop-blur lg:px-10 lg:py-6;
+        @apply sticky top-0 z-20 flex items-center justify-between gap-4 px-4 py-3 lg:px-6 lg:py-4;
         border-bottom: 1px solid rgb(var(--app-line));
-        background: rgb(246 245 240 / 0.82);
+        background-color: rgb(var(--app-topbar-bg));
+        backdrop-filter: blur(12px);
+        transition: background-color var(--app-transition), border-color var(--app-transition);
     }
 
     .app-topbar__eyebrow {
-        @apply text-[0.68rem] font-semibold uppercase tracking-[0.32em];
+        @apply text-[0.65rem] font-semibold uppercase tracking-[0.3em];
         color: rgb(var(--app-muted));
     }
 
     .app-topbar__title {
-        @apply mt-2 text-2xl font-extrabold tracking-tight lg:text-[2rem];
+        @apply mt-0.5 text-lg font-bold tracking-tight lg:text-xl;
         color: rgb(var(--app-ink));
     }
 
@@ -212,20 +237,35 @@
     }
 
     .app-topbar__badge {
-        @apply hidden items-center gap-2 rounded-full bg-white/80 px-4 py-2 text-sm font-medium sm:inline-flex;
+        @apply hidden items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium sm:inline-flex;
         border: 1px solid rgb(var(--app-line));
+        background-color: rgb(var(--app-surface-overlay));
         color: rgb(var(--app-muted));
+        transition: background-color var(--app-transition), border-color var(--app-transition);
     }
 
     .app-topbar__badge-dot {
-        @apply size-2.5 rounded-full;
+        @apply size-2 rounded-full;
         background: rgb(var(--app-brand));
-        box-shadow: 0 0 0 6px rgb(12 112 93 / 0.14);
+        box-shadow: 0 0 0 4px rgb(3 172 14 / 0.15);
     }
 
     .app-topbar__menu {
-        @apply inline-flex size-11 items-center justify-center rounded-full bg-white/90 text-slate-800 lg:hidden;
+        @apply inline-flex size-9 items-center justify-center rounded-xl;
+        background-color: rgb(var(--app-surface-overlay));
         border: 1px solid rgb(var(--app-line));
+        color: rgb(var(--app-ink));
+        transition: background-color var(--app-transition), border-color var(--app-transition), color var(--app-transition);
+    }
+
+    .app-topbar__menu:hover {
+        background-color: rgb(var(--app-brand-soft) / 0.12);
+        border-color: rgb(var(--app-brand) / 0.4);
+        color: rgb(var(--app-brand));
+    }
+
+    .app-topbar__menu--nav {
+        @apply lg:hidden;
     }
 
     .app-shell__main {
@@ -236,20 +276,37 @@
         @apply mx-auto max-w-7xl space-y-6;
     }
 
+    /* Fade-in entry animation for dashboard sections */
+    .dashboard-entry {
+        opacity: 0;
+        transform: translateY(12px);
+        transition: opacity 380ms cubic-bezier(0.4, 0, 0.2, 1), transform 380ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .dashboard-entry.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .dashboard-entry--delay {
+        transition-delay: 120ms;
+    }
+
     .hero-panel {
-        @apply grid gap-6 overflow-hidden rounded-[2rem] p-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.9fr)] lg:p-8;
-        border: 1px solid rgb(255 255 255 / 0.8);
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(239, 245, 241, 0.92));
-        box-shadow: 0 25px 70px rgb(36 41 46 / 0.08);
+        @apply grid gap-5 overflow-hidden rounded-2xl p-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(16rem,0.9fr)] lg:p-6;
+        border: 1px solid rgb(var(--app-line));
+        background-color: rgb(var(--app-surface));
+        box-shadow: 0 4px 24px rgb(0 0 0 / 0.06);
+        transition: background-color var(--app-transition), border-color var(--app-transition), box-shadow var(--app-transition);
     }
 
     .hero-panel__title {
-        @apply max-w-3xl text-3xl font-extrabold leading-tight tracking-tight lg:text-5xl;
+        @apply max-w-3xl text-2xl font-extrabold leading-tight tracking-tight lg:text-4xl;
         color: rgb(var(--app-ink));
     }
 
     .hero-panel__text {
-        @apply mt-4 max-w-2xl text-sm leading-7 lg:text-base;
+        @apply mt-3 max-w-2xl text-sm leading-7;
         color: rgb(var(--app-muted));
     }
 
@@ -258,9 +315,14 @@
     }
 
     .stat-tile {
-        @apply rounded-[1.5rem] px-4 py-4;
+        @apply rounded-xl px-4 py-3.5;
         border-width: 1px;
         border-style: solid;
+        transition: background-color var(--app-transition), border-color var(--app-transition), transform 150ms ease;
+    }
+
+    .stat-tile:hover {
+        transform: translateY(-2px);
     }
 
     .stat-tile span {
@@ -273,30 +335,47 @@
         color: rgb(var(--app-ink));
     }
 
+    /* Tokopedia accent: oranye untuk "pending", hijau untuk "ready", biru untuk "info" */
     .stat-tile--amber {
-        background: rgb(255 251 235 / 0.9);
-        border-color: rgb(253 230 138);
+        background: rgb(255 247 237 / 0.9);
+        border-color: rgb(255 200 142);
+    }
+
+    [data-theme="dark"] .stat-tile--amber {
+        background: rgb(255 103 0 / 0.12);
+        border-color: rgb(255 103 0 / 0.35);
     }
 
     .stat-tile--emerald {
-        background: rgb(236 253 245 / 0.9);
-        border-color: rgb(167 243 208);
+        background: rgb(232 248 233 / 0.9);
+        border-color: rgb(134 222 138);
+    }
+
+    [data-theme="dark"] .stat-tile--emerald {
+        background: rgb(3 172 14 / 0.12);
+        border-color: rgb(3 172 14 / 0.35);
     }
 
     .stat-tile--sky {
-        background: rgb(240 249 255 / 0.9);
-        border-color: rgb(186 230 253);
+        background: rgb(239 247 255 / 0.9);
+        border-color: rgb(147 210 252);
+    }
+
+    [data-theme="dark"] .stat-tile--sky {
+        background: rgb(14 116 204 / 0.12);
+        border-color: rgb(14 116 204 / 0.35);
     }
 
     .content-grid {
-        @apply grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(22rem,0.9fr)];
+        @apply grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(20rem,0.9fr)];
     }
 
     .surface-panel {
-        @apply rounded-[1.9rem] p-6 backdrop-blur lg:p-7;
-        border: 1px solid rgb(255 255 255 / 0.8);
-        background: rgb(255 255 255 / 0.84);
-        box-shadow: 0 20px 60px rgb(36 41 46 / 0.06);
+        @apply rounded-2xl p-5 lg:p-6;
+        border: 1px solid rgb(var(--app-line));
+        background-color: rgb(var(--app-surface));
+        box-shadow: 0 4px 16px rgb(0 0 0 / 0.05);
+        transition: background-color var(--app-transition), border-color var(--app-transition);
     }
 
     .surface-panel--compact {
@@ -327,9 +406,10 @@
     }
 
     .timeline-list article {
-        @apply grid gap-4 rounded-[1.6rem] p-4 sm:grid-cols-[3rem_minmax(0,1fr)];
+        @apply grid gap-4 rounded-xl p-4 sm:grid-cols-[3rem_minmax(0,1fr)];
         border: 1px solid rgb(var(--app-line));
-        background: rgb(246 245 240 / 0.55);
+        background-color: rgb(var(--app-surface-overlay));
+        transition: background-color var(--app-transition), border-color var(--app-transition);
     }
 
     .timeline-list span {
@@ -345,6 +425,12 @@
     .timeline-list p {
         @apply mt-2 text-sm leading-7;
         color: rgb(var(--app-muted));
+    }
+
+    .timeline-list p code {
+        @apply rounded px-1.5 py-0.5 text-xs font-mono font-semibold;
+        background-color: rgb(var(--app-brand) / 0.1);
+        color: rgb(var(--app-brand));
     }
 
     .feature-list {
@@ -371,10 +457,11 @@
     }
 
     .settings-hero {
-        @apply grid gap-4 rounded-[2rem] p-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)] lg:items-end lg:p-7;
-        border: 1px solid rgb(255 255 255 / 0.9);
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(241, 247, 243, 0.92));
-        box-shadow: 0 20px 45px rgb(36 41 46 / 0.05);
+        @apply grid gap-4 rounded-2xl p-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)] lg:items-end lg:p-6;
+        border: 1px solid rgb(var(--app-line));
+        background-color: rgb(var(--app-surface));
+        box-shadow: 0 4px 24px rgb(0 0 0 / 0.06);
+        transition: background-color var(--app-transition), border-color var(--app-transition);
     }
 
     .settings-hero__intro h3 {
@@ -392,9 +479,10 @@
     }
 
     .mini-stat {
-        @apply rounded-[1.4rem] px-4 py-4;
+        @apply rounded-xl px-4 py-3.5;
         border: 1px solid rgb(var(--app-line));
-        background: rgb(255 255 255 / 0.74);
+        background-color: rgb(var(--app-surface-overlay));
+        transition: background-color var(--app-transition), border-color var(--app-transition);
     }
 
     .mini-stat span {
@@ -416,9 +504,10 @@
     }
 
     .settings-checklist article {
-        @apply rounded-[1.4rem] px-4 py-4;
+        @apply rounded-xl px-4 py-4;
         border: 1px solid rgb(var(--app-line));
-        background: rgb(246 245 240 / 0.55);
+        background-color: rgb(var(--app-surface-overlay));
+        transition: background-color var(--app-transition), border-color var(--app-transition);
     }
 
     .settings-checklist strong {
@@ -436,10 +525,11 @@
     }
 
     .external-hero {
-        @apply grid gap-4 rounded-[2rem] p-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.85fr)] lg:items-end lg:p-7;
-        border: 1px solid rgb(255 255 255 / 0.9);
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(239, 244, 248, 0.92));
-        box-shadow: 0 20px 45px rgb(36 41 46 / 0.05);
+        @apply grid gap-4 rounded-2xl p-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.85fr)] lg:items-end lg:p-6;
+        border: 1px solid rgb(var(--app-line));
+        background-color: rgb(var(--app-surface));
+        box-shadow: 0 4px 24px rgb(0 0 0 / 0.06);
+        transition: background-color var(--app-transition), border-color var(--app-transition);
     }
 
     .external-hero__intro h3 {
@@ -461,9 +551,10 @@
     }
 
     .provider-switcher__item {
-        @apply rounded-[1.5rem] px-4 py-4 text-left transition;
+        @apply rounded-2xl px-4 py-4 text-left;
         border: 1px solid rgb(var(--app-line));
-        background: rgb(246 245 240 / 0.55);
+        background-color: rgb(var(--app-surface-overlay));
+        transition: background-color var(--app-transition), border-color var(--app-transition), box-shadow var(--app-transition);
     }
 
     .provider-switcher__item span {
@@ -479,7 +570,7 @@
     .provider-switcher__item.is-active {
         border-color: rgb(var(--app-brand));
         background: linear-gradient(135deg, rgb(var(--app-brand-deep)), rgb(var(--app-brand)));
-        box-shadow: 0 18px 35px rgb(6 78 59 / 0.2);
+        box-shadow: 0 8px 24px rgb(var(--app-brand) / 0.3);
     }
 
     .provider-switcher__item.is-active span,
@@ -509,14 +600,16 @@
     }
 
     .form-input {
-        @apply w-full rounded-2xl border bg-white px-4 py-3 text-sm shadow-sm outline-none transition;
+        @apply w-full rounded-2xl border px-4 py-3 text-sm shadow-sm outline-none;
         border-color: rgb(var(--app-line));
+        background-color: rgb(var(--app-surface));
         color: rgb(var(--app-ink));
+        transition: border-color var(--app-transition), background-color var(--app-transition), box-shadow var(--app-transition);
     }
 
     .form-input:focus {
         border-color: rgb(var(--app-brand));
-        box-shadow: 0 0 0 4px rgb(12 112 93 / 0.12);
+        box-shadow: 0 0 0 4px rgb(var(--app-brand) / 0.12);
     }
 
     .form-help {
@@ -542,15 +635,15 @@
     }
 
     .form-inline-note code {
-        @apply rounded-full px-3 py-1 text-xs font-semibold;
-        background: rgb(246 245 240);
+        @apply rounded-lg px-2 py-0.5 text-xs font-semibold;
+        background: rgb(var(--app-surface-overlay));
         color: rgb(var(--app-ink));
     }
 
     .primary-action {
-        @apply inline-flex items-center justify-center rounded-2xl px-5 py-3 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60;
+        @apply inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60;
         background: linear-gradient(135deg, rgb(var(--app-brand-deep)), rgb(var(--app-brand)));
-        box-shadow: 0 20px 35px rgb(12 112 93 / 0.18);
+        box-shadow: 0 4px 16px rgb(var(--app-brand) / 0.35);
     }
 
     .form-alert {
@@ -591,9 +684,10 @@
     }
 
     .result-summary {
-        @apply flex flex-col gap-4 rounded-[1.7rem] p-5 lg:flex-row lg:items-start lg:justify-between;
-        border: 1px solid rgb(167 243 208);
-        background: linear-gradient(135deg, rgb(236 253 245 / 0.92), rgb(255 255 255 / 0.96));
+        @apply flex flex-col gap-4 rounded-2xl p-5 lg:flex-row lg:items-start lg:justify-between;
+        border: 1px solid rgb(var(--app-brand) / 0.3);
+        background-color: rgb(var(--app-surface));
+        transition: background-color var(--app-transition), border-color var(--app-transition);
     }
 
     .result-summary__copy h4 {
@@ -615,9 +709,9 @@
     }
 
     .result-preview__media {
-        @apply overflow-hidden rounded-[1.7rem];
+        @apply overflow-hidden rounded-2xl;
         border: 1px solid rgb(var(--app-line));
-        background: rgb(246 245 240 / 0.6);
+        background-color: rgb(var(--app-surface-overlay));
     }
 
     .result-preview__media img {
@@ -634,9 +728,10 @@
     }
 
     .result-stat-grid article {
-        @apply rounded-[1.3rem] px-4 py-4;
+        @apply rounded-xl px-4 py-4;
         border: 1px solid rgb(var(--app-line));
-        background: rgb(255 255 255 / 0.8);
+        background-color: rgb(var(--app-surface-overlay));
+        transition: background-color var(--app-transition), border-color var(--app-transition);
     }
 
     .result-stat-grid span {
@@ -650,11 +745,10 @@
     }
 
     .parcel-summary {
-        @apply flex flex-col gap-4 rounded-[1.7rem] p-5 lg:flex-row lg:items-start lg:justify-between;
-        border: 1px solid rgb(167 243 208);
-        background:
-            linear-gradient(135deg, rgb(236 253 245 / 0.92), rgb(255 255 255 / 0.96)),
-            radial-gradient(circle at 12% 20%, rgb(16 185 129 / 0.16), transparent 32%);
+        @apply flex flex-col gap-4 rounded-2xl p-5 lg:flex-row lg:items-start lg:justify-between;
+        border: 1px solid rgb(var(--app-brand) / 0.3);
+        background-color: rgb(var(--app-surface));
+        transition: background-color var(--app-transition), border-color var(--app-transition);
     }
 
     .parcel-summary h4 {
@@ -672,9 +766,10 @@
     }
 
     .parcel-data-grid article {
-        @apply rounded-[1.3rem] px-4 py-4;
+        @apply rounded-xl px-4 py-4;
         border: 1px solid rgb(var(--app-line));
-        background: rgb(255 255 255 / 0.82);
+        background-color: rgb(var(--app-surface-overlay));
+        transition: background-color var(--app-transition), border-color var(--app-transition);
     }
 
     .parcel-data-grid span {
