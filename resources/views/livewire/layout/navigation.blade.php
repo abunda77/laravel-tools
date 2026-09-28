@@ -71,6 +71,7 @@ new class extends Component
                         ['label' => 'Proxy Validate', 'route' => 'internet.proxy-validate'],
                         ['label' => 'Whois', 'route' => 'internet.whois'],
                         ['label' => 'Bookmark', 'route' => 'internet.bookmark'],
+                        ['label' => 'World Clock', 'route' => 'internet.world-clock'],
                     ]],
                     ['label' => 'ApiFreaks Tools', 'route' => 'apifreaks-tools', 'icon' => 'api', 'subItems' => [
                         ['label' => 'Overview', 'route' => 'apifreaks-tools'],
