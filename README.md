@@ -52,6 +52,9 @@ Pendekatan utama adalah **config-driven modules**, sehingga menu dan submenu API
 - Wilayah Indonesia API docs: [https://docs.api.co.id/products/indonesia-regional/](https://docs.api.co.id/products/indonesia-regional/)
 - Wilayah Indonesia endpoint base URL: `https://use.api.co.id`
 - Wilayah Indonesia authentication header: `x-api-co-id`
+- Gold API docs: [https://www.goldapi.io](https://www.goldapi.io)
+- Gold API base URL: `https://www.goldapi.io`
+- Gold API authentication header: `x-access-token`
 
 ### Kategori API yang Tersedia
 
@@ -254,7 +257,8 @@ Modules
 |   |-- Overview
 |   |-- Kurs Mata Uang
 |   |-- Proxy Validate
-|   `-- Whois
+|   |-- Whois
+|   `-- Gold Price
 |-- ApiFreaks Tools
 |   |-- Overview
 |   |-- Credit Usage
@@ -323,6 +327,7 @@ Catatan modul Internet:
 - `Kurs Mata Uang`
 - `Proxy Validate`
 - `Whois`
+- `Gold Price`
 
 ---
 
@@ -359,8 +364,11 @@ Catatan modul Image AI:
 
 Menu **Workspace -> ChatBot** menyediakan antarmuka chat AI multi-provider dengan dukungan percakapan berkelanjutan.
 
-- Mendukung provider: `OpenAI`, `Gemini`, `Anthropic`, dan `Perplexity`.
+- Mendukung provider: `OpenAI`, `Gemini`, `Anthropic`, `Perplexity`, dan `OpenRouter`.
 - Setiap provider memiliki daftar model aktif yang dikelola di tabel `llm_models`.
+- Pilihan provider pada form dibangun dinamis dari model yang aktif, sehingga provider tanpa model aktif tidak muncul dan provider tersimpan yang tidak valid otomatis di-reset.
+- API key provider diambil dari `api_keys` (identifier sama dengan nama provider, contoh `openrouter`); jika kosong, baru jatuh ke environment variable.
+- Kegagalan **Web Search** tidak membatalkan request chat — percakapan tetap lanjut tanpa source context dan user mendapat pesan status.
 - Sesi chat disimpan per user dengan title otomatis berdasarkan prompt pertama.
 - Mendukung upload attachment (image: jpg, jpeg, png, webp; document: pdf, txt, md, csv, json, doc, docx) dengan batas 12 MB.
 - Fitur **Web Search** menggabungkan hasil pencarian web dari Perplexity sebagai konteks tambahan sebelum dikirim ke LLM.
@@ -375,12 +383,13 @@ OPENAI_API_KEY=
 GEMINI_API_KEY=
 ANTHROPIC_API_KEY=
 PERPLEXITY_API_KEY=
+OPENROUTER_API_KEY=
 ```
 
 ### Model yang Didukung
 
 Model LLM dikelola di tabel `llm_models` dengan field:
-- `provider`: `openai`, `gemini`, `anthropic`, `perplexity`
+- `provider`: `openai`, `gemini`, `anthropic`, `perplexity`, `openrouter`
 - `name`: nama model (contoh: `gpt-4o`, `claude-sonnet-4-20250514`, `gemini-2.0-flash`)
 - `label`: nama tampilan di UI
 - `is_active`: status aktif/nonaktif
@@ -781,6 +790,22 @@ Menu **Modules -> Internet -> Whois** menyediakan workbench untuk melihat inform
 
 ---
 
+## Fitur Gold Price
+
+Menu **Modules -> Internet -> Gold Price** menampilkan harga komoditi emas (XAU) terbaru beserta tabel pergerakan harga 7 hari terakhir.
+
+- Harga diambil dari goldapi.io dengan API key tersimpan di tabel `api_keys` identifier `goldapi_provider`.
+- Base URL yang dipakai adalah `https://www.goldapi.io`, endpoint `/api/XAU/USD/{YYYYMMDD}`.
+- Semua request memakai header autentikasi `x-access-token`.
+- Harga yang ditampilkan adalah emas 24k per gram (`price_gram_24k`); nilai per troy ounce dikonversi dengan 1 oz = 31,1035 gram.
+- Konversi ke Rupiah memakai kurs `USDIDR` dari `CurrencyExchangeRateService` (identifier `apicoid_provider`), bukan API key terpisah.
+- Ringkasan menampilkan harga per gram (IDR & USD), kurs yang dipakai, waktu pengambilan data, serta perubahan terhadap harga penutupan sebelumnya (`prev_close_price` dan `chp`).
+- Tabel pergerakan memuat kolom Tanggal, Harga/gram 24k (USD), Harga/gram 24k (IDR), Perubahan (IDR), dan Perubahan (%).
+- Tanggal tanpa data (akhir pekan / libur pasar) dilewati, sehingga baris tabel bisa kurang dari 7.
+- Hasil di-cache 1 jam karena 7 hari = 7 request ke goldapi.io (menjaga kuota API free tier).
+
+---
+
 ## Fitur ApiFreaks Tools
 
 Menu **Modules -> ApiFreaks Tools** menyediakan kumpulan workbench untuk endpoint dari provider ApiFreaks.
@@ -935,7 +960,7 @@ Menu **Operations -> Settings -> General Settings** menyediakan konfigurasi glob
 Menu **Operations -> Settings -> LLM Models** menyediakan pengelolaan daftar model LLM per provider yang dipakai oleh ChatBot.
 
 - Mengelola entitas pada tabel `llm_models` (provider, name, label, is_active, sort_order).
-- Provider yang didukung: `openai`, `gemini`, `anthropic`, `perplexity`.
+- Provider yang didukung: `openai`, `gemini`, `anthropic`, `perplexity`, `openrouter`.
 - Hanya model dengan `is_active=true` yang muncul di pilihan model pada UI ChatBot.
 - Mendukung toggle aktif/nonaktif dan pengaturan urutan tampil.
 
@@ -969,7 +994,7 @@ Daftar model LLM per provider yang dikelola lewat `LlmModelManager`.
 | Kolom | Tipe | Keterangan |
 |---|---|---|
 | id | bigint | Primary key |
-| provider | string | `openai`, `gemini`, `anthropic`, `perplexity` |
+| provider | string | `openai`, `gemini`, `anthropic`, `perplexity`, `openrouter` |
 | name | string | Nama model (contoh: `gpt-4o`) |
 | label | string | Nama tampilan di UI |
 | is_active | boolean | Status aktif/nonaktif |
@@ -1073,6 +1098,7 @@ OPENAI_API_KEY=
 GEMINI_API_KEY=
 ANTHROPIC_API_KEY=
 PERPLEXITY_API_KEY=
+OPENROUTER_API_KEY=
 
 # Freepik integration gate (default false)
 FREEPIK_ENABLED=false
@@ -1157,6 +1183,7 @@ Tests memakai PHPUnit (bukan Pest) dengan in-memory SQLite, array cache, dan syn
 - [x] Modul Tools: Wilayah API (API.co.id Indonesia Regional — hierarki provinsi, kabupaten/kota, kecamatan, desa/kelurahan)
 - [x] Modul Internet: Proxy Validate (filter, bulk select, validate, export, progress)
 - [x] Modul Internet: Whois (lookup domain + raw WHOIS record)
+- [x] Modul Internet: Gold Price (goldapi.io XAU/USD per gram 24k + tabel pergerakan 7 hari, konversi kurs USDIDR)
 - [x] Modul ApiFreaks Tools: Credit Usage, Domain WHOIS Lookup/History, Domain Search, Subdomain Lookup, Commodity Symbols, Live/Historical Commodity Prices, IP Geolocation
 - [x] Modul Apify Scraper: GMaps 1.0 (data bisnis Google Maps + export CSV/XLSX/PDF)
 - [x] Modul Image AI: Generation Image (Freepik text-to-image + task polling + history)
@@ -1173,7 +1200,7 @@ Tests memakai PHPUnit (bukan Pest) dengan in-memory SQLite, array cache, dan syn
 ### Phase 4 - Settings & Security
 - [x] Settings management (API key terpusat, timeout, queue mode, LLM model manager)
 - [x] Backup dan restore API key dari file backup
-- [x] AI ChatBot dengan multi-provider (OpenAI, Gemini, Anthropic, Perplexity)
+- [x] AI ChatBot dengan multi-provider (OpenAI, Gemini, Anthropic, Perplexity, OpenRouter)
 - [ ] Role & Permission (spatie/laravel-permission)
 - [ ] Audit log (spatie/laravel-activitylog)
 - [ ] Execution History (logging eksekusi API/script)
@@ -1195,7 +1222,8 @@ Tests memakai PHPUnit (bukan Pest) dengan in-memory SQLite, array cache, dan syn
 - **API Key Freepik / Magnific Provider**: Dipakai hanya jika `FREEPIK_ENABLED=true`. Saat aktif, modul Search -> Freepik Image, Image AI -> Generation Image, Image AI -> Image2Prompt, Image AI -> Improve Prompt, dan Video AI -> Generation Video mengambil key dari `api_keys` dengan identifier `freepik_provider`.
 - **API Key YouTube Data API**: Modul Search -> Youtube Finder dan Search -> Youtube Channel mengambil key dari `api_keys` dengan identifier `youtubeapi_provider` untuk request ke YouTube Data API v3.
 - **API Key Apify**: Modul Apify Scraper -> GMaps 1.0 mengambil key dari `api_keys` dengan identifier `apify_provider` untuk request ke Apify actor API.
-- **API Key ChatBot Providers**: Modul Workspace -> ChatBot menggunakan API key dari environment `OPENAI_API_KEY`, `GEMINI_API_KEY`, `ANTHROPIC_API_KEY`, dan `PERPLEXITY_API_KEY`. API key Perplexity dipakai juga sebagai web search grounding untuk provider lain selain Perplexity itu sendiri.
+- **API Key Gold / GoldAPI**: Modul Internet -> Gold Price mengambil key dari `api_keys` dengan identifier `goldapi_provider` dan mengirimkannya melalui header `x-access-token` ke `https://www.goldapi.io`. Konversi USD ke IDR memakai `CurrencyExchangeRateService` dengan identifier `apicoid_provider`.
+- **API Key ChatBot Providers**: Modul Workspace -> ChatBot menggunakan API key dari environment `OPENAI_API_KEY`, `GEMINI_API_KEY`, `ANTHROPIC_API_KEY`, `PERPLEXITY_API_KEY`, dan `OPENROUTER_API_KEY` — atau dari `api_keys` dengan identifier `openai`/`gemini`/`anthropic`/`perplexity`/`openrouter` (DB diprioritaskan, env sebagai fallback). API key Perplexity dipakai juga sebagai web search grounding untuk provider lain selain Perplexity itu sendiri; kegagalan web search tidak membatalkan request chat.
 - **API Key FreeimageHost**: Modul Image AI -> Image2Prompt menggunakan `FreeimageHostService` yang mengambil key dari `api_keys` dengan identifier `freeimage_host`. Key ini dipakai untuk upload gambar ke Freeimage.host API v1 (`POST /api/1/upload`) guna mendapatkan URL publik sebelum dikirim ke endpoint Image2Prompt.
 - **Attachment ChatBot**: File attachment dari ChatBot disimpan di disk `local` pada direktori `chatbot-attachments`. Akses file dibatasi per sesi chat milik masing-masing user.
 - **Backup API Key**: File backup API key berisi secret asli agar dapat direstore. Simpan file backup di lokasi aman dan jangan commit file dari `storage/app/private/api-key-backups`.

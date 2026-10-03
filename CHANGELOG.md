@@ -24,14 +24,22 @@ dan proyek ini mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Tools: Holiday (menu **Modules -> Tools -> Holiday**) untuk jadwal libur nasional Indonesia menggunakan API.co.id (`apicoid_provider`): daftar libur per tahun, cek tanggal, dan libur mendatang (dihitung dari field `is_upcoming`/`days_until` pada endpoint `/holidays/indonesia` karena endpoint `/holidays/indonesia/upcoming` tidak tersedia di API)
 - Tools: Wilayah API (menu **Modules -> Tools -> Wilayah API**) untuk menelusuri wilayah administrasi Indonesia (provinsi, kabupaten/kota, kecamatan, desa/kelurahan) menggunakan API.co.id (`apicoid_provider`): hierarki bertahap dengan filter nama per level, kode wilayah, kode pos, dan status `is_courier_support`
 - Command: `cleanup:temporary-uploads` untuk membersihkan temporary upload Livewire dan file QR Code kedaluwarsa
+- Internet: **Gold Price** (menu **Modules -> Internet -> Gold Price**) — harga emas (XAU) per gram 24k dalam USD dan IDR beserta tabel pergerakan 7 hari terakhir. Menggunakan `GoldPriceService` (`app/Services/Internet/GoldPriceService.php`) ke goldapi.io (`/api/XAU/USD/{YYYYMMDD}`, header `x-access-token`, key `goldapi_provider`) dengan konversi kurs `USDIDR` dari `CurrencyExchangeRateService` (`apicoid_provider`), plus komponen `app/Livewire/Internet/GoldPrice.php`
+- ChatBot: provider **OpenRouter** (`openrouter`) — ditambahkan di `LlmModelManager`, `LlmCredentialResolver` (key dari `api_keys` name `openrouter`, fallback `OPENROUTER_API_KEY`), dan `ChatResponder` (mapping ke `Lab::OpenRouter`), dengan 2 model awal di `LlmModelSeeder`
 
 ### Changed
+- ChatBot: dropdown provider pada form chat kini dibangun dinamis dari `llm_models` yang `is_active` (bukan daftar hardcoded), validasi `provider` memakai `Rule::in()`, dan `mount()` memvalidasi provider terpilih agar tidak jatuh ke provider yang tidak punya model aktif
 - Bookmark: dokumentasi lengkap di `BOOKMARK.md` (fitur, struktur database, endpoint API `v1`, format response, error handling, contoh integrasi cURL/JS/Dart/Kotlin/PHP)
 - Downloader: workbench `mount()` menerima `selectedProvider` opsional agar halaman ytshorts bisa pre-select provider
 - Downloader: validation rule `selectedProvider` ditambah `ytshorts`; stat provider count dijadikan dinamis
 - Downloader: validation rule `selectedProvider` ditambah `ytmp4`; provider `ytmp4` ditambah ke `DownloaderService::PROVIDERS` (endpoint `/downloader/ytmp4`)
 - Update README — dokumentasi fitur Downloader (Instagram, TikTok, Facebook, YouTube Shorts, YouTube MP4)
+- Update README — dokumentasi fitur Gold Price dan provider ChatBot OpenRouter
 - Update CLAUDE.md
+
+### Fixed
+- ChatBot: kegagalan web search Perplexity tidak lagi membatalkan seluruh request chat — error di-`report()` dan user mendapat pesan status, lalu percakapan lanjut tanpa source context
+- ChatBot: provider aktif yang tersimpan di state tidak lagi menyisakan provider tanpa model (mis. `perplexity` tanpa model aktif) yang membuat pengiriman pesan gagal; provider otomatis di-reset ke provider aktif pertama
 
 ---
 
