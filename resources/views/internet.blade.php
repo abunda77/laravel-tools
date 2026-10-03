@@ -62,6 +62,22 @@
                     Simpan tautan dari internet dengan title, gambar OG, dan deskripsi otomatis — seperti link preview di Facebook/WhatsApp.
                 </p>
             </div>
+
+            <div class="surface-panel surface-panel--compact">
+                <div class="surface-panel__header">
+                    <div>
+                        <p class="section-kicker">Available tools</p>
+                        <h3>Gold Price</h3>
+                    </div>
+                    <a href="{{ route('internet.gold-price') }}" wire:navigate class="primary-action">
+                        Buka tool
+                    </a>
+                </div>
+
+                <p class="surface-panel__text">
+                    Harga emas (XAU) per gram 24k dalam USD dan IDR, lengkap dengan pergerakan harga 7 hari terakhir.
+                </p>
+            </div>
         </div>
     </section>
 </x-app-layout>

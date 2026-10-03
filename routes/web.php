@@ -78,6 +78,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('internet/whois', 'internet.whois')->name('internet.whois');
     Route::view('internet/bookmark', 'internet.bookmark')->name('internet.bookmark');
     Route::view('internet/world-clock', 'internet.world-clock')->name('internet.world-clock');
+    Route::view('internet/gold-price', 'internet.gold-price')->name('internet.gold-price');
     Route::view('apifreaks-tools', 'apifreaks-tools')->name('apifreaks-tools');
     Route::view('apifreaks-tools/credit-usage', 'apifreaks-tools.credit-usage')->name('apifreaks-tools.credit-usage');
     Route::view('apifreaks-tools/domain-whois-lookup', 'apifreaks-tools.domain-whois-lookup')->name('apifreaks-tools.domain-whois-lookup');

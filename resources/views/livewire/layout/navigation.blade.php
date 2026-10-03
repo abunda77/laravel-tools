@@ -72,6 +72,7 @@ new class extends Component
                         ['label' => 'Whois', 'route' => 'internet.whois'],
                         ['label' => 'Bookmark', 'route' => 'internet.bookmark'],
                         ['label' => 'World Clock', 'route' => 'internet.world-clock'],
+                        ['label' => 'Gold Price', 'route' => 'internet.gold-price'],
                     ]],
                     ['label' => 'ApiFreaks Tools', 'route' => 'apifreaks-tools', 'icon' => 'api', 'subItems' => [
                         ['label' => 'Overview', 'route' => 'apifreaks-tools'],
