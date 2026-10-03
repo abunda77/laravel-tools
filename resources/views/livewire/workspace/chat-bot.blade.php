@@ -99,10 +99,11 @@
                 <div class="form-field">
                     <label for="chat_provider" class="form-label">Provider</label>
                     <select id="chat_provider" wire:model.live="provider" class="form-input">
-                        <option value="openai">OpenAI</option>
-                        <option value="gemini">Gemini</option>
-                        <option value="anthropic">Claude</option>
-                        <option value="perplexity">Perplexity</option>
+                        @forelse ($providers as $providerOption)
+                            <option value="{{ $providerOption }}">{{ $providerOption }}</option>
+                        @empty
+                            <option value="">Tidak ada provider aktif</option>
+                        @endforelse
                     </select>
                     @error('provider') <p class="form-error">{{ $message }}</p> @enderror
                 </div>

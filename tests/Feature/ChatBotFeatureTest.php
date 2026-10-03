@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Ai\Agents\ChatBotAgent;
 use App\Livewire\Settings\LlmModelManager;
 use App\Livewire\Workspace\ChatBot;
 use App\Models\ChatSession;
@@ -9,9 +10,12 @@ use App\Models\LlmModel;
 use App\Models\User;
 use App\Services\Ai\ChatResponder;
 use App\Services\Ai\ChatResponse;
+use App\Services\Ai\PerplexityClient;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Ai\AiManager;
 use Livewire\Livewire;
 use Mockery;
+use RuntimeException;
 use Tests\TestCase;
 
 class ChatBotFeatureTest extends TestCase
@@ -128,12 +132,60 @@ class ChatBotFeatureTest extends TestCase
         ]);
     }
 
-    private function createModel(): LlmModel
+    public function test_send_still_works_when_web_search_fails(): void
+    {
+        $user = User::factory()->create();
+        $model = $this->createModel();
+
+        $this->app->make(AiManager::class)
+            ->fakeAgent(ChatBotAgent::class, ['Jawaban tanpa source.']);
+
+        $perplexity = Mockery::mock(PerplexityClient::class);
+        $perplexity->shouldReceive('search')
+            ->once()
+            ->andThrow(new RuntimeException('Perplexity API Error: You exceeded your current quota.'));
+
+        $this->app->instance(PerplexityClient::class, $perplexity);
+
+        Livewire::actingAs($user)
+            ->test(ChatBot::class)
+            ->set('provider', 'openai')
+            ->set('modelId', $model->id)
+            ->set('prompt', 'Apa itu Laravel?')
+            ->call('send')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('chat_messages', [
+            'role' => 'assistant',
+            'content' => 'Jawaban tanpa source.',
+        ]);
+
+        $this->assertDatabaseCount('chat_citations', 0);
+    }
+
+    public function test_openrouter_provider_appears_in_chatbot(): void
+    {
+        $user = User::factory()->create();
+        $model = $this->createModel(provider: 'openrouter', name: 'openai/gpt-4o', label: 'OpenRouter GPT-4o');
+
+        $this->actingAs($user)
+            ->get(route('workspace.chatbot'))
+            ->assertSeeLivewire(ChatBot::class)
+            ->assertSee('openrouter');
+
+        Livewire::actingAs($user)
+            ->test(ChatBot::class)
+            ->set('provider', 'openrouter')
+            ->assertSet('provider', 'openrouter')
+            ->assertSet('modelId', $model->id);
+    }
+
+    private function createModel(string $provider = 'openai', string $name = 'gpt-4.1', string $label = 'GPT 4.1'): LlmModel
     {
         return LlmModel::query()->create([
-            'provider' => 'openai',
-            'name' => 'gpt-4.1',
-            'label' => 'GPT 4.1',
+            'provider' => $provider,
+            'name' => $name,
+            'label' => $label,
             'supports_documents' => true,
             'supports_images' => true,
             'supports_web_search' => true,

@@ -15,6 +15,7 @@ use Laravel\Ai\Enums\Lab;
 use Laravel\Ai\Files;
 use Laravel\Ai\Messages\Message;
 use RuntimeException;
+use Throwable;
 
 class ChatResponder
 {
@@ -42,7 +43,13 @@ class ChatResponder
         $sourceContext = [];
 
         if ($webSearch) {
-            $sourceContext = $this->perplexity->search($userMessage->content);
+            try {
+                $sourceContext = $this->perplexity->search($userMessage->content);
+            } catch (Throwable $exception) {
+                report($exception);
+
+                session()->flash('chatbot_status', 'Web search gagal ('.$exception->getMessage().'). Melanjutkan tanpa source context.');
+            }
         }
 
         $response = (new ChatBotAgent($this->conversationMessages($session, beforeMessageId: $userMessage->id)))
@@ -210,6 +217,7 @@ PROMPT;
             'openai' => Lab::OpenAI,
             'gemini' => Lab::Gemini,
             'anthropic' => Lab::Anthropic,
+            'openrouter' => Lab::OpenRouter,
             default => throw new RuntimeException('Provider tidak didukung: '.$provider.'.'),
         };
     }

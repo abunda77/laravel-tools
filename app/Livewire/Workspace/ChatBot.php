@@ -10,6 +10,7 @@ use App\Services\Ai\ChatResponder;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Throwable;
@@ -33,12 +34,36 @@ class ChatBot extends Component
 
     public function mount(): void
     {
+        $this->ensureValidProvider();
+
         $this->modelId = LlmModel::query()
             ->active()
             ->where('provider', $this->provider)
             ->orderBy('sort_order')
             ->orderBy('label')
             ->value('id');
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function providers(): array
+    {
+        return LlmModel::query()
+            ->active()
+            ->distinct()
+            ->orderBy('provider')
+            ->pluck('provider')
+            ->all();
+    }
+
+    private function ensureValidProvider(): void
+    {
+        if (in_array($this->provider, $this->providers(), true)) {
+            return;
+        }
+
+        $this->provider = $this->providers()[0] ?? 'openai';
     }
 
     public function updatedProvider(): void
@@ -89,7 +114,7 @@ class ChatBot extends Component
     public function send(ChatResponder $responder): void
     {
         $validated = $this->validate([
-            'provider' => ['required', 'string', 'in:openai,gemini,anthropic,perplexity'],
+            'provider' => ['required', 'string', Rule::in($this->providers())],
             'modelId' => ['required', 'integer', 'exists:llm_models,id'],
             'prompt' => ['required', 'string', 'max:12000'],
             'webSearch' => ['boolean'],
@@ -170,6 +195,7 @@ class ChatBot extends Component
     public function render(): View
     {
         return view('livewire.workspace.chat-bot', [
+            'providers' => $this->providers(),
             'sessions' => $this->ownedSessions()->latest('updated_at')->get(),
             'messages' => $this->activeSessionId
                 ? $this->ownedSessions()

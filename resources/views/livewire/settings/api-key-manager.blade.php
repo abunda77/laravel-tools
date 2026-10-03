@@ -298,6 +298,10 @@
                         <strong>Gemini Service</strong>
                         <p>Gunakan <code>name: gemini</code></p>
                     </article>
+                    <article>
+                        <strong>OpenRouter</strong>
+                        <p>Gunakan <code>name: openrouter</code></p>
+                    </article>
                     @if (config('services.freepik.enabled'))
                         <article>
                             <strong>Freepik Generation Service</strong>

@@ -15,6 +15,7 @@ class LlmCredentialResolver
         'gemini' => 'gemini',
         'anthropic' => 'anthropic',
         'perplexity' => 'perplexity',
+        'openrouter' => 'openrouter',
     ];
 
     public function requireKey(string $provider): string
@@ -47,13 +48,14 @@ class LlmCredentialResolver
             'gemini' => config('ai.providers.gemini.key'),
             'anthropic' => config('ai.providers.anthropic.key'),
             'perplexity' => config('services.perplexity.key'),
+            'openrouter' => config('ai.providers.openrouter.key'),
             default => null,
         };
     }
 
     public function configureLaravelAiProvider(string $provider): void
     {
-        if (! in_array($provider, ['openai', 'gemini', 'anthropic'], true)) {
+        if (! in_array($provider, ['openai', 'gemini', 'anthropic', 'openrouter'], true)) {
             return;
         }
 

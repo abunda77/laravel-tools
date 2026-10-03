@@ -21,6 +21,8 @@ class LlmModelSeeder extends Seeder
             ['provider' => 'anthropic', 'name' => 'claude-haiku-4-5-20251001', 'label' => 'Claude Haiku 4.5', 'supports_documents' => true, 'supports_images' => true, 'sort_order' => 20],
             ['provider' => 'perplexity', 'name' => 'sonar-pro', 'label' => 'Sonar Pro', 'supports_documents' => false, 'supports_images' => false, 'sort_order' => 10],
             ['provider' => 'perplexity', 'name' => 'sonar', 'label' => 'Sonar', 'supports_documents' => false, 'supports_images' => false, 'sort_order' => 20],
+            ['provider' => 'openrouter', 'name' => 'openai/gpt-4o', 'label' => 'OpenRouter GPT-4o', 'supports_documents' => true, 'supports_images' => true, 'sort_order' => 10],
+            ['provider' => 'openrouter', 'name' => 'anthropic/claude-sonnet-4.5', 'label' => 'OpenRouter Claude Sonnet 4.5', 'supports_documents' => true, 'supports_images' => true, 'sort_order' => 20],
         ];
 
         foreach ($models as $model) {

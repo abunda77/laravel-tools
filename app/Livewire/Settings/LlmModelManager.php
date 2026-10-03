@@ -34,7 +34,7 @@ class LlmModelManager extends Component
      */
     public function providers(): array
     {
-        return ['openai', 'gemini', 'anthropic', 'perplexity'];
+        return ['openai', 'gemini', 'anthropic', 'perplexity', 'openrouter'];
     }
 
     public function openAdd(): void
