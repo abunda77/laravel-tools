@@ -106,6 +106,40 @@
                     </article>
                 </div>
 
+                @php
+                    $maxPrice = max(array_column($rows, 'priceGramIdr'));
+                @endphp
+
+                <div class="overflow-hidden rounded-[1.75rem] border border-[rgb(var(--app-line))] bg-white/80 px-6 py-6">
+                    <h4 class="mb-6 text-sm font-semibold uppercase tracking-[0.22em] text-[rgb(var(--app-muted))]">Grafik Pergerakan Harga 7 Hari</h4>
+                    <div class="overflow-x-auto">
+                        <div class="flex items-end justify-around gap-2 min-w-[500px]" style="height: 220px;">
+                            @foreach (array_reverse($rows) as $row)
+                                @php
+                                    $height = $maxPrice > 0 ? ($row['priceGramIdr'] / $maxPrice) * 100 : 0;
+                                    $bgColor = $row['isUp'] ? 'bg-emerald-500' : 'bg-rose-500';
+                                @endphp
+                                <div class="flex flex-col items-center flex-1 group">
+                                    <div class="relative w-full">
+                                        <div 
+                                            class="{{ $bgColor }} rounded-t-lg transition-all hover:opacity-80 cursor-pointer w-full"
+                                            style="height: {{ $height }}%;"
+                                            title="{{ \Illuminate\Support\Carbon::parse($row['date'])->format('d M Y') }}: {{ $formatIdr($row['priceGramIdr']) }}"
+                                        >
+                                        </div>
+                                        <div class="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap pointer-events-none">
+                                            {{ $formatIdr($row['priceGramIdr']) }}
+                                        </div>
+                                    </div>
+                                    <div class="mt-2 text-xs text-center text-[rgb(var(--app-muted))]">
+                                        {{ \Illuminate\Support\Carbon::parse($row['date'])->format('d M') }}
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
                 <div class="overflow-hidden rounded-[1.75rem] border border-[rgb(var(--app-line))] bg-white/80">
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-[rgb(var(--app-line))] text-sm">
