@@ -19,7 +19,7 @@ class AuthenticationTest extends TestCase
             ->assertOk()
             ->assertSeeVolt('pages.auth.login')
             ->assertSee('Masuk ke dashboard operasional.')
-            ->assertSee('Secure workspace');
+            ->assertSee('Panel internal');
     }
 
     public function test_users_can_authenticate_using_the_login_screen(): void

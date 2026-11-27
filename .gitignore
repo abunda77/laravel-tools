@@ -36,3 +36,4 @@ docs/
 .mcp.json
 /.kilo
 /.codegraph
+/storage/laritor-timeout.txt

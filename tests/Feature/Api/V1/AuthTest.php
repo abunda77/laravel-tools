@@ -4,6 +4,7 @@ namespace Tests\Feature\Api\V1;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class AuthTest extends TestCase
@@ -174,5 +175,76 @@ class AuthTest extends TestCase
         $response = $this->getJson(route('api.auth.me'));
 
         $response->assertStatus(401);
+    }
+
+    public function test_login_is_throttled_per_email_even_when_the_ip_is_spoofed(): void
+    {
+        User::factory()->create([
+            'email' => 'test@example.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        foreach (range(1, 10) as $attempt) {
+            $this->withHeader('X-Forwarded-For', '203.0.113.'.$attempt)
+                ->postJson(route('api.auth.login'), [
+                    'email' => 'test@example.com',
+                    'password' => 'salah-'.$attempt,
+                ])
+                ->assertStatus(422)
+                ->assertJsonValidationErrors(['email']);
+        }
+
+        $response = $this->withHeader('X-Forwarded-For', '198.51.100.77')
+            ->postJson(route('api.auth.login'), [
+                'email' => 'test@example.com',
+                'password' => 'password123',
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['email']);
+
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+    }
+
+    public function test_login_response_contains_token_expiry(): void
+    {
+        User::factory()->create([
+            'email' => 'test@example.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $response = $this->postJson(route('api.auth.login'), [
+            'email' => 'test@example.com',
+            'password' => 'password123',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonStructure(['data' => ['token', 'token_type', 'expires_at']]);
+
+        $expirationMinutes = (int) config('sanctum.expiration');
+
+        $this->assertGreaterThan(0, $expirationMinutes, 'Masa berlaku token harus dibatasi.');
+
+        $expiresAt = Carbon::parse($response->json('data.expires_at'));
+
+        $this->assertTrue(
+            $expiresAt->between(
+                now()->addMinutes($expirationMinutes)->subMinute(),
+                now()->addMinutes($expirationMinutes)->addMinute(),
+            ),
+            'expires_at harus sesuai SANCTUM_TOKEN_EXPIRATION.',
+        );
+    }
+
+    public function test_expired_token_is_rejected(): void
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('test-device')->plainTextToken;
+
+        $this->travel((int) config('sanctum.expiration') + 1)->minutes();
+
+        $this->withHeader('Authorization', 'Bearer '.$token)
+            ->getJson(route('api.auth.me'))
+            ->assertStatus(401);
     }
 }
